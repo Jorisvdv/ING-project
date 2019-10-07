@@ -2,7 +2,7 @@
 tags: [literature]
 title: 'Literature research: Machine Metrics'
 created: '2019-10-01T16:19:19.201Z'
-modified: '2019-10-04T10:09:00.146Z'
+modified: '2019-10-07T08:14:40.466Z'
 ---
 
 # Literature research: Machine Metrics
@@ -29,6 +29,13 @@ Kotorba tries to measure digitalization in various industries through a set of s
   - origination IP for security tracking purposes.
 
 ### Pandis, I., Johnson, R., Hardavellas, N., & Ailamaki, A. (2010). Data-oriented transaction execution. _Proceedings of the VLDB Endowment_, _3_(1-2), 928-939.
+This paper is focused on stressing systems with a high workload using different benchmarking systems. These benchmarks can be identified with TPC-[A-C]. These benchmarks are a way to measure the stress levels on transactional systems. In the paper, they state they have developed their own prototype, DORA, to experiment with some multithreaded parallel system. This system does not look to be very useful related to our research.
+
+They do, however, mention a benchmark, TCP-B, which seems to be something that we can use. In section 5.1 under **workloads** they mention the following:
+> TPC-B models  a  bank  where  customers  deposit  and  withdraw  from their accounts.
+
+The website of the TPC organization defines the benchmark as follows:
+> TPC Benchmark B is designed to be a stress test on the core portion of a database system. It focuses in on the portion of a system which performs the actual transaction processing, much like a magnifying glass.
 
 
 ## Potentially valuable
