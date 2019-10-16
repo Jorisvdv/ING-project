@@ -12,8 +12,8 @@ from collections import deque
 # configuration vars
 RANDOM_SEED = 64
 S_SERVER = 100
-N_FRACTION = 1 # miliseconds
-N_SIMULATION = 60 # seconds
+N_FRACTION = 60 # seconds
+N_SIMULATION = 60 * 60 # seconds
 T_SIMULATION = N_SIMULATION / N_FRACTION
 
 # set the random seed
@@ -23,7 +23,7 @@ random.seed(RANDOM_SEED)
 monitored = []
 
 # distribution of user transactions
-dist = stats.poisson.rvs(mu=20, size=int(T_SIMULATION), random_state=RANDOM_SEED)
+dist = stats.poisson.rvs(mu=40, size=int(T_SIMULATION), random_state=RANDOM_SEED)
 
 def server_monitor(resource, pre=None, post=None):
     """
@@ -101,7 +101,6 @@ def source(env, server):
         yield env.timeout(N_FRACTION)
 
 # we need a new environment
-# env = simpy.RealtimeEnvironment(factor=N_FRACTION, strict=True)
 env = simpy.Environment()
 
 # we need a new server
