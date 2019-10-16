@@ -52,6 +52,7 @@ class TransactionGeneratorTestCase(unittest.TestCase):
 
         # should be the lenght of a week in days
         self.assertEqual(len(weekly), 7)
+        
 # run test as main
 if __name__ == "__main__":
     unittest.main()
