@@ -3,15 +3,13 @@
 # dependencies
 import unittest
 import simpy
+import simpy.rt
 import random
 import time
 import datetime
 
 # set random seed to keep consistency
 random.seed(64)
-
-# initial system startup time
-startup_time = time.time()
 
 class SimpleTransaction(object):
     """
@@ -45,7 +43,7 @@ class SimpleTransaction(object):
         msg: string
             Description of the process to log.
         """
-        print(msg, self._id, datetime.datetime.fromtimestamp(startup_time + self.env.now), sep=" | ")
+        print(msg, self._id, datetime.datetime.fromtimestamp(time.time()), sep=",")
 
     def request(self):
         """
@@ -92,7 +90,7 @@ class SimpleTransactionTestCase(unittest.TestCase):
     def test_transaction(self):
         
         # we need a new environment
-        env = simpy.Environment()
+        env = simpy.rt.RealtimeEnvironment(factor=1.0, strict=True)
 
         # we need servers to process the transaction
         servers = simpy.Resource(env, capacity=3)
@@ -104,7 +102,7 @@ class SimpleTransactionTestCase(unittest.TestCase):
             transaction = SimpleTransaction(env, servers, n)
 
         # run the simulation
-        env.run()
+        env.run(until=10)
 
 # run test as main
 if __name__ == "__main__":
