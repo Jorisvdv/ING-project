@@ -10,11 +10,14 @@ import scipy.stats as stats
 from collections import deque
 
 # configuration vars
-RANDOM_SEED = 64
+RANDOM_SEED = 42
 S_SERVER = 100
 N_FRACTION = 60 # seconds
 N_SIMULATION = 60 * 60 # seconds
 T_SIMULATION = N_SIMULATION / N_FRACTION
+
+t = 60 # minutes
+rate = 1000 * t # 1000 per minute
 
 # set the random seed
 random.seed(RANDOM_SEED)
@@ -23,7 +26,19 @@ random.seed(RANDOM_SEED)
 monitored = []
 
 # distribution of user transactions
-dist = stats.poisson.rvs(mu=40, size=int(T_SIMULATION), random_state=RANDOM_SEED)
+plt.subplot(211)
+dist = stats.poisson.rvs(mu=rate, size=t, random_state=RANDOM_SEED)
+plt.plot(range(60), dist)
+plt.xlabel('transactions per minute')
+
+plt.subplot(212)
+dist = stats.poisson.rvs(mu=rate*24, size=24, random_state=RANDOM_SEED)
+plt.plot(range(len(dist)), dist)
+plt.xlabel('transactions per hour')
+
+plt.tight_layout()
+plt.show()
+exit()
 
 def server_monitor(resource, pre=None, post=None):
     """
