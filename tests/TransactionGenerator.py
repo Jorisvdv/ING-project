@@ -9,7 +9,7 @@ a sample distribution of transactions according to a timespan.
 
 # dependencies
 import unittest
-from src import TransactionGenerator
+from src.TransactionGenerator import TransactionGenerator
 
 class TransactionGeneratorTestCase(unittest.TestCase):
 
@@ -52,7 +52,7 @@ class TransactionGeneratorTestCase(unittest.TestCase):
 
         # should be the lenght of a week in days
         self.assertEqual(len(weekly), 7)
-        
+
 # run test as main
 if __name__ == "__main__":
     unittest.main()
