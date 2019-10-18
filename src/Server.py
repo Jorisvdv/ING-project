@@ -39,19 +39,9 @@ def server_monitor(resource, pre=None, post=None):
     if hasattr(resource, 'request'):
         setattr(resource, 'request', get_wrapper(getattr(resource, 'request')))
 
-def monitor(data, resource):
-    """Function to monitor a server."""
-    print("server process request - {}".format(resource._env.now))
-
-    # we need to add the metrics to a data container
-    data.append((
-        resource._env.now,
-        resource.count
-    ))
-
 class Server(Resource):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, env, capacity=100):
         """
         Constructor.
 
@@ -60,13 +50,20 @@ class Server(Resource):
         See simpy.Resource
         """
         # call the parent constructor
-        super().__init__(*args, **kwargs)
+        super().__init__(self, env, capacity=capacity)
 
         # init empty metrics container
         self.metrics = []
 
-        # bind monitor method to data
-        monitor = partial(monitor, self.metrics)
+        def monitor():
+            """Function to monitor a server."""
+            print("server process request - {}".format(self._env.now))
+
+            # we need to add the metrics to a data container
+            self.metrics.append((
+                self._env.now,
+                self.count
+            ))
 
         # install a server monitor
         server_monitor(self, pre=monitor)
