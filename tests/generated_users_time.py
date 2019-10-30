@@ -8,6 +8,8 @@ from functools import partial, wraps
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 from collections import deque
+import logging
+logging.basicConfig(filename="example.log", level=logging.DEBUG)
 
 # configuration vars
 RANDOM_SEED = 42
@@ -26,19 +28,9 @@ random.seed(RANDOM_SEED)
 monitored = []
 
 # distribution of user transactions
-plt.subplot(211)
 dist = stats.poisson.rvs(mu=rate, size=t, random_state=RANDOM_SEED)
-plt.plot(range(60), dist)
-plt.xlabel('transactions per minute')
 
-plt.subplot(212)
 dist = stats.poisson.rvs(mu=rate*24, size=24, random_state=RANDOM_SEED)
-plt.plot(range(len(dist)), dist)
-plt.xlabel('transactions per hour')
-
-plt.tight_layout()
-plt.show()
-exit()
 
 def server_monitor(resource, pre=None, post=None):
     """
@@ -78,7 +70,7 @@ def monitor(data, resource):
 
 def request(env, server, user, transaction):
     """Function as process of a request of a transaction."""        
-    print("requesting a transaction for user {} at {}".format(user, env.now))
+    logging.info("requesting a transaction for user {} at {}".format(user, env.now))
 
     # we need to ask the server to process our request
     with server.request() as req:
@@ -88,14 +80,15 @@ def request(env, server, user, transaction):
 
         # tell others about the process of the request
         yield process(env, user, transaction)
-        print("processed transaction for user {} at {}".format(user, env.now))
+        logging.info("processed transaction for user {} at {}".format(user, env.now))
 
 def process(env, user, transaction):
     """Function as process of processing a request of a transaction.""" 
-    print("processing a transaction for user {} at {}".format(user, env.now))
+    logging.info("processing a transaction for user {} at {}".format(user, env.now))
 
     # larger transactions take more time to process
     if transaction > 100:
+        logging.warning('large transaction')
         return env.timeout(3)
 
     # regular transactions take little time to process
@@ -132,11 +125,3 @@ env.process(source(env, server))
 
 # run the simulation
 env.run(until=N_SIMULATION)
-
-# output monitored server data
-x = [t for (t, n) in monitored]
-y = [n for (t, n) in monitored]
-plt.plot(x, y)
-plt.xlabel('simulation time passed')
-plt.ylabel('active transaction requests')
-plt.show()

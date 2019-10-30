@@ -9,6 +9,7 @@ more than a resource with some additional patches.
 # dependencies
 from simpy import Resource
 from functools import partial, wraps
+import logging
 
 def server_monitor(resource, pre=None, post=None):
     """
@@ -41,27 +42,43 @@ def server_monitor(resource, pre=None, post=None):
 
 class Server(Resource):
 
-    def __init__(self, env, capacity=100):
+    def __init__(self, uuid, env, capacity=100):
         """
         Constructor.
 
         Parameters
         ----------
+        uuid: string
+            UUID as identifier for this server.
+        +
         See simpy.Resource
         """
         # call the parent constructor
         super().__init__(self, env, capacity=capacity)
+
+        # setup the name of this server
+        self._name = "server#%s" % uuid
+
+        # we need a logger instance
+        logger = logging.getLogger(self._name)
+        file_handler = logging.FileHandler(self._name)
+        
+        # we need to add the file handler to the logger, so
+        # all logs are forwarded, and written to the
+        # specified file
+        logger.addHandler(file_handler)
 
         # init empty metrics container
         self.metrics = []
 
         def monitor():
             """Function to monitor a server."""
-            print("server process request - {}".format(self._env.now))
+            logger.info("TIME: {}::QUEUE: {}::ACTIVE: {}".format(self._env.now, len(self.queue), self.count)
 
             # we need to add the metrics to a data container
             self.metrics.append((
                 self._env.now,
+                len(self.queue),
                 self.count
             ))
 
