@@ -55,3 +55,26 @@ This last paragraph is intriguing since we want to model a banking system where 
 - What are the main risk drivers in SFO for operational risk events?
 - What are the causal relations between risk drivers and risk events? 
 - What are the key performance indicators (KPIs) for the SFO domain?
+
+The paper developed a network structure for the modelling of operational risk based on a functioning SFO unit within a major Australian bank.
+The dominant perspective used in developing this model structure is that of human error and its role in contributing to operational losses. Within the unit under investigation, human action plays a dominant role in the transaction processes, which makes it logical to emphasize human error.
+
+The model is designed to generate probabilities of operational loss events by consideration of interaction between the working environment, transaction processes and their effect on the generation of human errors. A valuable feature of the model is its modularity, which provides the opportunity to add other types of operational loss events as necessary.
+
+
+### Babulak, E., & Wang, M. (2008 ). Discrete Event Simulation _International Journal of Online Engineering (iJOE) _, _4_ (60)
+
+Discrete-event simulation represents modeling, simulating, and analyzing systems utilizing
+the computational and mathematical techniques, while creating a model construct of a
+conceptual framework that describes a system. The system is father simulates by performing
+experiment(s) using computer implementation of the model and analyzed to draw
+conclusions from output that assist in decision making process. Discrete event simulation
+technologies have been extensively used by industry and academia to deal with various
+industrial problems. By late 1990s, the discrete event simulation was in doldrums as global
+manufacturing industries went through radical changes. The simulation software industry
+also went through consolidation. The changes have created new problems, challenges and
+opportunities to the discrete event simulation. This chapter reviews the discrete event
+simulation technologies; discusses challenges and opportunities presented by both global
+manufacturing and the knowledge economy. The authors believe that discrete event
+simulation remains one of the most effective decision support tools but much need to be
+done in order to address new challenges. To this end,
