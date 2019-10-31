@@ -54,46 +54,58 @@ class Server(Resource):
         See simpy.Resource
         """
         # call the parent constructor
-        super().__init__(self, env, capacity=capacity)
+        super().__init__(env, capacity=capacity)
 
         # setup the name of this server
         self._name = "server#%s" % uuid
 
         # we need a logger instance
-        logger = logging.getLogger(self._name)
-        file_handler = logging.FileHandler(self._name)
+        self._logger = logging.getLogger(self._name)
+        file_handler = logging.FileHandler(self._name + '.log')
         
         # we need to add the file handler to the logger, so
         # all logs are forwarded, and written to the
         # specified file
-        logger.addHandler(file_handler)
+        self._logger.addHandler(file_handler)
 
-        # init empty metrics container
-        self.metrics = []
+        # initialize an empty state
+        self._state = {'time': 0, 'queue': 0, 'users': 0}
 
-        def monitor():
+        def monitor(self):
             """Function to monitor a server."""
-            logger.info("TIME: {}::QUEUE: {}::ACTIVE: {}".format(self._env.now, len(self.queue), self.count)
-
-            # we need to add the metrics to a data container
-            self.metrics.append((
-                self._env.now,
-                len(self.queue),
-                self.count
-            ))
+            self._state = {
+                'time':  self._env.now,
+                'queue': len(self.queue),
+                'users': self.count
+            }
 
         # install a server monitor
-        server_monitor(self, pre=monitor)
+        server_monitor(self, post=monitor)
 
-    def metrics(self):
+    def log(self, msg):
         """
-        Method to expose metrics of the current state of a server.
+        Method to log a message on this server.
+
+        Parameters
+        ----------
+        msg: string
+            Message to log.
 
         Returns
         -------
-        list
+        self
         """
-        return self.metrics
+        self._logger.debug(msg)
+
+    def state(self):
+        """
+        Method to expose the current state of a server.
+
+        Returns
+        -------
+        dict
+        """
+        return self._state
 
     def latency(self):
         """

@@ -4,6 +4,8 @@
 import simpy
 from src.TransactionGenerator import TransactionGenerator
 from src.Server import Server
+from uuid import uuid4
+import logging
 
 # we need a new generator
 gen = TransactionGenerator()
@@ -13,7 +15,7 @@ data = gen.hourly()
 
 def request(env, server, user):
     """Function as process of a request of a transaction."""        
-    print("requesting transaction - {} - {}".format(user, env.now))
+    #print("requesting transaction - {} - {}".format(user, env.now))
 
     # we need to ask the server to process our request
     with server.request() as req:
@@ -23,7 +25,6 @@ def request(env, server, user):
 
         # it takes time to process
         yield env.timeout(server.latency())
-        print("processed transaction - {} - {}".format(user, env.now))
 
 def source(env, server):
     """Function as process of generating new transaction requests from users."""
@@ -35,14 +36,26 @@ def source(env, server):
         for k in range(t):
             env.process(request(env, server, k))
 
+        # we need to prepare a timeout, which will indicate when the next
+        # batch of transactions are coming in
+        timeout = 1 / gen.MINUTE
+
+        # log the current state of the server to the server log
+        server_state = server.state()
+        server_state['upcoming'] = env.now 
+        server.log(server_state)
+
         # we need to wait for the next users to request transactions
-        yield env.timeout(1 / gen.MINUTE)
+        yield env.timeout(timeout)
+
+# set the logging environment
+logging.basicConfig(level=logging.DEBUG)
 
 # we need a new environment
 env = simpy.Environment()
 
 # we need a new server
-server = Server(env, capacity=100)
+server = Server(uuid4(), env, capacity=50000)
 
 # start generating users
 env.process(source(env, server))
