@@ -62,19 +62,36 @@ The dominant perspective used in developing this model structure is that of huma
 The model is designed to generate probabilities of operational loss events by consideration of interaction between the working environment, transaction processes and their effect on the generation of human errors. A valuable feature of the model is its modularity, which provides the opportunity to add other types of operational loss events as necessary.
 
 
-### Babulak, E., & Wang, M. (2008 ). Discrete Event Simulation _International Journal of Online Engineering (iJOE) _, _4_ (60)
+### Babulak, E., & Wang, M. (2008 ). Discrete Event Simulation _International Journal of Online Engineering (iJOE)_. _4_ (60)
 
-Discrete-event simulation represents modeling, simulating, and analyzing systems utilizing
-the computational and mathematical techniques, while creating a model construct of a
-conceptual framework that describes a system. The system is father simulates by performing
-experiment(s) using computer implementation of the model and analyzed to draw
-conclusions from output that assist in decision making process. Discrete event simulation
-technologies have been extensively used by industry and academia to deal with various
-industrial problems. By late 1990s, the discrete event simulation was in doldrums as global
-manufacturing industries went through radical changes. The simulation software industry
-also went through consolidation. The changes have created new problems, challenges and
-opportunities to the discrete event simulation. This chapter reviews the discrete event
-simulation technologies; discusses challenges and opportunities presented by both global
-manufacturing and the knowledge economy. The authors believe that discrete event
-simulation remains one of the most effective decision support tools but much need to be
-done in order to address new challenges. To this end,
+Managers have started to use discrete event simulation for the service industries. In particular for banking and finance services. Some examples are:
+
+- call center modeling & simulation
+- bank branch modeling & simulation
+- simulation of vehicle routing (cash carriage services) and number of cash carriage services per routing
+- simulation study of cash management of ATM such as minimum re-order point, optimum budget and so on.
+
+#### Modeling of service operations
+
+*1)* Process flow: A manufacturing process is always associated with physical flows of
+materials/components and therefore can be easily identified. It may not be the case for
+many service applications where business activities are information-based and triggered by
+an external or internal event such as a written or oral request. The current solution is to use
+a business process mapping tool to capture the business process and then convert the
+process model to the discrete event simulation model [KBSI, Lanner].
+*2)* Process related data such as processing time: In a manufacturing company, industrial
+engineers are responsible for time study, setting processing time and balancing flow. Most
+of service companies do not hire industrial engineers or have equivalent position within
+organizations. As a result, much of the process related data are not readily available.
+*3)* Knowledge workers: In many service companies, employees work primarily with
+information or develop and use knowledge. They are knowledge workers, a term coined by
+Peter Drucker. A knowledge worker tends to be self-motivated, work interactively and
+make decisions constantly. How to represent knowledge workers and human-decision
+making process in discrete event simulation remains a subject under study [10].
+In the postindustrial economy, the service sector makes up more than half of the American
+economy. Since mid 1990s, the sector has generated almost all of the US economy increases
+in employment. Knowledge workers are now estimated to outnumber all other workers in
+North America by at least a four to one margin [11]. Thus, there is a great potential for
+discrete event simulation technologies in service sector. However, new approach and
+techniques are required to model and simulate knowledge workers and their decisionmaking
+processes.
