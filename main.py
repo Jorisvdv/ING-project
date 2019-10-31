@@ -3,6 +3,7 @@ from os import path
 
 # dependencies
 from src.Simulation import Simulation
+from src.Logger import Logger
 import src.settings as settings
 
 def main():
@@ -18,8 +19,16 @@ def main():
     # exists, as the logger does not create one. all server logs will be outputted there
     log_dir = path.join(__file__, 'logs')
 
-    # let the simulation use the log directory as output
-    simulation.use(log_dir)
+    # now that we have an output dir, we can construct our logger which we can use for
+    # the simulation
+    logger = Logger(log_dir)
+
+    # we can use the logger for the simulation, so we know where all logs will be written
+    simulation.use(logger)
+
+    # specify a generator as callback that will be used as the main process in a simulation
+    # this callback will receive an environment, and server instance
+    simulation.process(myprocess)
 
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
