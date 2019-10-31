@@ -10,7 +10,7 @@ modified: '2019-10-07T10:34:06.168Z'
 **Date**: September 30th, 2019
 
 ## About
-This document contains a series of summaries of papers. The subject of these papers ~~should be~~ is related to machine metrics. The summaries should present new insights into machine metrics, improving its understanding.
+This document contains a series of summaries of papers. The subject of these papers is related to machine metrics. The summaries should present new insights into machine metrics, improving its understanding.
 
 ## Papers
 This section contains a series of potentially valuable papers and a series of valuable papers, where each paper is summarized.
