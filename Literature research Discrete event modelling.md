@@ -11,7 +11,7 @@ This document contains a series of summaries of papers. The subject of these pap
 
 ### Sanford, A. D. & Moosa, I. A. (2012). A Bayesian network structure for operational risk modelling in structured finance operations. _The Journal of the Operational Research Society_, _63_ (4), pp.431-444
 
-**This paper seems very useful for the study that we are trying to perform.**
+#### This paper seems very useful for the study that we are trying to perform.
 
 This paper is concerned with the design of a Bayesian network structure that is suitable for operational risk modelling.  
 
@@ -46,3 +46,12 @@ This last paragraph is intriguing since we want to model a banking system where 
         - Elication review
         - sensitivity analysis
         - case evaluation
+
+
+#### Structural development
+
+- What operational risk queries should the model be able to answer?
+- What operational risk categories and events should be included in the model?
+- What are the main risk drivers in SFO for operational risk events?
+- What are the causal relations between risk drivers and risk events? 
+- What are the key performance indicators (KPIs) for the SFO domain?
