@@ -32,11 +32,16 @@ This last paragraph is intriguing since we want to model a banking system where 
 The Bayesian network construction process is made in steps and cycles.
 
 - Step 1, Structural development and evaluation:
+
     -  identify all of the relevant risk driver events, their causal relations, and the query, hypothesis or operational loss event variables.
+    
 - Step 2, Probability elicitation and parameter estimation:
+
     -  involves defining the probability distributions of the nodes and setting their parameter values.
+
 - Step 3, Model validation:
-    - *most problematic step*
+
+    - **most problematic step**
     -  How does one validate a model constructed largely through the subjective opinion of experts?
         - Elication review
         - sensitivity analysis
