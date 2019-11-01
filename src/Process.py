@@ -10,7 +10,6 @@ want to specify your own process.
 
 # dependencies
 from abc import ABCMeta, abstractmethod
-from simpy.events import AnyOf
 import unittest
 
 class Process(metaclass=ABCMeta):
@@ -23,16 +22,16 @@ class Process(metaclass=ABCMeta):
         ----------
         environment: simpy.Environment
             The environment the process is running in.
-        servers: list
+        servers: Servers
             The list of servers that are active within a simulation.
         """
         self.environment = environment
-        self.server = AnyOf(servers)
+        self.server = servers.get()
 
         # we need to run this process immediately and expose the process as
         # public which allows others to interfere with it, which is allowed.
         # this could be useful for, for example, introducing errors.
-        self.process = self._environment.process(self.run())
+        self.process = self.environment.process(self.run())
 
     @abstractmethod
     def run(self):

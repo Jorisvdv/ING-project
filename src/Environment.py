@@ -42,11 +42,10 @@ class Environment(simpy.Environment):
         # allow chaining
         return self
 
-    def step(self, *args, **kwargs):
+    def step(self):
         """
         Method that wraps around simpy.Environment.step.
         """
-
         # we need the current process, which we can pipe
         # to our middleware
         current = self.active_process
@@ -57,5 +56,5 @@ class Environment(simpy.Environment):
             m.pipe(current)
 
         # call the original method
-        return super().step(*args, **kwargs)
+        return super().step()
 

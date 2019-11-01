@@ -30,17 +30,16 @@ class Logger(Middleware):
         ValueError
             Is raised when the directory does not exist.
         """
-
         # we need to check if the given directory path actually
         # points to an existing directory, otherwise we stop
-        if not os.path.isdir(directory):
+        if not os.path.isdir(os.path.join(directory)):
             raise ValueError("directory does not exist")
 
         # we need to get the logger with the given name
         self._logger = logging.getLogger(name)
 
         # we need a new file handler so the logs are written to the file
-        filehandler = logging.FileHandler(os.path.join(directory, name))
+        filehandler = logging.FileHandler(os.path.join(directory, name), mode='a')
 
         # add the file handler to the logger so all logs will be outputted there
         self._logger.addHandler(filehandler)
@@ -48,7 +47,7 @@ class Logger(Middleware):
         # assignt the directory
         self._directory = directory
 
-    def log(self, message, level=20):
+    def log(self, message, level=10):
         """
         Method to log a message.
 
@@ -57,13 +56,13 @@ class Logger(Middleware):
         message: string
             Message to log.
         level: integer
-            Level of logging (default: 20).
+            Level of logging (default: 10).
 
         Returns
         -------
         self
         """
-        
+
         # log the message using our logger
         self._logger.log(level, message)
 

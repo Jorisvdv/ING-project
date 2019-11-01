@@ -28,7 +28,12 @@ class TestProcess(Process):
         ------
         simpy.Timeout
         """
-        
-        # yield a simply timeout using the environment. note that we can use the
-        # "private" variable, as we extend from it and it belongs to this class
-        yield self._env.timeout(3)
+        # yield a simply timeout using the environment
+        for i in range(1000):
+
+            # ask our server for a request
+            with self.server.request() as request:
+
+                # yield the request and timeout
+                yield request
+                yield self.environment.timeout(self.server.latency())

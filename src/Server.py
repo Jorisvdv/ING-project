@@ -8,6 +8,7 @@ more than a resource with some additional patches.
 
 # dependencies
 from simpy import Resource
+from functools import wraps
 from src.Logger import Logger
 
 def server_monitor(resource, pre=None, post=None):
@@ -60,7 +61,7 @@ class Server(Resource):
         See simpy.Resource
         """
         # call the parent constructor
-        super().__init__(env, capacity=capacity)
+        super().__init__(env, capacity)
 
         # setup the name of this server
         self._name = "server#%s" % uuid
@@ -68,7 +69,7 @@ class Server(Resource):
         # setup a logger for this server
         self._logger = Logger(self._name)
 
-        def monitor():
+        def monitor(self):
             """
             Function to monitor a server.
 
@@ -80,7 +81,7 @@ class Server(Resource):
 
             # update the state of the server
             self._state = {
-                'time':  self._env.now,
+                'time':  env.now,
                 'queue': len(self.queue),
                 'users': self.count
             }
