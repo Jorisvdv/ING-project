@@ -15,14 +15,12 @@ initial start of a simulation.
 # dependencies
 import simpy
 from uuid import uuid4
+from Environment import Environment
 
 class Simulation(object):
 
     # running state of a simulation
     _running = False
-
-    # collection of middlewares
-    _middlewares = []
 
     # collection of servers
     _servers = []
@@ -57,7 +55,7 @@ class Simulation(object):
         # we need a new environment, which is where all processes,
         # resources, and other are taking place and run within
         # a simulation
-        self._env = simpy.Environment()
+        self._env = Environment()
 
     def use(self, middleware):
         """
@@ -75,7 +73,7 @@ class Simulation(object):
         self
         """
         # append the middleware to the collection of middlewares
-        self._middlewares.append(middleware)
+        self._environment.use(middleware)
 
         # allow chaining
         return self
@@ -126,7 +124,7 @@ class Simulation(object):
         # we need to instantiate a number of servers, which are the primary
         # resources within a simulation. this is where the transactions
         # will be processed.
-        self._servers = [Server(uuid4(), self._env, capacity=self._ncapacity) for i in range(self._nservers)]
+        self._servers = [Server(uuid4(), self._env, self._ncapacity) for i in range(self._nservers)]
 
         # we need to iterate over each process so that it can be installed as process and run
         for Process in self._processes:

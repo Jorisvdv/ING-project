@@ -15,7 +15,7 @@ import os
 
 class Logger(Middleware):
 
-    def __init__(self, directory="logs"):
+    def __init__(self, name, directory="logs"):
         """
         Constructor.
         
@@ -36,10 +36,19 @@ class Logger(Middleware):
         if not os.path.isdir(directory):
             raise ValueError("directory does not exist")
 
+        # we need to get the logger with the given name
+        self._logger = logging.getLogger(name)
+
+        # we need a new file handler so the logs are written to the file
+        filehandler = logging.FileHandler(os.path.join(directory, name))
+
+        # add the file handler to the logger so all logs will be outputted there
+        self._logger.addHandler(filehandler)
+
         # assignt the directory
         self._directory = directory
 
-    def log(self, message):
+    def log(self, message, level=20):
         """
         Method to log a message.
 
@@ -47,14 +56,16 @@ class Logger(Middleware):
         ----------
         message: string
             Message to log.
+        level: integer
+            Level of logging (default: 20).
 
         Returns
         -------
         self
         """
-
-        # @todo find a way to log to a specific file
-        print("log: {}".format(message))
+        
+        # log the message using our logger
+        self._logger.log(level, message)
 
         # allow chaining
         return self

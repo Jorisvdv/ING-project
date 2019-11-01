@@ -8,8 +8,7 @@ more than a resource with some additional patches.
 
 # dependencies
 from simpy import Resource
-from functools import partial, wraps
-import logging
+from Logger import Logger
 
 def server_monitor(resource, pre=None, post=None):
     """
@@ -42,6 +41,13 @@ def server_monitor(resource, pre=None, post=None):
 
 class Server(Resource):
 
+    # empty state of a server
+    _state = {
+        'time': 0,
+        'queue': 0,
+        'users': 0
+    }
+
     def __init__(self, uuid, env, capacity=100):
         """
         Constructor.
@@ -59,43 +65,31 @@ class Server(Resource):
         # setup the name of this server
         self._name = "server#%s" % uuid
 
-        # we need a logger instance
-        self._logger = logging.getLogger(self._name)
-        file_handler = logging.FileHandler(self._name + '.log')
-        
-        # we need to add the file handler to the logger, so
-        # all logs are forwarded, and written to the
-        # specified file
-        self._logger.addHandler(file_handler)
+        # setup a logger for this server
+        self._logger = Logger(self._name)
 
-        # initialize an empty state
-        self._state = {'time': 0, 'queue': 0, 'users': 0}
+        def monitor():
+            """
+            Function to monitor a server.
 
-        def monitor(self):
-            """Function to monitor a server."""
+            Parameters
+            ----------
+            server: Server
+                The server to monitor
+            """
+
+            # update the state of the server
             self._state = {
                 'time':  self._env.now,
                 'queue': len(self.queue),
                 'users': self.count
             }
 
+            # log the update of the state
+            self._logger.log('{} UPDATE::{}::{}::{}'.format(self._name, self._state['time'], self._state['queue'], self._state['users']))
+
         # install a server monitor
         server_monitor(self, post=monitor)
-
-    def log(self, msg):
-        """
-        Method to log a message on this server.
-
-        Parameters
-        ----------
-        msg: string
-            Message to log.
-
-        Returns
-        -------
-        self
-        """
-        self._logger.debug(msg)
 
     def state(self):
         """
