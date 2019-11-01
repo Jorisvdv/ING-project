@@ -71,27 +71,25 @@ Managers have started to use discrete event simulation for the service industrie
 - simulation of vehicle routing (cash carriage services) and number of cash carriage services per routing
 - simulation study of cash management of ATM such as minimum re-order point, optimum budget and so on.
 
-#### Modeling of service operations
+#### Modeling of service operations steps
 
-*1)* Process flow: A manufacturing process is always associated with physical flows of
+**1)** Process flow: A manufacturing process is always associated with physical flows of
 materials/components and therefore can be easily identified. It may not be the case for
 many service applications where business activities are information-based and triggered by
 an external or internal event such as a written or oral request. The current solution is to use
 a business process mapping tool to capture the business process and then convert the
-process model to the discrete event simulation model [KBSI, Lanner].
-*2)* Process related data such as processing time: In a manufacturing company, industrial
+process model to the discrete event simulation model.
+
+**2)** Process related data such as processing time: In a manufacturing company, industrial
 engineers are responsible for time study, setting processing time and balancing flow. Most
 of service companies do not hire industrial engineers or have equivalent position within
 organizations. As a result, much of the process related data are not readily available.
-*3)* Knowledge workers: In many service companies, employees work primarily with
+
+**3)** Knowledge workers: In many service companies, employees work primarily with
 information or develop and use knowledge. They are knowledge workers, a term coined by
 Peter Drucker. A knowledge worker tends to be self-motivated, work interactively and
 make decisions constantly. How to represent knowledge workers and human-decision
-making process in discrete event simulation remains a subject under study [10].
-In the postindustrial economy, the service sector makes up more than half of the American
-economy. Since mid 1990s, the sector has generated almost all of the US economy increases
-in employment. Knowledge workers are now estimated to outnumber all other workers in
-North America by at least a four to one margin [11]. Thus, there is a great potential for
-discrete event simulation technologies in service sector. However, new approach and
-techniques are required to model and simulate knowledge workers and their decisionmaking
-processes.
+making process in discrete event simulation remains a subject under study.
+
+
+###  Hoekstra, A.G., Dorst, L., Bergman, M., Lagerberg, J., Visser, A., Yakali, H., Groen, F., Hertzberger, L.O. (1997). High performance discrete event simulations to evaluate complex industrial systems, the case of automatic. _Lecture Notes in Computer Science_, 1225, 41-50
