@@ -11,7 +11,7 @@ testing and debugging purposes.
 """
 
 # dependencies
-from Process import Process
+from src.Process import Process
 
 class TestProcess(Process):
     """

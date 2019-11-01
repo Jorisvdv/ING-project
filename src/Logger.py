@@ -9,7 +9,7 @@ a middleware on a simulation.
 """
 
 # dependencies
-from Middleware import Middleware
+from src.Middleware import Middleware
 import logging
 import os
 

@@ -6,6 +6,12 @@ from src.Simulation import Simulation
 from src.Logger import Logger
 from src.Tests import TestProcess
 import src.settings as settings
+import logging
+
+# we need to setup logging configuration here,
+# so all other loggers will properly function
+# and behave the same
+logging.basicConfig(level=logging.DEBUG)
 
 def main():
     """
@@ -22,7 +28,7 @@ def main():
 
     # now that we have an output dir, we can construct our logger which we can use for
     # the simulation
-    logger = Logger(log_dir)
+    logger = Logger(__name__, log_dir)
 
     # we can use the logger for the simulation, so we know where all logs will be written
     simulation.use(logger)

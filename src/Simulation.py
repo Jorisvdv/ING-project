@@ -15,7 +15,7 @@ initial start of a simulation.
 # dependencies
 import simpy
 from uuid import uuid4
-from Environment import Environment
+from src.Environment import Environment
 
 class Simulation(object):
 

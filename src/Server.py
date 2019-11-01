@@ -8,7 +8,7 @@ more than a resource with some additional patches.
 
 # dependencies
 from simpy import Resource
-from Logger import Logger
+from src.Logger import Logger
 
 def server_monitor(resource, pre=None, post=None):
     """
