@@ -28,6 +28,10 @@ class Simulation(object):
     _servers = []
 
     # collection of processes
+    _processes = []
+
+    # collection of running process
+    _running = []
 
     def __init__(self, nservers=1, ncapacity=1000, **kwargs):
         """
@@ -76,7 +80,7 @@ class Simulation(object):
         # allow chaining
         return self
 
-    def process(self, callback):
+    def process(self, process):
         """
         Method to install a process on a simulation. This will be called whenever a
         simulatio is run. Each callback receives the simulation environment and
@@ -84,8 +88,8 @@ class Simulation(object):
 
         Parameters
         ----------
-        callback: function
-            Callback to install as process on a simulation.
+        process: Process
+            Process to run on a simulation.
 
         Returns
         -------
@@ -93,7 +97,7 @@ class Simulation(object):
         """
         
         # install this callback on the collection of processes
-        self._processes.append(callback)
+        self._processes.append(process)
 
         # allow chaining
         return self
@@ -124,9 +128,9 @@ class Simulation(object):
         # will be processed.
         self._servers = [Server(uuid4(), self._env, capacity=self._ncapacity) for i in range(self._nservers)]
 
-        # we need to iterate over each callback so that it can be installed as process
-        for process in self._processes:
-            self._env.process(process(env))
+        # we need to iterate over each process so that it can be installed as process and run
+        for Process in self._processes:
+            self._running.append(Process(self._env, self._servers))
 
         # we can run the simulation until the given runtime
         self._env.run(until=runtime)

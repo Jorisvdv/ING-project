@@ -4,6 +4,7 @@ from os import path
 # dependencies
 from src.Simulation import Simulation
 from src.Logger import Logger
+from src.Tests import TestProcess
 import src.settings as settings
 
 def main():
@@ -27,8 +28,8 @@ def main():
     simulation.use(logger)
 
     # specify a generator as callback that will be used as the main process in a simulation
-    # this callback will receive an environment, and server instance
-    simulation.process(myprocess)
+    # this callback will receive an environment, and a list of available servers
+    simulation.process(TestProcess)
 
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
