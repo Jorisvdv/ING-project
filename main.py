@@ -33,7 +33,7 @@ def main():
     logger = Logger(__name__, log_dir)
 
     # we can use the logger for the simulation, so we know where all logs will be written
-    #simulation.use(logger)
+    simulation.use(logger)
 
     # specify a generator as callback that will be used as the main process in a simulation
     # this callback will receive an environment, and a list of available servers

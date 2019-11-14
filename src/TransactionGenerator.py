@@ -5,6 +5,7 @@ function.
 
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @file   src/TransactionGenerator.py
+@scope  public
 """
 
 # dependencies
