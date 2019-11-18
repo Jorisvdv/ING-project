@@ -38,25 +38,14 @@ class Servers(object):
         -------
         Server
         """
-
-        # we need to iterate over all pools and find out if one has
-        # space left in the queue
-        for server in self._pool:
-
-            # we need to get the current state of the server
-            state = server.state()
-
-            # if there's space left in the queue, expose the server
-            # as an available one
-            if state['queue'] < state['users']:
-                return server
-
         # we need a reference to the server with the lowest number of
-        # processes in queue
+        # processes in queue, which is the server that is going to
+        # be targeted
         lowest = None
 
-        # all servers all full, then get the server with the least
-        # number of users in the queue
+        # we need to iterate over the pool of servers, so we can check
+        # the state of each server and find the one with the least
+        # amount of traffic
         for server in self._pool:
 
             # assign a new server as the lowest

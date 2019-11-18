@@ -11,7 +11,7 @@ from simpy import Resource
 from functools import wraps
 from src.Logger import Logger
 
-def server_monitor(resource, pre=None, post=None):
+def _server_monitor(resource, pre=None, post=None):
     """
     Function to patch a server resource to monitor a server.
     """
@@ -46,7 +46,7 @@ class Server(Resource):
     _state = {
         'time': 0,
         'queue': 0,
-        'users': 0
+        'users': 0,
     }
 
     def __init__(self, uuid, env, capacity=100):
@@ -90,7 +90,7 @@ class Server(Resource):
             self._logger.log('{} UPDATE::{}::{}::{}'.format(self._name, self._state['time'], self._state['queue'], self._state['users']))
 
         # install a server monitor
-        server_monitor(self, post=monitor)
+        _server_monitor(self, post=monitor)
 
     def state(self):
         """
@@ -106,10 +106,34 @@ class Server(Resource):
         """
         Method to expose the server latency.
 
-        @todo   Implement configurable latency.
+        @todo   Implement configurable/editable latency.
 
         Returns
         -------
-        int
+        float
         """
         return 0.01
+
+    def memory(self):
+        """
+        Method to expose the server's memory usage.
+
+        @todo   Implement configurable/editable memory.
+
+        Returns
+        -------
+        float
+        """
+        pass
+
+    def cpu(self):
+        """
+        Method to expose the server's cpu usage.
+
+        @todo   Implement configurable/editable cpu.
+
+        Returns
+        -------
+        float
+        """
+        pass
