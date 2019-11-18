@@ -3,13 +3,13 @@ Class for acting as a server inside of a simpy simulation. This server is nothin
 more than a resource with some additional patches.
 
 @author Tycho Atsma <tycho.atsma@gmail.com>
-@file   src/Server.py
+@file   lib/Server.py
 """
 
 # dependencies
 from simpy import Resource
 from functools import wraps
-from src.Logger import Logger
+from lib.Logger import Logger
 
 def _server_monitor(resource, pre=None, post=None):
     """

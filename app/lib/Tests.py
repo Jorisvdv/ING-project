@@ -5,13 +5,13 @@ final behavior.
 Please add unittests, or any other kind, to the /tests directory for
 testing and debugging purposes.
 
-@file   src/Tests.py
+@file   lib/Tests.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  public
 """
 
 # dependencies
-from src.Process import Process
+from lib.Process import Process
 
 class TestProcess(Process):
     """

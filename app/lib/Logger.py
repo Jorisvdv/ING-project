@@ -3,13 +3,13 @@ Class for logging. This class can be used for logging processes that
 occur within a simulation given a certain level. This can be installed 
 a middleware on a simulation.
 
-@file   src/Logger.py
+@file   lib/Logger.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  private
 """
 
 # dependencies
-from src.Middleware import Middleware
+from lib.Middleware import Middleware
 import logging
 import os
 

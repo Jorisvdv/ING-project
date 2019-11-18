@@ -3,7 +3,7 @@ Class for creating an environment where a simulation can run in.
 This is a small extension of the simpy.Environment which allows
 us to add some additional middleware functionality.
 
-@file   src/Environment.py
+@file   lib/Environment.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  public
 """

@@ -7,7 +7,7 @@ the only class that you should construct if you want to run simulations.
 See the constructor documentation to find out how you can configure the
 initial start of a simulation.
 
-@file   src/Simulation.py
+@file   lib/Simulation.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  public
 """
@@ -15,8 +15,8 @@ initial start of a simulation.
 # dependencies
 import simpy
 from uuid import uuid4
-from src.Environment import Environment
-from src.Servers import Servers
+from lib.Environment import Environment
+from lib.Servers import Servers
 
 class Simulation(object):
 

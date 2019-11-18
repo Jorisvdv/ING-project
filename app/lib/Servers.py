@@ -2,13 +2,13 @@
 Class for setting up a pool of servers. This can be used to pool
 a given number of servers and get access to an available one.
 
-@file   src/Servers.py
+@file   lib/Servers.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  private
 """
 
 # dependencies
-from src.Server import Server
+from lib.Server import Server
 from uuid import uuid4
 
 class Servers(object):

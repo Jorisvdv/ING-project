@@ -3,7 +3,7 @@ Class to act as base class for all processes within a simulation. This
 class should not be instantiated directly, but inherited from if you
 want to specify your own process.
 
-@file   src/Process.py
+@file   lib/Process.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  private
 """

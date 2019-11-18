@@ -3,7 +3,7 @@ Class for exposing the default interface of middleware. This class should never
 be instantiated. This class can be inherited if you want to create your
 own middleware, which can be used by a simulation.
 
-@file   src/Middleware.py
+@file   lib/Middleware.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  private
 """

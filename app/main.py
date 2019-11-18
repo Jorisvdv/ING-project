@@ -4,10 +4,10 @@
 from os import path
 
 # dependencies
-from src.Simulation import Simulation
-from src.Logger import Logger
-from src.Tests import TestProcess
-import src.settings as settings
+from lib.Simulation import Simulation
+from lib.Logger import Logger
+from lib.Tests import TestProcess
+import lib.settings as settings
 import logging
 
 # we need to setup logging configuration here,

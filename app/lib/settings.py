@@ -1,7 +1,7 @@
 """
 This file contains all general settings for a simulation.
 
-@file   src/settings.py
+@file   lib/settings.py
 @author Tycho Atsma <tycho.atsma@gmail.com>
 @scope  public
 """
