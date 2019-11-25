@@ -11,7 +11,7 @@ should be declared here (if they relate to the entire client).
 # dependencies
 from flask import Flask, render_template
 from multiprocessing import Process
-from lib.sockets.pipeline import Pipeline
+from sockets.pipeline import Pipeline
 
 # we need to instantiate a flask application, which will be the
 # backbone of the web client
