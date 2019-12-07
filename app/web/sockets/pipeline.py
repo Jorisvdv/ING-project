@@ -53,12 +53,11 @@ async def _echo(websocket, path):
             # on the other side of the pipeline can listen to it
             await asyncio.wait([socket.send(pulled) for socket in sockets])
 
-        except:
+        except websockets.ConnectionClosed:
             # at this point, we don't care about errors
             pass
 
         finally:
-
             # forget the connection when it closes, so we don't echo messages
             # into the void
             sockets.remove(websocket)

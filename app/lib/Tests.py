@@ -29,11 +29,42 @@ class TestProcess(Process):
         simpy.Timeout
         """
         # yield a simply timeout using the environment
-        for i in range(1000):
+        for i in range(1500):
+
+            # we need to get access to a server, so we
+            # can fake processing something
+            server = self.server()
 
             # ask our server for a request
-            with self.server.request() as request:
+            with server.request() as request:
 
                 # yield the request and timeout
                 yield request
-                yield self.environment.timeout(self.server.latency())
+                yield self.environment.timeout(server.latency())
+
+class TestProcesses(Process):
+    """
+    Class that acts as a collection of test processes. Opposed
+    to TestProcess, this will spawn multiple processes.
+
+    @extends Process
+    """
+
+    def run(self):
+        """
+        Method to run the collection of test processes.
+
+        Yields
+        ------
+        simpy.Timeout
+        """
+        # spawn an arbitrary number of processes
+        for _ in range(15000):
+
+            # we need to spawn a new process on the environment
+            # this collection is assigned to
+            process = TestProcess(self.environment, self._servers)
+
+            # we're not interested in this actual process, so we
+            # return a nullified timeout
+            yield self.environment.timeout(0)

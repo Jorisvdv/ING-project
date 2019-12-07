@@ -26,12 +26,23 @@ class Process(metaclass=ABCMeta):
             The list of servers that are active within a simulation.
         """
         self.environment = environment
-        self.server = servers.get()
+        self._servers = servers
 
         # we need to run this process immediately and expose the process as
         # public which allows others to interfere with it, which is allowed.
         # this could be useful for, for example, introducing errors.
         self.process = self.environment.process(self.run())
+
+    def server(self):
+        """
+        Method to get access to a server from the pool of servers given
+        to this process.
+
+        Returns
+        -------
+        Server
+        """
+        return self._servers.get()
 
     @abstractmethod
     def run(self):

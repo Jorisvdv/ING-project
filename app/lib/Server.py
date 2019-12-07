@@ -72,22 +72,19 @@ class Server(Resource):
         def monitor(self):
             """
             Function to monitor a server.
-
-            Parameters
-            ----------
-            server: Server
-                The server to monitor
             """
 
             # update the state of the server
             self._state = {
                 'time':  env.now,
                 'queue': len(self.queue),
-                'users': self.count
+                'users': self.count,
+                'name':  self._name
             }
 
             # log the update of the state
-            self._logger.log('{} UPDATE::{}::{}::{}'.format(self._name, self._state['time'], self._state['queue'], self._state['users']))
+            self._logger.log('process,{},{},{},{}'.format(self._name, self._state['time'], self._state['queue'], self._state['users']))
+            env.push(self._state)
 
         # install a server monitor
         _server_monitor(self, post=monitor)

@@ -10,23 +10,10 @@ Class for pushing messages to the websocket pipeline.
 import asyncio
 import websockets
 
-async def _send(uri, message):
-    """
-    Async function to send a message to a websocket.
-
-    Parameters
-    ----------
-    uri: string
-        URI of the websocket.
-    message: mixed
-        Message formatted in a way that websockets can 
-        receive them.
-    """
-    # connect with the websocket so we can send messages
-    async with websockets.connect(uri) as websocket:
-
-        # send out the message to the pipeline
-        await websocket.send(message)
+import logging
+logger = logging.getLogger('websockets')
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
 class Pusher(object):
 
@@ -41,7 +28,43 @@ class Pusher(object):
         port: int
             Port that corresponds with the ip address.
         """
+        # uri to connect to
         self._uri = "ws://{}:{}/".format(ip, port)
+
+    async def connect(self):
+        """
+        Async method to connect to a websocket connection.
+
+        Returns
+        -------
+        websockets.WebSocketCommonProtocol
+        """
+        # expose the connection if there is one already
+        if hasattr(self, '_connection'):
+            return self._connection
+
+        # await the connection
+        self._connection = await websockets.connect(self._uri)
+
+        # if the connection is open, we can expose the connection
+        if self._connection.open:
+            return self._connection
+
+    async def _send(self, message):
+        """
+        Async method to send a message over a websocket.
+
+        Parameters
+        ----------
+        message: mixed
+            Message formatted in a way that websockets can 
+            receive them.
+        """
+        # await the connection
+        async with websockets.connect(self._uri) as ws:
+
+            # send the message
+            await ws.send(message)
 
     def push(self, message):
         """
@@ -59,7 +82,7 @@ class Pusher(object):
         """
         # get access to the event loop and run the send
         # callback to push the message to the pipeline
-        asyncio.get_event_loop().run_until_complete(_send(self._uri, message))
+        asyncio.get_event_loop().run_until_complete(self._send(message))
 
         # allow chaining
         return self
@@ -68,13 +91,11 @@ class Pusher(object):
 if __name__ == "__main__":
 
     import time
+    import json
 
     # pusher instance
     pusher = Pusher()
 
     # push a message every second
-    while True:
-        print("push message")
-        pusher.push("foo")
-        time.sleep(1)
+    pusher.push(json.dumps({ "type": "log", "message": "foo" }))
 

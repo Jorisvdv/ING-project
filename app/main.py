@@ -6,7 +6,8 @@ from os import path
 # dependencies
 from lib.Simulation import Simulation
 from lib.Logger import Logger
-from lib.Tests import TestProcess
+from lib.Tests import TestProcesses
+from lib.SocketPusher import SocketPusher
 import lib.settings as settings
 import logging
 
@@ -39,9 +40,14 @@ def main():
 
     # -- end -- #
 
+    # we need a new socket pusher, which we can install as middleware on the simulation.
+    # this causes all messages that are going through the simulation to also be pushed
+    # to the web client through websockets
+    simulation.use(SocketPusher())
+
     # specify a generator as callback that will be used as the main process in a simulation
     # this callback will receive an environment, and a list of available servers
-    simulation.process(TestProcess)
+    simulation.process(TestProcesses)
 
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.

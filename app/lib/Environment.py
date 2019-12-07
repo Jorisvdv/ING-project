@@ -42,6 +42,29 @@ class Environment(simpy.Environment):
         # allow chaining
         return self
 
+    def push(self, message):
+        """
+        Method to forcibly push a message through the pipeline of
+        the environment's simulation. This is the opposite of
+        the "pull" wrapper around the step method.
+
+        Parameters
+        ----------
+        message: string
+            Message to pipe through this environment.
+
+        Returns
+        -------
+        self
+        """
+
+        # iterate over all middlewares to push the messages
+        for m in self._middleware:
+            m.pipe(message)
+
+        # allow chaining
+        return self
+
     def step(self):
         """
         Method that wraps around simpy.Environment.step.

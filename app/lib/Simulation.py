@@ -21,7 +21,7 @@ from lib.Servers import Servers
 class Simulation(object):
 
     # running state of a simulation
-    _running = False
+    _runs = False
 
     # collection of processes
     _processes = []
@@ -116,7 +116,7 @@ class Simulation(object):
 
         # we need to check if a simulation is already running, if so,
         # don't continue
-        if self._running:
+        if self._runs:
             return False
         
         # we need to instantiate a pool of servers, which are the primary
@@ -133,7 +133,7 @@ class Simulation(object):
 
         # we need to update the state of this simulation, as we do not allow for
         # multiple simulation run simultaneously
-        self._running = True
+        self._runs = True
 
         # expose the success of the start of a simulation
         return True

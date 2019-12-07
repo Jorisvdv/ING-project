@@ -7,7 +7,7 @@ This file contains all general settings for a simulation.
 """
 
 # the number of servers
-NSERVERS = 1
+NSERVERS = 10
 
 # the capacity for each server
 NCAPACITY = 1000
