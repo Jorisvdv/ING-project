@@ -60,7 +60,10 @@ class Environment(simpy.Environment):
 
         # iterate over all middlewares to push the messages
         for m in self._middleware:
-            m.pipe(message)
+
+            # only pipe valid message
+            if m:
+                m.pipe(message)
 
         # allow chaining
         return self
@@ -76,7 +79,10 @@ class Environment(simpy.Environment):
         # we need to iterate over the middleware, so we
         # can pipe the active process to that
         for m in self._middleware:
-            m.pipe(current)
+
+            # only pipe valid message
+            if m:
+                m.pipe(current)
 
         # call the original method
         return super().step()

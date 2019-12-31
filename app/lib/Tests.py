@@ -29,7 +29,7 @@ class TestProcess(Process):
         simpy.Timeout
         """
         # yield a simply timeout using the environment
-        for i in range(1500):
+        for i in range(10):
 
             # we need to get access to a server, so we
             # can fake processing something
@@ -59,7 +59,7 @@ class TestProcesses(Process):
         simpy.Timeout
         """
         # spawn an arbitrary number of processes
-        for _ in range(15000):
+        for _ in range(3):
 
             # we need to spawn a new process on the environment
             # this collection is assigned to

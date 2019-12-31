@@ -42,13 +42,6 @@ def _server_monitor(resource, pre=None, post=None):
 
 class Server(Resource):
 
-    # empty state of a server
-    _state = {
-        'time': 0,
-        'queue': 0,
-        'users': 0,
-    }
-
     def __init__(self, uuid, env, capacity=100):
         """
         Constructor.
@@ -63,28 +56,33 @@ class Server(Resource):
         # call the parent constructor
         super().__init__(env, capacity)
 
-        # setup the name of this server
-        self._name = "server#%s" % uuid
+        # setup the initial state of this server
+        self._state = {
+            'name':  "server#%s" % uuid,
+            'time':  round(env.now, 4),
+            'queue': len(self.queue),
+            'users': self.count
+        }
 
         # setup a logger for this server
-        self._logger = Logger(self._name)
+        self._logger = Logger(self._state['name'])
 
         def monitor(self):
             """
             Function to monitor a server.
             """
-
             # update the state of the server
-            self._state = {
-                'time':  env.now,
-                'queue': len(self.queue),
-                'users': self.count,
-                'name':  self._name
-            }
+            self._state.update(time=round(env.now, 4), queue=len(self.queue), users=self.count)
+
+            # we need to construct a logmessage, which we can log on this server
+            # and push onto the environment
+            msg = "%(time)-15s %(name)-15s %(queue)-6s %(users)-6s" % self._state
 
             # log the update of the state
-            self._logger.log('process,{},{},{},{}'.format(self._name, self._state['time'], self._state['queue'], self._state['users']))
-            env.push(self._state)
+            self._logger.log(msg)
+
+            # push the log to the environment
+            env.push(msg)
 
         # install a server monitor
         _server_monitor(self, post=monitor)

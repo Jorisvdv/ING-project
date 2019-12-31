@@ -7,10 +7,10 @@ This file contains all general settings for a simulation.
 """
 
 # the number of servers
-NSERVERS = 10
+NSERVERS = 3
 
 # the capacity for each server
-NCAPACITY = 1000
+NCAPACITY = 2
 
 # the runtime of a simulation
-RUNTIME = 100
+RUNTIME = 10

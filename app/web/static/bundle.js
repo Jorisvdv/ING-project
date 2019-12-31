@@ -1,1 +1,0 @@
-onload=function(){const mainContainer=document.getElementById("main"),dummy=document.createElement("div");mainContainer.appendChild(dummy),new WebSocket("ws://127.0.0.1:80/").onmessage=(event=>{let textNode=document.createTextNode(event.data);dummy.appendChild(textNode)})};

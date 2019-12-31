@@ -1,7 +1,7 @@
 .PHONY: clean all
 
 all:
-	uglifyjs js/* main.js -o bundle.js -c
+	#uglifyjs js/* main.js -o bundle.js -c
 	lessc less/* bundle.css
 
 clean:

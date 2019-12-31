@@ -21,6 +21,8 @@ class Logger(Middleware):
         
         Parameters
         ----------
+        name: string
+            Name of the file that content will be logged to.
         directory: string
             Path to a directory where all logfiles should be written
             to. Note that this directory must exist before logging.
@@ -47,7 +49,7 @@ class Logger(Middleware):
         # assignt the directory
         self._directory = directory
 
-    def log(self, message, level=10):
+    def log(self, message, level=20):
         """
         Method to log a message.
 
@@ -84,7 +86,8 @@ class Logger(Middleware):
         """
 
         # log the message
-        self.log(message)
+        if message:
+            self.log(message)
         
         # allow chaining
         return self
