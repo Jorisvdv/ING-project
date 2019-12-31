@@ -9,10 +9,20 @@ part clean from these declarations.
 @scope  public
 """
 
-# dependencies
+# third party dependencies
 from flask import request, render_template
 from flask.json import jsonify
-from main import main
+import logging
+
+# we need to setup logging configuration here,
+# so all other loggers will properly function
+# and behave the same
+logging.basicConfig(level=logging.INFO)
+
+# dependencies
+from lib.Simulation import Simulation
+from lib.Logger import Logger
+from lib.Tests import TestProcesses
 
 def install(client):
     """
@@ -23,6 +33,9 @@ def install(client):
     client: Flask
         Flask application to install the routes on.
     """
+
+    # global simulation count
+    simc = 0
     
     # declare the index route
     @client.route('/')
@@ -43,18 +56,51 @@ def install(client):
         Function to install handlers on the /simulation path. This allows for
         requesting simulation data or starting a new simulation.
 
+        Parameters
+        ----------
+        POST:
+            nservers: int
+                Number of servers.
+            ncapacity: int
+                Capacity of each server.
+            runtime: int
+                Runtime of the simulation (defined by simpy package).
+
         Returns
         -------
         GET: dict
         POST: int
         """
         if request.method == "POST":
-            
-            # start a new simulation
-            main()
+
+            # nonlocal use of the simulation count
+            nonlocal simc
+
+            # increment the simulation count
+            simc += 1
+
+            # we need a new simulation which we can run. this is going to be initialized
+            # with a number of servers (nservers) and the capacity for each server (ncapacity)
+            simulation = Simulation(nservers=int(request.form['nservers']), ncapacity=int(request.form['ncapacity']))
+
+            # now that we have an output dir, we can construct our logger which we can use for
+            # the simulation
+            logger = Logger(__name__ + "#" + str(simc))
+
+            # we can use the logger for the simulation, so we know where all logs will be written
+            simulation.use(logger)
+
+            # specify a generator as callback that will be used as the main process in a simulation
+            # this callback will receive an environment, and a list of available servers
+            simulation.process(TestProcesses)
+
+            # run the simulation with a certain runtime (runtime). this runtime is not equivalent
+            # to the current time (measurements). this should be the seasonality of the system.
+            # for example, day or week.
+            simulation.run(runtime=int(request.form['runtime']))
 
             # expose the id of the simulation
-            return -1
+            return jsonify(simc)
 
         if request.method == "GET":
 

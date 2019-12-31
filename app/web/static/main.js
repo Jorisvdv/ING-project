@@ -27,4 +27,19 @@ onload = function() {
      */
     const dummy = document.createElement('div');
     mainContainer.appendChild(dummy);
+
+    /**
+     *  Dummy formdata.
+     *  @var    FormData
+     */
+    const data = new FormData();
+
+    // add all dummy data to the data object
+    [["nservers", 3], ["ncapacity", 3], ["runtime", 10]].forEach(([k, v]) => data.set(k, v));
+
+    // make a new POST request, to start a simulation
+    fetch('/simulation', {
+        method:     'POST',
+        body:       data,
+    });
 };
