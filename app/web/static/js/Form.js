@@ -1,17 +1,27 @@
 /**
  *  Class for constructing a form.
  *
+ *  @todo   event handling.
+ *
  *  @author Tycho Atsma <tycho.atsma@gmail.com>
  *  @file   web/static/js/Form.js
  *  @scope  public
  */
 
 /**
+ *  Dependencies.
+ */
+import { Container } from './js/Container.js';
+import { FormField } from './js/FormField.js';
+import { InputField } from './js/InputField.js';
+import { TextField } from './js/TextField.js';
+import { NumberField } from './js/NumberField.js';
+
+/**
  *  Private property accessors.
  *  @var    Symbol
  */
 const container = Symbol('container');
-const installed = Symbol('installed');
 
 /**
  *  Export class definition.
@@ -28,16 +38,13 @@ export class Form {
     constructor(parent, options = {}) {
 
         /**
-         *  Element for encapsulating the form fields.
-         *  @var    Element
+         *  Container for all the classes.
+         *  @var    Container
          */
-        this[container] = document.createElement('form');
-
-        /**
-         *  Collection of installed classes.
-         *  @var    WeakSet
-         */
-        this[installed] = new WeakSet();
+        this[container] = new Container(parent, {
+            element: 'form',
+            className: 'form'
+        });
     }
 
     /**
@@ -49,14 +56,8 @@ export class Form {
      */
     instantiate(Constructor, ...args) {
 
-        // construct the new class
-        const widget = new Constructor(this[container], ...args);
-
-        // remember the widget
-        this[installed].add(widget);
-
-        // expose the widget
-        return widget;
+        // expose the newly created class instance
+        return this[container].append(Constructor, ...args);
     }
 
     /**
@@ -109,15 +110,6 @@ export class Form {
      *  Cleanup.
      */
     remove() {
-
-        // remove all installed classes
-        for (let widget of this[installed]) widget.remove();
-
-        // clear the installed classes
-        this[installed].clear();
-
-        // drop the reference
-        this[installed] = null;
 
         // remove the container
         this[container].remove();
