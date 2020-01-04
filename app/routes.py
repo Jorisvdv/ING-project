@@ -11,12 +11,13 @@ part clean from these declarations.
 
 # third party dependencies
 from flask import request, render_template
-from flask.json import jsonify
-import logging
+from flask.json import jsonify, load
+from os import path
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
 # and behave the same
+import logging
 logging.basicConfig(level=logging.INFO)
 
 # dependencies
@@ -48,6 +49,38 @@ def install(client):
         string
         """
         return render_template('index.html')
+
+    # declare endpoint for retrieving forms
+    @client.route('/forms/<name>')
+    def forms(name):
+        """
+        Function to install handlers on the /forms path. This allows for
+        retrieving predefined forms.
+
+        Parameters
+        ----------
+        GET:
+            name: string
+                Name of the form file.
+
+        Returns
+        -------
+        GET: string
+        """
+        # construct the path to the form
+        fp = path.join(path.dirname(__file__), 'web', 'forms', name)
+
+        # we need to have a valid path
+        if not path.exists(fp):
+
+            # tell the user there's no form
+            return jsonify({ "error": "file does not exist" })
+
+        # open the file
+        with open(fp) as form:
+
+            # expose the json of the form
+            return load(form)
 
     # declare endpoint for starting a new simulation
     @client.route('/simulation', methods=["GET", "POST"])

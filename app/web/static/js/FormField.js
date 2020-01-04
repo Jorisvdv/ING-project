@@ -13,7 +13,7 @@
 /**
  *  Dependencies.
  */
-import { Container } from './js/Container.js';
+import { Container } from './Container.js';
 
 /**
  *  Export class definition.

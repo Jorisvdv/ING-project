@@ -11,11 +11,13 @@
 /**
  *  Dependencies.
  */
-import { Container } from './js/Container.js';
-import { FormField } from './js/FormField.js';
-import { InputField } from './js/InputField.js';
-import { TextField } from './js/TextField.js';
-import { NumberField } from './js/NumberField.js';
+import { Container } from './Container.js';
+import { FormField } from './FormField.js';
+import { InputField } from './InputField.js';
+import { TextField } from './TextField.js';
+import { NumberField } from './NumberField.js';
+import { Mixin } from './Mixin.js';
+import { EventBus } from './EventBus.js';
 
 /**
  *  Private property accessors.
@@ -26,7 +28,7 @@ const container = Symbol('container');
 /**
  *  Export class definition.
  */
-export class Form {
+export class Form extends Mixin.mix(Container).with(EventBus) {
 
     /**
      *  Constructor.
@@ -37,14 +39,14 @@ export class Form {
      */
     constructor(parent, options = {}) {
 
-        /**
-         *  Container for all the classes.
-         *  @var    Container
-         */
-        this[container] = new Container(parent, {
+        // call the parent
+        super(parent, {
             element: 'form',
             className: 'form'
         });
+
+        // we need to check if we need to define some fields already
+        if (options.fields) options.fields.forEach(this.input.bind(this));
     }
 
     /**
@@ -57,7 +59,7 @@ export class Form {
     instantiate(Constructor, ...args) {
 
         // expose the newly created class instance
-        return this[container].append(Constructor, ...args);
+        return this.append(Constructor, ...args);
     }
 
     /**
@@ -104,17 +106,5 @@ export class Form {
         
         // add a new number field
         return this.field().append(NumberField, config);
-    }
-
-    /**
-     *  Cleanup.
-     */
-    remove() {
-
-        // remove the container
-        this[container].remove();
-
-        // drop the reference
-        this[container] = null;
     }
 };

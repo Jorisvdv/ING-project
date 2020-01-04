@@ -9,7 +9,7 @@
 /**
  *  Dependencies
  */
-import { InputField } from './js/InputField.js';
+import { InputField } from './InputField.js';
 
 /**
  *  Export class definition.

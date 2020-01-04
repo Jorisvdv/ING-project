@@ -10,8 +10,8 @@
 /**
  *  Dependencies.
  */
-import { Api } from './js/Api.js';
-import { Form } from './js/Form.js';
+import { Api } from './Api.js';
+import { Form } from './Form.js';
 
 /**
  *  Api instance for form templates.
@@ -33,7 +33,7 @@ export class Forms {
     static create(parent, name) {
 
         // make a new request to fetch the form template
-        return templates.get(name).then((json) => {
+        return templates.get(name, { }).then((json) => {
 
             // we need a new form to add to the container
             return new Form(parent, Object.assign({ fields: [] }, json));

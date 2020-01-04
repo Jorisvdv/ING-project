@@ -9,6 +9,9 @@
 // strict checks
 'use strict';
 
+// test dependencies
+import { Forms } from './js/Forms.js';
+
 /**
  *  Event handler that initialized when the document
  *  is ready.
@@ -30,4 +33,13 @@ onload = function() {
      */
     const dummy = document.createElement('div');
     mainContainer.appendChild(dummy);
+
+    /**
+     *  Test form.
+     */
+    Forms.create(dummy, '/test.json').then((form) => {
+
+        // has been created
+        console.log('form has been created');
+    });
 };
