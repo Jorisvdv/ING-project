@@ -50,26 +50,13 @@ export class Form extends Mixin.mix(Container).with(EventBus) {
     }
 
     /**
-     *  Method to instantiate a class on this form.
-     *  @param  Function    Constructor function that needs to accept at least
-     *                      a parent element as first parameter.
-     *  @param  variadic    Additional arguments.
-     *  @return mixed
-     */
-    instantiate(Constructor, ...args) {
-
-        // expose the newly created class instance
-        return this.append(Constructor, ...args);
-    }
-
-    /**
      *  Method to add a form field to the form.
      *  @return FormField
      */
     field() {
 
         // expose the newly constructed form field
-        return this.instantiate(FormField);
+        return this.append(FormField);
     }
 
     /**
