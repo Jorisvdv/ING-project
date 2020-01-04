@@ -4,6 +4,7 @@
  -  add styles.
  -  add classes for creating charts using d3.
  -  add endpoint for retrieving logfiles.
+ -  setup basic form for simulation configuration
  
 ### Done
  -
