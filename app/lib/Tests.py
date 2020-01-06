@@ -33,14 +33,25 @@ class TestProcess(Process):
 
             # we need to get access to a server, so we
             # can fake processing something
-            server = self.server()
+            server = self.server(kind='regular')
 
             # ask our server for a request
-            with server.request() as request:
+            with server.request(requested_by='client', process_id=12345) as request:
 
                 # yield the request and timeout
                 yield request
                 yield self.environment.timeout(server.latency())
+
+                # request a new server for the second transaction, say for
+                # requesting the balance, but do not ask the originating one
+                balance_server = self.server(kind='balance')
+
+                # ask the server for a request
+                with balance_server.request(requested_by=server.state()['name'], process_id=12345) as request:
+
+                    # yield another request and timeout
+                    yield request
+                    yield self.environment.timeout(balance_server.latency())
 
 class TestProcesses(Process):
     """

@@ -11,6 +11,7 @@
 
 // test dependencies
 import { Forms } from './js/Forms.js';
+import { api } from './js/Api.js';
 
 /**
  *  Event handler that initialized when the document
@@ -33,6 +34,12 @@ onload = function() {
      */
     const dummy = document.createElement('div');
     mainContainer.appendChild(dummy);
+
+    const data = new FormData();
+    data.append('nservers', 5);
+    data.append('ncapacity', 5);
+    data.append('runtime', 5);
+    api.post('/simulation', data);
 
     /**
      *  Test form.

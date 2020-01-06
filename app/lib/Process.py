@@ -33,16 +33,22 @@ class Process(metaclass=ABCMeta):
         # this could be useful for, for example, introducing errors.
         self.process = self.environment.process(self.run())
 
-    def server(self):
+    def server(self, **kwargs):
         """
         Method to get access to a server from the pool of servers given
         to this process.
+
+        Keyworded parameters
+        --------------------
+        exclude: list
+            Collection of servers to exclude from the pool when looking for
+            a new server.
 
         Returns
         -------
         Server
         """
-        return self._servers.get()
+        return self._servers.get(**kwargs)
 
     @abstractmethod
     def run(self):

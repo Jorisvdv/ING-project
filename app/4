@@ -32,15 +32,12 @@ class Servers(object):
             Default: 10.
         kind: string
             Kind of servers in this pool.
-            Default: 'regular'.
         """
         # set the default arguments
         size = kwargs['size'] if 'size' in kwargs else 10
-        capacity = kwargs['capacity'] if 'capacity' in kwargs else 10
-        kind = kwargs['kind'] if 'kind' in kwargs else 'regular'
 
         # construct a new pool
-        self._pool = [Server(env, capacity, uuid=uuid4(), kind=kind) for _ in range(size)]
+        self._pool = [Server(uuid4(), 'regular', env, capacity) for i in range(size)]
 
     def get(self, **kwargs):
         """
@@ -51,6 +48,8 @@ class Servers(object):
         exclude: list
             Collection of servers to exclude from the pool when looking for
             a new server.
+        kind: string
+            Kind of servers to look for.
 
         Returns
         -------
@@ -63,18 +62,24 @@ class Servers(object):
 
         # we need to check if we have a list of servers that we need to exclude
         # from the pool of servers
+        pool = self._pool
         exclude = kwargs['exclude'] if 'exclude' in kwargs else []
+        kind = kwargs['kind'] if 'kind' in kwargs else None
 
         # we need to iterate over the pool of servers, so we can check
         # the state of each server and find the one with the least
         # amount of traffic
-        for server in self._pool:
+        for server in pool:
 
             # state of the current server
             current = server.state()
 
             # pass servers that we need to exclude
             if server in exclude:
+                continue
+
+            # check if we need to search for a specific kind of server
+            if kind and current['kind'] != kind:
                 continue
 
             # assign a new server as the lowest
