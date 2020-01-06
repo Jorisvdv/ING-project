@@ -28,7 +28,7 @@ class Server(Resource):
             Kind of the server (e.g. balance, regular, database).
         """
         # call the parent constructor
-        super().__init__(*args, **kwargs)
+        super().__init__(*args)
 
         # reference to the environment
         self.env = args[0]
@@ -71,7 +71,7 @@ class Server(Resource):
 
         # we need to construct a logmessage, which we can log on this server
         # and push onto the environment
-        msg = ';'.join(state.values())
+        msg = ';'.join([str(_) for _ in state.values()])
 
         # log the update of the state
         self._logger.log(msg)

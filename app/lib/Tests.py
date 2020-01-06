@@ -33,7 +33,7 @@ class TestProcess(Process):
 
             # we need to get access to a server, so we
             # can fake processing something
-            server = self.server(kind='regular')
+            server = self.servers('regular').server()
 
             # ask our server for a request
             with server.request(requested_by='client', process_id=12345) as request:
@@ -44,7 +44,7 @@ class TestProcess(Process):
 
                 # request a new server for the second transaction, say for
                 # requesting the balance, but do not ask the originating one
-                balance_server = self.server(kind='balance')
+                balance_server = self.servers('balance').server()
 
                 # ask the server for a request
                 with balance_server.request(requested_by=server.state()['name'], process_id=12345) as request:

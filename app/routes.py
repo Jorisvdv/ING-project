@@ -22,6 +22,7 @@ logging.basicConfig(level=logging.INFO)
 
 # dependencies
 from lib.Simulation import Simulation
+from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Tests import TestProcesses
 
@@ -112,9 +113,13 @@ def install(client):
             # increment the simulation count
             simc += 1
 
-            # we need a new simulation which we can run. this is going to be initialized
-            # with a number of servers (nservers) and the capacity for each server (ncapacity)
-            simulation = Simulation(nservers=int(request.form['nservers']), ncapacity=int(request.form['ncapacity']))
+            # we need a new simulation which we can run.
+            simulation = Simulation()
+
+            # let's add a basic server pool to the simulation
+            servers = simulation.servers()
+            servers.append(Servers(simulation.environment, size=2, capacity=5, kind='regular'))
+            servers.append(Servers(simulation.environment, size=2, capacity=5, kind='balance'))
 
             # now that we have an output dir, we can construct our logger which we can use for
             # the simulation

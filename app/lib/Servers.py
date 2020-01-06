@@ -35,14 +35,28 @@ class Servers(object):
             Default: 'regular'.
         """
         # set the default arguments
-        size = kwargs['size'] if 'size' in kwargs else 10
+        size     = kwargs['size'] if 'size' in kwargs else 10
         capacity = kwargs['capacity'] if 'capacity' in kwargs else 10
-        kind = kwargs['kind'] if 'kind' in kwargs else 'regular'
+        kind     = kwargs['kind'] if 'kind' in kwargs else 'regular'
 
         # construct a new pool
         self._pool = [Server(env, capacity, uuid=uuid4(), kind=kind) for _ in range(size)]
 
-    def get(self, **kwargs):
+        # assign some parameters as properties
+        self._kind = kind
+
+    @property
+    def kind(self):
+        """
+        Getter to expose the kind of this server pool.
+
+        Returns
+        -------
+        string
+        """
+        return self._kind
+
+    def server(self, **kwargs):
         """
         Method to get access to an available server from the pool.
 

@@ -10,7 +10,6 @@ want to specify your own process.
 
 # dependencies
 from abc import ABCMeta, abstractmethod
-import unittest
 
 class Process(metaclass=ABCMeta):
 
@@ -22,8 +21,8 @@ class Process(metaclass=ABCMeta):
         ----------
         environment: simpy.Environment
             The environment the process is running in.
-        servers: Servers
-            The list of servers that are active within a simulation.
+        servers: MultiServers
+            The pool of pools of servers from which you can access them.
         """
         self.environment = environment
         self._servers = servers
@@ -33,22 +32,21 @@ class Process(metaclass=ABCMeta):
         # this could be useful for, for example, introducing errors.
         self.process = self.environment.process(self.run())
 
-    def server(self, **kwargs):
+    def servers(self, kind):
         """
-        Method to get access to a server from the pool of servers given
+        Method to get access to a pool of servers given
         to this process.
 
-        Keyworded parameters
-        --------------------
-        exclude: list
-            Collection of servers to exclude from the pool when looking for
-            a new server.
+        Parameters
+        ----------
+        kind: string
+            Kind of server pool to get access to.
 
         Returns
         -------
-        Server
+        Servers
         """
-        return self._servers.get(**kwargs)
+        return self._servers.get(kind)
 
     @abstractmethod
     def run(self):
@@ -61,15 +59,3 @@ class Process(metaclass=ABCMeta):
         simpy.Timeout or simpy.Process
         """
         pass
-
-class ProcessTestCase(unittest.TestCase):
-
-    def test_should_not_construct(self):
-        """
-        Test to ensure that the class cannot be instantiated.
-        """
-        self.assertRaises(TypeError, Process)
-
-# run as main
-if __name__ == "__main__":
-    unittest.main()

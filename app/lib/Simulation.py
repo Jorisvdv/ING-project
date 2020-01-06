@@ -14,9 +14,8 @@ initial start of a simulation.
 
 # dependencies
 import simpy
-from uuid import uuid4
 from lib.Environment import Environment
-from lib.Servers import Servers
+from lib.MultiServers import MultiServers
 
 class Simulation(object):
 
@@ -29,31 +28,43 @@ class Simulation(object):
     # collection of running process
     _running = []
 
-    def __init__(self, nservers=1, ncapacity=1000, **kwargs):
+    def __init__(self):
         """
         Constructor.
-
-        Parameters
-        ----------
-        nservers: integer
-            The number of servers that will be used as resources.
-            default: 1
-        ncapacity; integer
-            The capacity of each server. Thus, the maximum workload
-            that each server can handle (e.g. 1000 transations).
-            default: 1000
-
-        Keyworded arguments
-        -------------------
-        Nothing yet.
         """
-        self._nservers = nservers
-        self._ncapacity = ncapacity
-
         # we need a new environment, which is where all processes,
         # resources, and other are taking place and run within
         # a simulation
         self._env = Environment()
+
+        # we need a new multiservers pool, which we can append pools to
+        self._multiserver = MultiServers()
+
+    @property
+    def environment(self):
+        """
+        Getter to expose the environment.
+
+        @todo   Find solution which can get rid of this method so the env is
+                not exposed to the outside world.
+        
+        Returns
+        -------
+        simpy.Environment
+        """
+        return self._env
+
+    def servers(self):
+        """
+        Method to get access to the multiservers system. This way you can append
+        server pools to the system.
+
+        Returns
+        -------
+        MultiServers
+        """
+        # expose the multiserver system
+        return self._multiserver
 
     def use(self, middleware):
         """
@@ -118,15 +129,10 @@ class Simulation(object):
         # don't continue
         if self._runs:
             return False
-        
-        # we need to instantiate a pool of servers, which are the primary
-        # resources within a simulation. this is where the transactions
-        # will be processed.
-        self._servers = Servers(self._env, self._nservers, self._ncapacity)
 
         # we need to iterate over each process so that it can be installed as process and run
         for process in self._processes:
-            self._running.append(process(self._env, self._servers))
+            self._running.append(process(self._env, self._multiserver))
 
         # we can run the simulation until the given runtime
         self._env.run(until=runtime)
