@@ -1,10 +1,3 @@
-import numpy as np
-import pandas as pd
-
-# time = input("Enter time in seconds")
-time_value_1 = 150000
-time_value_2 = 20000
-
 class Seasonality(object):
     """ Seasonality adjust the maximum transaction rate according to a specified .csv
     file containing a scaler for certain time stamps
@@ -18,7 +11,7 @@ class Seasonality(object):
         self.seasonality_df = pd.read_csv(self.seasonality_file , sep = ";")
 
         # Find highest time value in seasonality seasonality_dataframe
-        self.max_time_seasonality = max(seasonality_df["time"].values)
+        self.max_time_seasonality = max(self.seasonality_df["time"].values)
 
     def scale(self, timestamp = None):
         """ Return scalar to adjust amount of messages, use timestamp if given,
@@ -37,8 +30,3 @@ class Seasonality(object):
         closest_time = abs(self.seasonality_df["time"]-timestamp).values.argmin()
         # Return scaler value correspoding to closest_time
         return self.seasonality_df["scaler_value"][closest_time]
-
-season = Seasonality(filename)
-
-print(f"""Time: {time_value_1}, seasonality scalar {season.scale(time_value_1)}""")
-print(f"""Time: {time_value_2}, seasonality scalar {season.scale(time_value_2)}""")
