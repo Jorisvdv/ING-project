@@ -1,3 +1,7 @@
+# Import dependencies
+import numpy as np
+import pandas as pd
+
 class Seasonality(object):
     """ Seasonality adjust the maximum transaction rate according to a specified .csv
     file containing a scaler for certain time stamps
