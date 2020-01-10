@@ -2,22 +2,24 @@
 import numpy as np
 import pandas as pd
 
+
 class Seasonality(object):
     """ Seasonality adjust the maximum transaction rate according to a specified .csv
     file containing a scaler for certain time stamps
     requires pandas as pd and numpy as np
     """
-    def __init__(self, seasonality_file, envoirment = None):
+
+    def __init__(self, seasonality_file, enviroment=None):
         self.seasonality_file = seasonality_file
-        self.env = envoirment
+        self.env = enviroment
 
         # Import seasonality .csv file
-        self.seasonality_df = pd.read_csv(self.seasonality_file , sep = ";")
+        self.seasonality_df = pd.read_csv(self.seasonality_file, sep=";")
 
         # Find highest time value in seasonality seasonality_dataframe
         self.max_time_seasonality = max(self.seasonality_df["time"].values)
 
-    def scale(self, timestamp = None):
+    def scale(self, timestamp=None):
         """ Return scalar to adjust amount of messages, use timestamp if given,
         otherwise call envoirment to determine current time
         """
