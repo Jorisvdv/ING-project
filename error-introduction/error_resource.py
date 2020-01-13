@@ -35,7 +35,7 @@ def message_generator(env, server):
 
 def error_generator(env, server):
     while True:
-        yield env.timeout(randint(100, 250))
+        yield env.timeout(randint(200, 250))
         print(f"LOG_ERROR_Start error at time {env.now}")
         with server.request(priority=0) as req:  # Generate a request event
             yield req                               # Wait for access
