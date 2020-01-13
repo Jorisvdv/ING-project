@@ -108,7 +108,7 @@ class Simulation(object):
         """
         
         # install this callback on the collection of processes
-        self._processes.append([Process, kwargs]))
+        self._processes.append([Process, kwargs])
 
         # allow chaining
         return self

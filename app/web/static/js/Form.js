@@ -1,7 +1,10 @@
 /**
  *  Class for constructing a form.
  *
- *  @todo   event handling.
+ *  This class triggers the folllowing events:
+ *
+ *      @event  "submit"    When the user submits the form.
+ *                          @param  "target"    Instance that triggered the event.
  *
  *  @author Tycho Atsma <tycho.atsma@gmail.com>
  *  @file   web/static/js/Form.js
@@ -11,12 +14,12 @@
 /**
  *  Dependencies.
  */
-import { Container } from './Container.js';
+import { EventContainer } from './Container.js';
 import { FormField } from './FormField.js';
 import { InputField } from './InputField.js';
 import { TextField } from './TextField.js';
 import { NumberField } from './NumberField.js';
-import { Mixin } from './Mixin.js';
+import { ButtonField } from './ButtonField.js';
 import { EventBus } from './EventBus.js';
 
 /**
@@ -28,7 +31,7 @@ const container = Symbol('container');
 /**
  *  Export class definition.
  */
-export class Form extends Mixin.mix(Container).with(EventBus) {
+export class Form extends EventBus(class {}) {
 
     /**
      *  Constructor.
@@ -39,14 +42,52 @@ export class Form extends Mixin.mix(Container).with(EventBus) {
      */
     constructor(parent, options = {}) {
 
-        // call the parent
-        super(parent, {
-            element: 'form',
-            className: 'form'
+        // call the parent class
+        super();
+
+        /**
+         *  Container for managing all fields and inputs.
+         *  @var    EventContainer
+         */
+        this[container] = new EventContainer(parent, {
+            element: 'form'
+        });
+
+        /**
+         *  Retrigger submit events.
+         */
+        this[container].on('submit', (e) => {
+
+            // prevent default behavior
+            e.preventDefault();
+
+            // trigger the submit event to the outside world
+            this.trigger('submit', {
+                target: this
+            });
         });
 
         // we need to check if we need to define some fields already
-        if (options.fields) options.fields.forEach(this.input.bind(this));
+        if (options.fields) options.fields.forEach((field) => {
+
+            // create a button field
+            if (field.button) this.button(field);
+
+            // create an input field
+            else this.input(field);
+        });
+    }
+
+    /**
+     *  Method to expose the data of the form.
+     *  @return Array
+     */
+    data() {
+
+        // expose the values of all fields
+        return this[container].installed
+            .map((instance) => instance.value)
+            .filter((value) => Object.keys(value).length);
     }
 
     /**
@@ -56,7 +97,7 @@ export class Form extends Mixin.mix(Container).with(EventBus) {
     field() {
 
         // expose the newly constructed form field
-        return this.append(FormField);
+        return this[container].append(FormField);
     }
 
     /**
@@ -93,5 +134,28 @@ export class Form extends Mixin.mix(Container).with(EventBus) {
         
         // add a new number field
         return this.field().append(NumberField, config);
+    }
+
+    /**
+     *  Method to add a button field.
+     *  @param  Object  Configuration for the button field.
+     *  @return ButtonField
+     */
+    button(config = {}) {
+
+        // add a new button field
+        return this.field().append(ButtonField, config);
+    }
+
+    /**
+     *  Cleanup.
+     */
+    remove() {
+
+        // remove the container
+        this[container].remove();
+
+        // drop the reference
+        this[container] = null;
     }
 };
