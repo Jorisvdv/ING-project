@@ -24,7 +24,7 @@ logging.basicConfig(level=logging.INFO)
 from lib.Simulation import Simulation
 from lib.Servers import Servers
 from lib.Logger import Logger
-from lib.Tests import TestProcesses
+from lib.Processor import Processor
 
 def install(client):
     """
@@ -93,10 +93,17 @@ def install(client):
         Parameters
         ----------
         POST:
-            nservers: int
-                Number of servers.
-            ncapacity: int
-                Capacity of each server.
+
+            servers: list
+                List containing configurations for a server pool as dicts.
+                { capacity: int, size: int, kind: string } 
+                For example, { size: 10, capacity: 10, kind: 'regular' }.
+
+            process: list
+                List specifying how a process should go (from server to server). 
+                This should contain a sequence of server kinds.
+                For example, ["regular", "balance", "pay"].
+
             runtime: int
                 Runtime of the simulation (defined by simpy package).
 
@@ -118,19 +125,24 @@ def install(client):
 
             # let's add a basic server pool to the simulation
             servers = simulation.servers()
-            servers.append(Servers(simulation.environment, size=2, capacity=5, kind='regular'))
-            servers.append(Servers(simulation.environment, size=2, capacity=5, kind='balance'))
+
+            # iterate over all of the servers that need to be configured that
+            # we received from the client
+            for server in request.form['servers']:
+
+                # append a new server pool to the multiserver system
+                severs.append(Servers(simulation.environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
 
             # now that we have an output dir, we can construct our logger which we can use for
             # the simulation
-            logger = Logger(__name__ + "#" + str(simc))
+            logger = Logger("simulation#" + str(simc))
 
             # we can use the logger for the simulation, so we know where all logs will be written
             simulation.use(logger)
 
-            # specify a generator as callback that will be used as the main process in a simulation
-            # this callback will receive an environment, and a list of available servers
-            simulation.process(TestProcesses)
+            # now, we can put the process in the simulation, which will know
+            # how to define the process
+            simulation.process(Processor, kinds=request.form['process'].split(','))
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.

@@ -8,7 +8,6 @@ more than a resource with some additional patches.
 
 # dependencies
 from simpy import Resource
-from lib.Logger import Logger
 
 class Server(Resource):
 
@@ -30,20 +29,43 @@ class Server(Resource):
         # call the parent constructor
         super().__init__(*args)
 
-        # reference to the environment
-        self.env = args[0]
+        # reference to the environment and capacity
+        self._env = args[0]
+        self._capacity = args[1]
 
         # setup the initial state of this server
         self._state = {
             'name':  "server#%s" % kwargs['uuid'],
             'kind':  kwargs['kind'],
-            'time':  round(self.env.now, 4),
+            'time':  round(self._env.now, 4),
             'queue': len(self.queue),
-            'users': self.count
+            'users': self.count,
+            'cpu': 0,
+            'memory': 0,
+            'latency': 0
         }
 
-        # setup a logger for this server
-        self._logger = Logger(self._state['name'])
+    @property
+    def environment(self):
+        """
+        Getter to expose the environment.
+        
+        Returns
+        -------
+        Environment
+        """
+        return self._env
+
+    @property
+    def capacity(self):
+        """
+        Getter to expose the server capacity.
+
+        Returns
+        -------
+        int
+        """
+        return self._capacity
 
     def request(self, *args, **kwargs):
         """
@@ -59,7 +81,14 @@ class Server(Resource):
             server).
         """
         # update the state of the server
-        self._state.update(time=round(self.env.now, 4), queue=len(self.queue), users=self.count)
+        self._state.update(
+            time=round(self._env.now, 4),
+            queue=len(self.queue),
+            users=self.count,
+            cpu=self.cpu(),
+            memory=self.memory(),
+            latency=self.latency()
+        )
 
         # we need to update the state with the current process id, so we can
         # track this process later on
@@ -73,11 +102,8 @@ class Server(Resource):
         # and push onto the environment
         msg = ';'.join([str(_) for _ in state.values()])
 
-        # log the update of the state
-        self._logger.log(msg)
-
         # push the log to the environment
-        self.env.push(msg)
+        self._env.push(msg)
 
         # call the parent class for the original method
         return super().request()
@@ -96,34 +122,39 @@ class Server(Resource):
         """
         Method to expose the server latency.
 
-        @todo   Implement configurable/editable latency.
-
         Returns
         -------
         float
         """
-        return 0.01
+        # expose a random value based on an exponential distribution, scaled
+        # with the cpu time
+        return exponential(self.cpu())
 
     def memory(self):
         """
         Method to expose the server's memory usage.
 
-        @todo   Implement configurable/editable memory.
-
         Returns
         -------
         float
         """
-        pass
+        # get the current state
+        state = self.state()
+
+        # expose the calculated memory usage based on the queue, users, and
+        # scaled capacity
+        return (state.users + state.queue) / (self.capacity() * 10)
 
     def cpu(self):
         """
         Method to expose the server's cpu usage.
 
-        @todo   Implement configurable/editable cpu.
-
         Returns
         -------
         float
         """
-        pass
+        # get the current state
+        state = self.state()
+
+        # expose the cpu load
+        return state['users'] / self.capacity

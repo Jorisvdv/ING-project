@@ -87,7 +87,7 @@ class Simulation(object):
         # allow chaining
         return self
 
-    def process(self, process):
+    def process(self, Process, *kwargs):
         """
         Method to install a process on a simulation. This will be called whenever a
         simulatio is run. Each callback receives the simulation environment and
@@ -95,8 +95,12 @@ class Simulation(object):
 
         Parameters
         ----------
-        process: Process
+        Process: Process
             Process to run on a simulation.
+
+        Keyworded parameters
+        --------------------
+        Arguments for the process class constructor.
 
         Returns
         -------
@@ -104,7 +108,7 @@ class Simulation(object):
         """
         
         # install this callback on the collection of processes
-        self._processes.append(process)
+        self._processes.append([Process, kwargs]))
 
         # allow chaining
         return self
@@ -131,8 +135,10 @@ class Simulation(object):
             return False
 
         # we need to iterate over each process so that it can be installed as process and run
-        for process in self._processes:
-            self._running.append(process(self._env, self._multiserver))
+        for [Process, kwargs] in self._processes:
+
+            # append the process to the collection of running processes
+            self._running.append(Process(self._env, self._multiserver, **kwargs))
 
         # we can run the simulation until the given runtime
         self._env.run(until=runtime)

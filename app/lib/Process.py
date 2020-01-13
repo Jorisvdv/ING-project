@@ -24,13 +24,24 @@ class Process(metaclass=ABCMeta):
         servers: MultiServers
             The pool of pools of servers from which you can access them.
         """
-        self.environment = environment
+        self._env = environment
         self._servers = servers
 
         # we need to run this process immediately and expose the process as
         # public which allows others to interfere with it, which is allowed.
         # this could be useful for, for example, introducing errors.
-        self.process = self.environment.process(self.run())
+        self.process = self._env.process(self.run())
+
+    @property
+    def environment(self):
+        """
+        Getter for exposing the environment.
+
+        Returns
+        -------
+        Environment
+        """
+        return self._env
 
     def servers(self, kind):
         """
