@@ -5,9 +5,11 @@ Toy example on how introduce error using PreemptiveResource
 from random import randint
 import simpy
 
-timeout_time = 30
-error_duration = 100
-latency = (25, 32)
+timeout_time = 5
+error_duration = 2
+latency = (1, 6)
+errorwait = (2, 6)
+runtime = 10
 
 
 def message(env, server, i):
@@ -19,7 +21,13 @@ def message(env, server, i):
             yield env.timeout(process_time)
         print(f"INFO: message {i} processed at time {env.now}, duration {process_time}")
     except simpy.Interrupt as interrupt:
-        print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
+        # Check if error is due to interuption using error_generator
+        if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
+            # Manually print timeout message
+            print(f"ERROR: message {i} timeout at time {env.now}")
+        else:
+            # Use interrupt clause to write error message
+            print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
 
 
 def message_generator(env, server):
@@ -35,18 +43,26 @@ def message_generator(env, server):
 
 def error_generator(env, server):
     while True:
-        yield env.timeout(randint(200, 250))
+        # Wait a random amount of time to introduce the error
+        yield env.timeout(randint(*errorwait))
         print(f"LOG_ERROR_Start error at time {env.now}")
-        with server.request(priority=0) as req:  # Generate a request event
-            yield req                               # Wait for access
-            yield env.timeout(error_duration)
-            print(f"LOG_ERROR_End error at time {env.now}")
+        # Make an equal amount of requests to the capacity of the server
+        # Make a list of requests
+        request_list = [server.request(priority=0) for i in range(server.capacity)]
+        for request in request_list:
+            yield request  # Send priority request to PreemptiveResource
+        # Wait for the error to be resolved
+        yield env.timeout(error_duration)
+        # Release spots in server when the error is resolved
+        for request in request_list:
+            yield server.release(request)
+        print(f"LOG_ERROR_End error at time {env.now}")
 
 
 if __name__ == "__main__":
     env = simpy.Environment()
     print(env)
-    serv = simpy.PreemptiveResource(env, capacity=1)
+    serv = simpy.PreemptiveResource(env, capacity=5)
     env.process(error_generator(env, serv))
     env.process(message_generator(env, serv))
-    env.run(until=1000)
+    env.run(until=runtime)
