@@ -5,11 +5,11 @@ Toy example on how introduce error using PreemptiveResource
 from random import randint
 import simpy
 
-timeout_time = 5
-error_duration = 2
-latency = (1, 6)
-errorwait = (2, 6)
-runtime = 10
+timeout_time = 20
+error_duration = 30
+latency = (5, 25)
+errorwait = (20, 50)
+runtime = 100
 
 
 def message(env, server, i):
@@ -61,7 +61,6 @@ def error_generator(env, server):
 
 if __name__ == "__main__":
     env = simpy.Environment()
-    print(env)
     serv = simpy.PreemptiveResource(env, capacity=5)
     env.process(error_generator(env, serv))
     env.process(message_generator(env, serv))
