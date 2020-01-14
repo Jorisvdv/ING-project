@@ -10,10 +10,14 @@ part clean from these declarations.
 """
 
 # third party dependencies
+from os import listdir
+from os import path
+from os.path import isfile, join
 from flask import request, render_template
 from flask.json import jsonify, load
-from os import path
+import csv
 import pandas as pd
+import numpy as np
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -26,6 +30,10 @@ from lib.Simulation import Simulation
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
+
+# Global vars
+LOG_PATH = 'logs'
+LOG_FILENAMES = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
 
 def install(client):
     """
@@ -50,7 +58,7 @@ def install(client):
         -------
         string
         """
-        return render_template('index.html')
+        return render_template('index.html', log_filenames=LOG_FILENAMES, len_logfiles=len(LOG_FILENAMES))
 
     # declare endpoint for retrieving forms
     @client.route('/forms/<name>')
@@ -171,9 +179,9 @@ def install(client):
         -------
         GET: JSON
         """
-
         # Read in the log data
-        log_df = pd.read_csv('logs/Manual_log.csv', sep=';')
+        filename = request.args.get('f', default=LOG_FILENAMES[0])
+        log_df = pd.read_csv('logs/' + filename, sep=';')
 
         # Create 'final_matrix' (initially a zeros matrix)
         rows = log_df['Server'].unique()
@@ -186,9 +194,6 @@ def install(client):
         # Group by unique combinations and count occurrences
         df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
 
-        # Create 'final_matrix' (initially a zeros df)
-        final_matrix = pd.DataFrame(0, index=cols, columns=rows)
-
         # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
         for index, row in df.iterrows():
             final_matrix.loc[row['To_Server']][row['Server']] = row['count']
@@ -198,3 +203,28 @@ def install(client):
         json_convert = {"data": final_matrix_numpy}
 
         return jsonify(json_convert)
+
+
+
+    @client.route('/visualization')
+    def show_visualization():
+        """
+        Function to generate the D3/Dash visualizations of a given simulation logfile (.csv)
+
+        URL args
+        -------
+            f: simulation logfile - (By default takes the first .csv in /logs)
+
+        Returns
+        -------
+        GET: JSON
+        """
+
+        # Parse the URL arg
+        sim_file = request.args.get('f', default=LOG_FILENAMES[0])
+
+        return render_template('visualization.html', sim_file=sim_file)
+
+
+
+

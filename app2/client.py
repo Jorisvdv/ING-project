@@ -11,6 +11,8 @@ simulation.
 # dependencies
 from flask import Flask
 import routes
+import dash
+from lib.DashGraphs import show_dash_graphs
 
 class Client(object):
 
@@ -26,6 +28,11 @@ class Client(object):
         # we need to construct a flask application, which will be the
         # backbone of the web client
         self._client = Flask(__name__, static_url_path='', static_folder="web/static", template_folder="web/templates")
+        self._dashapp = dash.Dash(
+                                    __name__,
+                                    server=self._client,
+                                    routes_pathname_prefix='/dash/'
+                                )
 
         # we need to setup some configuration variables, these may need to change
         # when running in production
@@ -33,13 +40,17 @@ class Client(object):
 
         # we need to install all routes onto the client
         routes.install(self._client)
+        show_dash_graphs(self._dashapp)
+
 
     def run(self):
         """
         Method to run the client. This will start up a simple webserver.
         """
         # run the client
-        self._client.run()
+        # self._client.run()
+
+        self._dashapp.run_server(debug=True)
 
 
 # run as main

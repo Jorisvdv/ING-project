@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+
+<center>    
+	<body>
+
+        <!--<img id="top_logo" src="{{ url_for('static', filename='img/ING_logo.jpg')}}?v=1" alt="ING Logo" align="middle" height="140" width="340">-->
+
+
+	  <img src="{{ url_for('static', filename='img/ING_logo.jpg')}}" alt="ING Logo" align="middle" height="175" width="380" style="padding-top: 20px;">
+	  <!-- Navbar -->
+
+	  <div><a>Showing visualization for: <b>{{ sim_file }}</b></a></div>
+
+	  <!-- Third Grid -->
+	  <div id="Visualisation" class="w3-row-padding w3-padding-64 w3-container">
+	      <!-- Create a div where the graph will take place -->
+	     <div align="center" alt="Server Communication" id="my_dataviz"></div>
+
+	     <!-- Dash visualizations iframe --> 
+	     <div id="mainFrameDiv" style="--aspect-ratio: 16/9;">
+			<iframe src="http://localhost:8050/dash/" width=1000 height=600> </iframe>
+		</div>
+
+	  </div>
+
+
+
+
+
+	  <div id="Logfile" class="w3-container w3-black w3-center w3-opacity w3-padding-64">
+	    
+	    <button class="w3-button w3-buttoncolor w3-padding-large w3-large w3-margin-top" onlick="myFunctions () ">Download logfiles</button>
+	  </div>
+
+	  <!-- Footer -->
+	  <footer class="w3-container w3-padding-64 w3-center w3-opacity">
+	    <div class="w3-xlarge w3-padding-32">
+	      <i class="fa fa-facebook-official w3-hover-opacity"></i>
+	      <i class="fa fa-instagram w3-hover-opacity"></i>
+
+	      <i class="fa fa-twitter w3-hover-opacity"></i>
+	      <i class="fa fa-linkedin w3-hover-opacity"></i>
+	    </div>
+	    <p>Powered by DSP</a></p>
+	  </footer>
+
+	  <script>
+
+	     var chordiagramDataUrl = "/get_endpoint_data?f={{ sim_file }}";
+
+	    // Used to toggle the menu on small screens when clicking on the menu button
+	    function myFunction() {
+	      var x = document.getElementById("mytopnav");
+	      if (x.className.indexOf("w3-show") == -1) {
+	        x.className += " w3-show";
+	      } else {
+	        x.className = x.className.replace(" w3-show", "");
+	      }
+	    }
+
+		/* When the user clicks on the button, 
+		toggle between hiding and showing the dropdown content */
+		function myFunction() {
+		  document.getElementById("myDropdown").classList.toggle("show");
+		}
+
+		// Close the dropdown if the user clicks outside of it
+		window.onclick = function(event) {
+		  if (!event.target.matches('.dropbtn')) {
+		    var dropdowns = document.getElementsByClassName("dropdown-content");
+		    var i;
+		    for (i = 0; i < dropdowns.length; i++) {
+		      var openDropdown = dropdowns[i];
+		      if (openDropdown.classList.contains('show')) {
+		        openDropdown.classList.remove('show');
+		      }
+		    }
+		  }
+		}
+
+	  </script>
+
+</body>
+    
+</center>
+
+{% endblock content %}

@@ -9,7 +9,7 @@
 // strict checks
 'use strict';
 
-// test dependencies
+// dependencies
 import { Forms } from './js/Forms.js';
 import { api } from './js/Api.js';
 
@@ -28,25 +28,20 @@ onload = function() {
     const mainContainer = document.getElementById('main');
 
     /**
-     *  Dummy placeholder to show that everything works.
-     *  This can be removed.
-     *  @var    Element
+     *  Form for starting a simulation.
      */
-    const dummy = document.createElement('div');
-    mainContainer.appendChild(dummy);
+    Forms.create(mainContainer, '/simulation.json').then((form) => {
 
-    const data = new FormData();
-    data.append('nservers', 5);
-    data.append('ncapacity', 5);
-    data.append('runtime', 5);
-    api.post('/simulation', data);
+        /**
+         *  Listener for the submit event on the form, so we know when
+         *  to start a new simulation, and parse the data before sending
+         *  it to the api.
+         */
+        form.on('submit', (e) => {
 
-    /**
-     *  Test form.
-     */
-    Forms.create(dummy, '/test.json').then((form) => {
-
-        // has been created
-        console.log('form has been created');
+            console.log(e.target.data());
+        });
     });
 };
+
+

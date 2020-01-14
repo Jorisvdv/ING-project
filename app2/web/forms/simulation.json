@@ -10,5 +10,9 @@
         "type": "text",
         "label": "Simulation process as server sequence (comma seperated).",
         "placeholder": "Enter a list of types of servers (comma seperated)"
+    }, {
+        "button": true,
+        "type": "submit",
+        "text": "Start simulation"
     }]
 }
