@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+
+<center>    
+    <body>
+        <h1>Data Systems Project: Web client.</h1>
+
+        <!-- define content container -->
+        <div id="main"></div>
+    </body>
+
+    <img id="top_logo" src="{{ url_for('static', filename='img/ING_logo.jpg')}}?v=1" alt="ING Logo" align="middle" height="140" width="340">
+
+    <!-- Create a div where the graph will take place -->
+    <div id="my_dataviz"></div>
+</center>
+
+{% endblock content %}

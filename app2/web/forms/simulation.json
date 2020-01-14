@@ -1,0 +1,14 @@
+{
+    "fields": [{
+        "name": "runtime",
+        "type": "number",
+        "label": "Simulation runtime.",
+        "placeholder": "Enter a number",
+        "value": 100
+    }, {
+        "name": "process",
+        "type": "text",
+        "label": "Simulation process as server sequence (comma seperated).",
+        "placeholder": "Enter a list of types of servers (comma seperated)"
+    }]
+}
