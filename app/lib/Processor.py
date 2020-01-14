@@ -9,11 +9,11 @@ to which server, in a sequence.
 """
 
 # dependencies
-from Process import Process
+from lib.Process import Process
 
 class Processor(Process):
 
-    def __init__(self, *args, *kwargs):
+    def __init__(self, *args, **kwargs):
         """
         Constructor.
 

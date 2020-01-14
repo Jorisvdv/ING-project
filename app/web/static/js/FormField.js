@@ -16,6 +16,12 @@
 import { Container } from './Container.js';
 
 /**
+ *  Private property accessors.
+ *  @var    Symbol
+ */
+const widgets = Symbol('widgets');
+
+/**
  *  Export class definition.
  */
 export class FormField extends Container {
@@ -28,5 +34,39 @@ export class FormField extends Container {
 
         // call the parent class
         super(parent, { className: 'formfield' });
+
+        /**
+         *  Collection of widgets appended to this field.
+         *  @var    Array
+         */
+        this[widgets] = [];
+    }
+
+    /**
+     *  Method to expose the value of this field.
+     *  @return Object
+     */
+    get value() {
+
+        // reconstruct the value based on the installed fields
+        return Object.fromEntries(this[widgets]
+            .map((widget) => [widget.name, widget.value])
+            .filter(([name, value]) => name));
+    }
+
+    /**
+     *  Method override of the .append method.
+     *  @see Container.append
+     */
+    append(Constructor, ...args) {
+
+        // call the parent class
+        const instance = super.append(Constructor, ...args);
+
+        // remember this instance so we can access it later
+        this[widgets].push(instance);
+
+        // expose the instance again
+        return instance;
     }
 };

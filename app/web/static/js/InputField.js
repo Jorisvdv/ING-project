@@ -42,6 +42,7 @@ export class InputField {
      *                      @see    https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement
      *                      +
      *                      "label"         Label of the input field.
+     *                      "name"          REQUIRED
      */
     constructor(parent, config = {}) {
 
@@ -63,6 +64,9 @@ export class InputField {
          */
         this[input] = this[container].appendChild(document.createElement('input'));
 
+        // set the name
+        this[input].setAttribute('name', config.name);
+
         /**
          *  Applicable attributes for an input element.
          *  @var    Object
@@ -71,9 +75,20 @@ export class InputField {
 
         // exclude any non-applicable attributes
         delete attributes.label;
+        delete attributes.name;
 
         // assignment of all attributes.
         setAttributes(this[input], attributes);
+    }
+
+    /**
+     *  Getter method to get the name of the input.
+     *  @return String
+     */
+    get name() {
+
+        // expose the name attribute
+        return this[input].getAttribute('name');
     }
 
     /**
