@@ -10,6 +10,7 @@ part clean from these declarations.
 """
 
 # third party dependencies
+import os
 from os import listdir
 from os import path
 from os.path import isfile, join
@@ -18,6 +19,8 @@ from flask.json import jsonify, load
 import csv
 import pandas as pd
 import numpy as np
+import time
+from datetime import datetime
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -30,10 +33,10 @@ from lib.Simulation import Simulation
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
+from lib.LogProcessing import get_endpoint_matrix
 
 # Global vars
 LOG_PATH = 'logs'
-LOG_FILENAMES = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
 
 def install(client):
     """
@@ -58,7 +61,9 @@ def install(client):
         -------
         string
         """
-        return render_template('index.html', log_filenames=LOG_FILENAMES, len_logfiles=len(LOG_FILENAMES))
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
+
+        return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
 
     # declare endpoint for retrieving forms
     @client.route('/forms/<name>')
@@ -174,35 +179,40 @@ def install(client):
         """
         Function to process the .csv logfile and return an endpoint_matrix
         in JSON format.
+        
+        Parameters
+        ----------
+        f: logfile name
 
         Returns
         -------
         GET: JSON
         """
-        # Read in the log data
-        filename = request.args.get('f', default=LOG_FILENAMES[0])
-        log_df = pd.read_csv('logs/' + filename, sep=';')
 
-        # Create 'final_matrix' (initially a zeros matrix)
-        rows = log_df['Server'].unique()
-        cols = log_df['To_Server'].unique()
-        final_matrix = pd.DataFrame(0, index=cols, columns=rows)
+        # Scan the logfile directory 
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
 
-        # Filter by Server and To_Server
-        filtered_log_df = log_df[['Server', 'To_Server']]
+        # Only process/return endpoint_matrix if a logfile exists
+        if log_filenames:
 
-        # Group by unique combinations and count occurrences
-        df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+            # By default, find the most recently created file
+            creation_dict = {}
+            for file in log_filenames:
+                (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(os.path.join(LOG_PATH, file))
+                creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
 
-        # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
-        for index, row in df.iterrows():
-            final_matrix.loc[row['To_Server']][row['Server']] = row['count']
+            creation_dict = {k: v for k, v in sorted(creation_dict.items(), key=lambda item: item[1])}
+            last_created = list(creation_dict.keys())[-1]
 
-        # Convert 'final_matrix' df to array and prepare data for jsonify
-        final_matrix_numpy = final_matrix.values.tolist()
-        json_convert = {"data": final_matrix_numpy}
+            # Parse URL request file f using last_created default 
+            f = request.args.get('f', default=last_created)
+            print("Getting endpoint_matrix for logfile:", f)
 
-        return jsonify(json_convert)
+            return get_endpoint_matrix(f)
+
+        else:
+            json_convert = {"data": 0, "message": "No logfile found."}
+            return jsonify(json_convert)
 
 
 
@@ -213,17 +223,36 @@ def install(client):
 
         URL args
         -------
-            f: simulation logfile - (By default takes the first .csv in /logs)
+        f: simulation logfile - (By default takes the first .csv in /logs)
 
         Returns
         -------
         GET: JSON
         """
 
-        # Parse the URL arg
-        sim_file = request.args.get('f', default=LOG_FILENAMES[0])
+        # Scan the logfile directory
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
 
-        return render_template('visualization.html', sim_file=sim_file)
+        # Only process/return endpoint_matrix if a logfile exists
+        if log_filenames:
+
+            # By default, find the most recently created file, else return index page
+            creation_dict = {}
+            for file in log_filenames:
+                (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(os.path.join(LOG_PATH, file))
+                creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
+
+            creation_dict = {k: v for k, v in sorted(creation_dict.items(), key=lambda item: item[1])}
+            last_created = list(creation_dict.keys())[-1]
+
+            # Parse URL request file f using last_created default 
+            sim_file = request.args.get('f', default=last_created)
+            print("Generating visualizations for:", sim_file)
+
+            return render_template('visualization.html', sim_file=sim_file)
+
+        else:
+            return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
 
 
 

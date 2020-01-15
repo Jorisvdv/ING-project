@@ -12,7 +12,7 @@ simulation.
 from flask import Flask
 import routes
 import dash
-from lib.DashGraphs import show_dash_graphs
+from lib.LogProcessing import show_dash_graphs
 
 class Client(object):
 

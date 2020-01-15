@@ -1,25 +1,69 @@
 """
-This file contains a set of functions to generate and display Dash visualizations 
-of simulation results as well as set up manual settings to customize them.
+This file contains a set of methods to process a simulation logfile. 
+Such calculations are later used to generate visualizations.
 
-@author Pablo Escobar <pablo.escobar@gmail.com>
-@file   dash.py
+@author Antonio Samaniego / Milos Dragojevic
+@file   LogProcessing.py
 @scope  public
 """
 
 # third party dependencies
-import csv
+import math
+import os
 import pandas as pd
+from flask.json import jsonify, load
+import csv
 import numpy as np
-
 import dash_table
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
 import dash_html_components as html
 
+# local dependencies
+from lib.OutlierDetection import detect_outliers
+
+# Global vars
+LOG_PATH = 'logs'
+
+def get_endpoint_matrix(f):
+    # Read in the log data
+    log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
+
+    # Create 'final_matrix' (initially a zeros matrix)
+    rows = log_df['Server'].unique()
+    cols = log_df['To_Server'].unique()
+    final_matrix = pd.DataFrame(0, index=cols, columns=rows)
+
+    # Filter by Server and To_Server
+    filtered_log_df = log_df[['Server', 'To_Server']]
+
+    # Group by unique combinations and count occurrences
+    df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+
+    # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
+    for index, row in df.iterrows():
+        final_matrix.loc[row['To_Server']][row['Server']] = row['count']
+
+    # Convert 'final_matrix' df to array and prepare data for jsonify
+    final_matrix_numpy = final_matrix.values.tolist()
+    json_convert = {"data": final_matrix_numpy, "message": "Success"}
+
+    return jsonify(json_convert)
+
+
 
 def show_dash_graphs(dashapp):
+    """
+    Function to generate Dash visualizations from a simulation logfile.
 
+    Parameters
+    ----------
+        dashapp: Dash app object
+
+    Returns
+    -------
+        Dash Graph
+    """
     df = pd.read_csv('logs/Manual_Log_Filtered.csv', sep = ",", error_bad_lines=False)
 
     dashapp.layout = html.Div([
@@ -77,16 +121,42 @@ def show_dash_graphs(dashapp):
         colors = ['#7FDBFF' if i in derived_virtual_selected_rows else '#0074D9'
                   for i in range(len(dff))]
 
-        return [
+        # Outliers
+        outlier_list = []
+        sim_file = 'Manual_Log_Filtered.csv'
+        metrics = ["CPU Usage", "Memory Usage"]
+        num_std_dev = 3
+        
+        for column in metrics:
+            if column in dff:
+                outlier_list.append(detect_outliers(list(dff[column]), s=num_std_dev, filename='outliers_' + column + '_' + sim_file))
+
+        metric_outliers = {}
+        for idx, metric in enumerate(metrics):
+            metric_outliers[metric] = [list(outlier_list[idx].keys()), list(outlier_list[idx].values())]
+
+        print(dff["Time_floor"].shape, dff[column].shape)
+        aux_X = list(range(0, dff[column].shape[0]))
+
+        fig = [
             dcc.Graph(
                 id=column,
                 figure={
                     "data": [
                         {
-                            "x": dff["Time_floor"],
+                            # "x": dff["Time_floor"],
+                            "x": aux_X,
                             "y": dff[column],
                             "type": "line",
                             "marker": {"color": colors},
+                            "name": "usage"
+                        },
+                        {
+                            "x": metric_outliers[column][0],
+                            "y": metric_outliers[column][1],
+                            'mode': 'markers',
+                            "marker": {"color": 'red'},
+                            "name": "outliers"
                         }
                     ],
                     "layout": {
@@ -100,11 +170,12 @@ def show_dash_graphs(dashapp):
                     },
                 },
             )
+
+
             # check if column exists - user may have deleted it
             # If `column.deletable=False`, then you don't
             # need to do this check.
             for column in ["CPU Usage", "Memory Usage"] if column in dff
         ]
 
-
-
+        return fig
