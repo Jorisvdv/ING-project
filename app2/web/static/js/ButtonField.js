@@ -56,11 +56,6 @@ export class ButtonField extends EventBus(class {}) {
         if (options.text) this[container].textContent = options.text;
 
         /**
-         *  Classlists for the button (note, this is not that nice for production).
-         */
-        this[container].classList.add("w3-button w3-white w3-padding-large w3-large");
-
-        /**
          *  Event listener for the click event.
          */
         this[container].addEventListener('click', (e) => {
