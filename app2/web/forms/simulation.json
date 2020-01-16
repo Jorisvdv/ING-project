@@ -6,9 +6,24 @@
         "placeholder": "Enter a number",
         "value": 100
     }, {
+        "name": "kinds",
+        "type": "text",
+        "label": "List of types of servers",
+        "placeholder": "Enter a list of types of servers (comma seperated)."
+    }, {
+        "name": "size",
+        "type": "number",
+        "label": "Number of servers per type",
+        "placeholder": "Enter a number of servers"
+    }, {
+        "name": "capacity",
+        "type": "number",
+        "label": "Max capacity of each server",
+        "placeholder": "Enter a capacity"
+    }, {
         "name": "process",
         "type": "text",
-        "label": "Simulation process as server sequence (comma seperated).",
+        "label": "Simulation process as sequence of servers (comma seperated).",
         "placeholder": "Enter a list of types of servers (comma seperated)"
     }, {
         "button": true,

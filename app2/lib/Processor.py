@@ -10,6 +10,8 @@ to which server, in a sequence.
 
 # dependencies
 from lib.Process import Process
+from uuid import uuid4
+from simpy import Interrupt
 
 class Processor(Process):
 
@@ -23,14 +25,21 @@ class Processor(Process):
 
         Keyworded parameters
         --------------------
+        seasonality: Seasonality
+            Source of incoming messages.
+            [required]
         kinds: list
             List of server kinds as sequence.
+            [optional]
         """
 
         # call the parent class
-        super().__init(self, *args)
+        super().__init__(*args)
 
-        # we need a collection of server kinds
+        # required seasonality
+        self._seasonality = kwargs['seasonality']
+
+        # optional sequence of kinds
         self._kinds = kwargs['kinds'] if 'kinds' in kwargs else ['regular']
 
     def run(self):
@@ -48,28 +57,52 @@ class Processor(Process):
         # sequence of server kinds
         kinds = self._kinds
 
-        # we need to iterate over all kinds
-        for (idx, kind) in enumerate(kinds):
+        # loop until the given seasonality end period
+        while True:
 
-            # we need to get access to a server, so we can start a process
-            server = self.servers(kind)
+            # timeout before proceeding to the next transaction
+            yield self.environment.timeout(self._seasonality.interval(self.environment.now))
 
-            # get the client who requested this process
-            requested_by = 'client' if idx > 0 else kinds[idx - 1]
+            # we need to iterate over all kinds
+            for (idx, kind) in enumerate(kinds):
 
-            # ask the server for a new request
-            request = server.request(requested_by=requested_by, process_id=1)
+                # we need to get access to a server, so we can start a process
+                server = self.servers(kind).server()
 
-            # yield the request and timeout
-            yield request
-            yield self.environment.timeout(server.latency())
+                # add the open request to the collection of open servers, so 
+                # we can release it later on
+                open_servers.append(server)
 
-            # add the open request to the collection of open servers, so 
-            # we can release it later on
-            open_servers.append(server)
+                # attempt to parse a server request
+                try:
 
-        # release all server requests
-        for server in open_servers:
+                    # get the client who requested this process
+                    requested_by = { "name": 'client', "kind": "client" } if idx < 1 else open_servers[idx - 1].state()
 
-            # release the server request
-            server.release()
+                    # ask the server for a new request
+                    request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=uuid4(), message=f"Requesting {kind} by {requested_by['kind']}")
+
+                    # yield the request and timeout
+                    yield request
+                    yield self.environment.timeout(server.latency())
+
+                # handle interruptions
+                except Interrupt as interrupt:
+
+                    # TODO Actually log to an error log.
+
+                    # Check if error is due to interuption using error_generator
+                    if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
+
+                        # Manually print timeout message
+                        print(f"ERROR: message {i} timeout at time {start + timeout_time}")
+
+                    else:
+                        # Use interrupt clause to write error message
+                        print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
+
+            # release all server requests
+            for server in open_servers:
+
+                # release the server request
+                server.release(request=request)

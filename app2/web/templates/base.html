@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bundle.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='bundle.css') }}">
     <script deferred type="module" src="{{ url_for('static', filename='main.js') }}?v=22"></script>
   </head>
 
@@ -32,7 +32,8 @@
         h3,
         h4,
         h5,
-        h6 {
+        h6,
+        label {
         font-family: "Lato", sans-serif
         }
 
@@ -45,6 +46,12 @@
         .fa-anchor,
         .fa-coffee {
         font-size: 200px
+        }
+
+        .simulation-form
+        {
+            max-width: 30rem;
+            margin: 0 auto;
         }
     </style>
 

@@ -34,6 +34,7 @@ from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
 from lib.LogProcessing import get_endpoint_matrix, show_dash_graphs
+from lib.Seasonality import TransactionInterval as Seasonality
 
 # Global vars
 LOG_PATH = 'logs'
@@ -154,10 +155,10 @@ def install(client):
 
             # iterate over all of the servers that need to be configured that
             # we received from the client
-            for server in request.form['servers']:
+            for kind in request.form['kinds'].split(','):
 
                 # append a new server pool to the multiserver system
-                severs.append(Servers(simulation.environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
+                servers.append(Servers(simulation.environment, size=int(request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
 
             # now that we have an output dir, we can construct our logger which we can use for
             # the simulation
@@ -166,9 +167,12 @@ def install(client):
             # we can use the logger for the simulation, so we know where all logs will be written
             simulation.use(logger)
 
+            # we need a new form of seasonality
+            seasonality = Seasonality(join('seasonality', 'week.csv'), max_volume=1000)
+
             # now, we can put the process in the simulation, which will know
             # how to define the process
-            simulation.process(Processor, kinds=request.form['process'].split(','))
+            simulation.process(Processor, seasonality=seasonality, kinds=[kind.strip() for kind in request.form['process'].split(',')])
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.

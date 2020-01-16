@@ -87,7 +87,7 @@ class Simulation(object):
         # allow chaining
         return self
 
-    def process(self, Process, *kwargs):
+    def process(self, Process, **kwargs):
         """
         Method to install a process on a simulation. This will be called whenever a
         simulatio is run. Each callback receives the simulation environment and

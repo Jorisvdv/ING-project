@@ -10,6 +10,7 @@ a given number of servers and get access to an available one.
 # dependencies
 from lib.Server import Server
 from uuid import uuid4
+from numpy.random import randint
 
 class Servers(object):
 
@@ -65,11 +66,26 @@ class Servers(object):
         exclude: list
             Collection of servers to exclude from the pool when looking for
             a new server.
+        random: bool
+            Get access to a randomly picked server, and not the one with the
+            lowest number of users in queue.
 
         Returns
         -------
         Server
         """
+        # we need a reference to the pool of servers
+        pool = self._pool
+
+        # we need to check if we need to pick a server randomly, or by lowest
+        random = kwargs['random'] if 'random' in kwargs else False
+
+        # check if we need to find a random one
+        if random:
+
+            # pick a random server
+            return pool[randint(0, len(pool))]
+
         # we need a reference to the server with the lowest number of
         # processes in queue, which is the server that is going to
         # be targeted
@@ -82,7 +98,7 @@ class Servers(object):
         # we need to iterate over the pool of servers, so we can check
         # the state of each server and find the one with the least
         # amount of traffic
-        for server in self._pool:
+        for server in pool:
 
             # state of the current server
             current = server.state()

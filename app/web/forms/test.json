@@ -1,8 +1,0 @@
-{
-    "fields": [{
-        "type": "text",
-        "name": "foo",
-        "placeholder": "It is working!",
-        "label": "foo"
-    }]
-}

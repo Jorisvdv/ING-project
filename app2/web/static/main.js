@@ -30,7 +30,9 @@ onload = function() {
     /**
      *  Form for starting a simulation.
      */
-    Forms.create(mainContainer, '/simulation.json').then((form) => {
+    Forms.create(mainContainer, '/simulation.json', {
+        className: 'simulation-form'
+    }).then((form) => {
 
         /**
          *  Listener for the submit event on the form, so we know when
@@ -39,7 +41,25 @@ onload = function() {
          */
         form.on('submit', (e) => {
 
-            console.log(e.target.data());
+            /**
+             *  Data to post to the api as formdata.
+             *  @var    FormData
+             */
+            const formdata = new FormData();
+
+            // append all data entries to the formdata
+            Object.entries(form.data()).forEach(([k, v]) => formdata.set(k, v));
+
+            /**
+             *  Post request to startup a new simulation based on the
+             *  values of the form.
+             *  @var    Promise
+             */
+            api.post('/simulation', formdata).then((res) => {
+
+                // test output
+                console.log(res);
+            });
         });
     });
 };
