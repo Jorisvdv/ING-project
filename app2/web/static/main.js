@@ -39,7 +39,25 @@ onload = function() {
          */
         form.on('submit', (e) => {
 
-            console.log(e.target.data());
+            /**
+             *  Data to post to the api as formdata.
+             *  @var    FormData
+             */
+            const formdata = new FormData();
+
+            // append all data entries to the formdata
+            Object.entries(form.data()).forEach(([k, v]) => formdata.set(k, v));
+
+            /**
+             *  Post request to startup a new simulation based on the
+             *  values of the form.
+             *  @var    Promise
+             */
+            api.post('/simulation', formdata).then((res) => {
+
+                // test output
+                console.log(res);
+            });
         });
     });
 };

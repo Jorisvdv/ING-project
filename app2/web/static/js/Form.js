@@ -80,14 +80,21 @@ export class Form extends EventBus(class {}) {
 
     /**
      *  Method to expose the data of the form.
-     *  @return Array
+     *  @return Object
      */
     data() {
 
-        // expose the values of all fields
-        return this[container].installed
+        // form data container
+        const data = { };
+
+        // iterate over the installed fields and assign them to the data
+        this[container].installed
             .map((instance) => instance.value)
-            .filter((value) => Object.keys(value).length);
+            .filter((value) => Object.keys(value).length)
+            .forEach((value) => Object.assign(data, value));
+
+        // expose the values of all fields
+        return data;
     }
 
     /**
