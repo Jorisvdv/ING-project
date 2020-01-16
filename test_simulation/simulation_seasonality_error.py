@@ -16,42 +16,45 @@ seasonality_df = pd.read_csv(csv_filename, sep=";")
 
 timeout_time = 0.5
 error_duration = (3, 5)
-inter_transaction_time = (.01, 0.1)
+latency = (.01, 0.55)
 errorwait = (2, 5)
 runtime = 10
 
 
-def message(env, server, i, timeout_time, interval_generator=None):
+def message(env, server, i, timeout_time, latency):
     start = env.now
-    # Enter all message processes here, for now random timeout
-    try:
-        if interval_generator is not None:
-            process_time = interval_generator.interval()
-        else:
-            process_time = uniform(inter_transaction_time[0], inter_transaction_time[1])
-        with server.request(priority=1) as req:  # Generate a request event
-            yield req                    # Wait for access
-            yield env.timeout(process_time)
-        print(f"INFO: message {i} processed at time {env.now}, duration {process_time}")
-    except simpy.Interrupt as interrupt:
-        # Check if error is due to interuption using error_generator
-        if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
-            # Manually print timeout message
-            print(f"ERROR: message {i} timeout at time {start + timeout_time}")
-        else:
-            # Use interrupt clause to write error message
-            print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
+    process_time = uniform(latency[0], latency[1])
+
+    def send_message(processing_time, timeout_time):
+        try:
+            with server.request(priority=1) as req:  # Generate a request event
+                yield req                    # Wait for access
+                yield env.timeout(processing_time)
+                print(f"INFO: message {i} processed at time {env.now}, duration {process_time}")
+
+        except simpy.Interrupt as interrupt:
+            # Check if error is due to interuption using error_generator
+            if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
+                # Manually print timeout message
+                print(f"ERROR: message {i} timeout at time {start + timeout_time}")
+            else:
+                # Use interrupt clause to write error message
+                print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
+
+    sent_message = env.process(send_message(process_time, timeout_time))
+    yield sent_message | env.timeout(timeout_time)
+
+    # If message not triggered then timeout is past
+    if (not sent_message.triggered):
+        sent_message.interrupt("timeout")
 
 
-def message_generator(env, server, timeout_time, interval_generator=None):
-    for i in range(1000):
-
-        message_process = env.process(message(env, server, i, timeout_time, interval_generator))
-        yield message_process | env.timeout(timeout_time)
-
-        # If message not triggered then timeout is past
-        if (not message_process.triggered):
-            message_process.interrupt("timeout")
+def message_generator(env, server, timeout_time, interval_generator, latency):
+    i = 1
+    while True:
+        yield env.timeout(interval_generator.interval())
+        env.process(message(env, server, i, timeout_time, latency))
+        i += 1
 
 
 def error_generator(env, server):
@@ -77,5 +80,5 @@ if __name__ == "__main__":
     t_interval = TransactionInterval(csv_filename, enviroment=env, max_volume=100)
     serv = simpy.PreemptiveResource(env, capacity=5)
     env.process(error_generator(env, serv))
-    env.process(message_generator(env, serv, timeout_time, t_interval))
+    env.process(message_generator(env, serv, timeout_time, t_interval, latency))
     env.run(until=runtime)
