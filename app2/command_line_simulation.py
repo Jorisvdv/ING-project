@@ -2,24 +2,32 @@
 File to start simulation from command line interface
 """
 
-# dependencies
-from lib.Processor import Processor
-from lib.Logger import Logger
-from lib.Servers import Servers
+import logging
 from lib.Simulation import Simulation
+from lib.Servers import Servers
+from lib.Logger import Logger
+from lib.Processor import Processor
+from lib.Seasonality import TransactionInterval as Seasonality
+import sys
+import os
+
+
+# dependencies
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
 # and behave the same
-import logging
 logging.basicConfig(level=logging.INFO)
 
 
-location_logs = "logs"
+location_logs = os.path.join(sys.path[0], "ClI_Logs")
 settings = {"servers": [{"size": 5,
-                         "capacity": 1000,
-                         "kind": "balance"}],
-            "process": "balance",
+                         "capacity": 100,
+                         "kind": "balance"},
+                        {"size": 5,
+                         "capacity": 100,
+                         "kind": "credit"}],
+            "process": "balance,credit",
             "runtime": 10}
 
 
@@ -53,9 +61,13 @@ def run_simulation(id, settings_simulation, logs=location_logs):
     # we can use the logger for the simulation, so we know where all logs will be written
     simulation.use(logger)
 
+    # we need a new form of seasonality
+    seasonality = Seasonality(os.path.join(sys.path[0], 'seasonality', 'week.csv'), max_volume=1000)
+
     # now, we can put the process in the simulation, which will know
     # how to define the process
-    simulation.process(Processor, kinds=settings_simulation['process'].split(','))
+    simulation.process(Processor, seasonality=seasonality,
+                       kinds=settings_simulation['process'].split(','))
 
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
