@@ -30,7 +30,9 @@ onload = function() {
     /**
      *  Form for starting a simulation.
      */
-    Forms.create(mainContainer, '/simulation.json').then((form) => {
+    Forms.create(mainContainer, '/simulation.json', {
+        className: 'simulation-form'
+    }).then((form) => {
 
         /**
          *  Listener for the submit event on the form, so we know when

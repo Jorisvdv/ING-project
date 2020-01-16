@@ -39,6 +39,7 @@ export class Form extends EventBus(class {}) {
      *  @param  Object  Configuration for the form. Supported options are:
      *
      *                      "fields"    Array   List of fields beloning to the form.
+     *                      "className" String  Name of the class of the form.
      */
     constructor(parent, options = {}) {
 
@@ -50,7 +51,8 @@ export class Form extends EventBus(class {}) {
          *  @var    EventContainer
          */
         this[container] = new EventContainer(parent, {
-            element: 'form'
+            element: 'form',
+            className: options.className
         });
 
         /**
