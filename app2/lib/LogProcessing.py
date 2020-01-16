@@ -10,10 +10,11 @@ Such calculations are later used to generate visualizations.
 # third party dependencies
 import math
 import os
-import pandas as pd
-from flask.json import jsonify, load
 import csv
+import json
+import pandas as pd
 import numpy as np
+from flask.json import jsonify, load
 import dash_table
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
@@ -24,6 +25,45 @@ from lib.OutlierDetection import detect_outliers
 
 # Global vars
 LOG_PATH = 'logs'
+
+def get_endpoint_json(f):
+    # Read in the log data
+    log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
+
+    # Create 'final_matrix' (initially a zeros matrix)
+    rows = log_df['Server'].dropna().unique()
+    cols = log_df['To_Server'].dropna().unique()
+    final_matrix = pd.DataFrame(0, index=cols, columns=rows)
+
+    # Filter by Server and To_Server
+    filtered_log_df = log_df[['Server', 'To_Server']]
+
+    # Group by unique combinations and count occurrences
+    endpoint_df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+
+    endpoint_json = {
+        "nodes":[], 
+        "links":[]
+    }
+
+    groups = cols
+    for idx, g in enumerate(groups):
+        endpoint_json["nodes"].append({
+                                       "id": g, 
+                                       "group": idx + 1
+                                      })
+        
+
+    for idx, r in endpoint_df.iterrows():
+        endpoint_json["links"].append({
+                                        "source": r['Server'], 
+                                        "target": r['To_Server'], 
+                                        "value": r['count']
+                                      })
+
+    return jsonify(endpoint_json)
+
+    
 
 def get_endpoint_matrix(f):
     # Read in the log data
@@ -38,10 +78,10 @@ def get_endpoint_matrix(f):
     filtered_log_df = log_df[['Server', 'To_Server']]
 
     # Group by unique combinations and count occurrences
-    df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+    endpoint_df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
 
     # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
-    for index, row in df.iterrows():
+    for index, row in endpoint_df.iterrows():
         final_matrix.loc[row['To_Server']][row['Server']] = row['count']
 
     # Convert 'final_matrix' df to array and prepare data for jsonify

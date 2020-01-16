@@ -15,7 +15,10 @@
 	  <!-- Third Grid -->
 	  <div id="Visualisation" class="w3-row-padding w3-padding-64 w3-container">
 	      <!-- Create a div where the graph will take place -->
-	     <div align="center" alt="Server Communication" id="my_dataviz"></div>
+	     <!--<div align="center" alt="Server Communication" id="my_dataviz"></div>-->
+	     <div alt="Server Communication">
+	     		<svg width="700" height="400"></svg>
+	     </div>
 
 	     <!-- Dash visualizations iframe --> 
 	     <div id="mainFrameDiv" style="--aspect-ratio: 16/9;">
@@ -45,44 +48,54 @@
 	    <p>Powered by DSP</a></p>
 	  </footer>
 
-	  <script>
-
-	     var chordiagramDataUrl = "/get_endpoint_data?f={{ sim_file }}";
-
-	    // Used to toggle the menu on small screens when clicking on the menu button
-	    function myFunction() {
-	      var x = document.getElementById("mytopnav");
-	      if (x.className.indexOf("w3-show") == -1) {
-	        x.className += " w3-show";
-	      } else {
-	        x.className = x.className.replace(" w3-show", "");
-	      }
-	    }
-
-		/* When the user clicks on the button, 
-		toggle between hiding and showing the dropdown content */
-		function myFunction() {
-		  document.getElementById("myDropdown").classList.toggle("show");
-		}
-
-		// Close the dropdown if the user clicks outside of it
-		window.onclick = function(event) {
-		  if (!event.target.matches('.dropbtn')) {
-		    var dropdowns = document.getElementsByClassName("dropdown-content");
-		    var i;
-		    for (i = 0; i < dropdowns.length; i++) {
-		      var openDropdown = dropdowns[i];
-		      if (openDropdown.classList.contains('show')) {
-		        openDropdown.classList.remove('show');
-		      }
-		    }
-		  }
-		}
-
-	  </script>
-
 </body>
     
 </center>
+
+<!--<script src="{{ url_for('static', filename='js/visualization.js') }}?v=15"></script>-->
+<script>
+
+	if ("{{ f }}") {
+		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
+	}
+	else {
+		forcegraphDataUrl = "/get_endpoint_data";
+	}
+
+	forceGraph(forcegraphDataUrl);
+
+	 var chordiagramDataUrl = "/get_endpoint_data?f={{ sim_file }}";
+
+	// Used to toggle the menu on small screens when clicking on the menu button
+	function myFunction() {
+	  var x = document.getElementById("mytopnav");
+	  if (x.className.indexOf("w3-show") == -1) {
+	    x.className += " w3-show";
+	  } else {
+	    x.className = x.className.replace(" w3-show", "");
+	  }
+	}
+
+	/* When the user clicks on the button, 
+	toggle between hiding and showing the dropdown content */
+	function myFunction() {
+	  document.getElementById("myDropdown").classList.toggle("show");
+	}
+
+	// Close the dropdown if the user clicks outside of it
+	window.onclick = function(event) {
+	  if (!event.target.matches('.dropbtn')) {
+	    var dropdowns = document.getElementsByClassName("dropdown-content");
+	    var i;
+	    for (i = 0; i < dropdowns.length; i++) {
+	      var openDropdown = dropdowns[i];
+	      if (openDropdown.classList.contains('show')) {
+	        openDropdown.classList.remove('show');
+	      }
+	    }
+	  }
+	}
+
+</script>
 
 {% endblock content %}

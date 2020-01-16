@@ -1,3 +1,45 @@
+/* base.html styles */
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+label {
+font-family: "Lato", sans-serif
+}
+
+.w3-bar,
+h1,
+button {
+font-family: "Montserrat", sans-serif
+}
+
+.fa-anchor,
+.fa-coffee {
+font-size: 200px;
+width: 300px;
+}
+
+.simulation-form
+{
+    max-width: 30rem;
+    margin: 0 auto;
+}
+
+/******/
+
+.center-img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 90px;
+  width: 300px;
+}
+
+
+
 #mainFrameDiv {
     margin-right:auto;
     margin-left:auto;
@@ -65,3 +107,21 @@
 .dropdown a:hover {background-color: #ddd;}
 
 .show {display: block;}
+
+
+
+/* D3 Force Graph styles */
+.links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+}
+
+text {
+  font-family: sans-serif;
+  font-size: 10px;
+}

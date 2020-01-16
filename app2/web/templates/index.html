@@ -67,9 +67,10 @@
 	      </div>
 			-->
 	      <!-- Create a div where the graph will take place -->
-	      <div> <h2>Hover me!</h2> </div>
-	     <div alt="Server Communication" id="my_dataviz"></div>
-
+	      <!--<div align="center" alt="Server Communication" id="my_dataviz"></div>-->
+	     <div alt="Server Communication">
+	     		<svg width="700" height="400"></svg>
+	     </div>
 
 	     <!-- Dropdown menu for Visualizations -->
 	     <div class="dropdown">
@@ -97,8 +98,11 @@
 	    <div class="w3-content">
 	        
 	      <div class="w3-twothird">
-	        
+
 	        <h1>Project description</h1>
+	        <div class="w3-third w3-center">
+	        	<img src="{{ url_for('static', filename='img/uva.png')}}" class="center-img">
+	     	 </div>
 	        <h5 class="w3-padding-32">The main motivation for this project is to have real-life-like IT metrics to be able
 	          to do feed our R&D and analytics initiatives with meaningful data.</h5>
 	          
@@ -113,19 +117,18 @@
 	          
 	      </div>
 
-	      <div class="w3-third w3-center">
-	        <img src="{{ url_for('static', filename='img/uva.png')}}" style="padding-left: 10px; padding-top: 15px;">
-	        
-	      </div>
+	      
 	    </div>
 	  </div>
 
 	  <!-- Second Grid -->
 	  <div id="Discreteeventsimulation" class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
 	    <div class="w3-content">
+	    <!--
 	      <div class="w3-third w3-center">
 	        <i class="fa fa-coffee w3-padding-64 w3-text-red w3-margin-right"></i>
 	      </div>
+	     -->
 
 	      <div class="w3-twothird">
 	        <h1>Discrete event simulation</h1>
@@ -151,9 +154,12 @@
 	  <!-- Fourth Grid -->
 	  <div id="Errorintroduction" class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
 	    <div class="w3-content">
+
+	    <!--
 	      <div class="w3-third w3-center">
 	        <i class="fa fa-coffee w3-padding-64 w3-text-red w3-margin-right"></i>
 	      </div>
+	      -->
 
 	      <div class="w3-twothird">
 	        <h1>Error Specification</h1>
@@ -192,45 +198,59 @@
 	    <p>Powered by DSP</a></p>
 	  </footer>
 
-	  <script>
-
-	     var chordiagramDataUrl = "{{ url_for('get_endpoint_data') }}";
-
-
-	    // Used to toggle the menu on small screens when clicking on the menu button
-	    function myFunction() {
-	      var x = document.getElementById("mytopnav");
-	      if (x.className.indexOf("w3-show") == -1) {
-	        x.className += " w3-show";
-	      } else {
-	        x.className = x.className.replace(" w3-show", "");
-	      }
-	    }
-
-		/* When the user clicks on the button, 
-		toggle between hiding and showing the dropdown content */
-		function myFunction2() {
-		  document.getElementById("myDropdown").classList.toggle("show");
-		}
-
-		// Close the dropdown if the user clicks outside of it
-		window.onclick = function(event) {
-		  if (!event.target.matches('.dropbtn')) {
-		    var dropdowns = document.getElementsByClassName("dropdown-content");
-		    var i;
-		    for (i = 0; i < dropdowns.length; i++) {
-		      var openDropdown = dropdowns[i];
-		      if (openDropdown.classList.contains('show')) {
-		        openDropdown.classList.remove('show');
-		      }
-		    }
-		  }
-		}
-
-	  </script>
+	  
 
 </body>
     
 </center>
+
+<!--<script type="text/javascript" src="{{ url_for('static', filename='js/JSindex.js') }}?v=44"></script>-->
+<script type="text/javascript">
+	var forcegraphDataUrl;
+
+	if ("{{ f }}") {
+		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
+	}
+	else {
+		forcegraphDataUrl = "/get_endpoint_data";
+	}
+
+	forceGraph(forcegraphDataUrl);
+
+	// var chordiagramDataUrl = "{{ url_for('get_endpoint_data') }}";
+
+
+	// Used to toggle the menu on small screens when clicking on the menu button
+	function myFunction() {
+	  var x = document.getElementById("mytopnav");
+	  if (x.className.indexOf("w3-show") == -1) {
+	    x.className += " w3-show";
+	  } else {
+	    x.className = x.className.replace(" w3-show", "");
+	  }
+	}
+
+	/* When the user clicks on the button, 
+	toggle between hiding and showing the dropdown content */
+	function myFunction2() {
+	  document.getElementById("myDropdown").classList.toggle("show");
+	}
+
+	// Close the dropdown if the user clicks outside of it
+	window.onclick = function(event) {
+	  if (!event.target.matches('.dropbtn')) {
+	    var dropdowns = document.getElementsByClassName("dropdown-content");
+	    var i;
+	    for (i = 0; i < dropdowns.length; i++) {
+	      var openDropdown = dropdowns[i];
+	      if (openDropdown.classList.contains('show')) {
+	        openDropdown.classList.remove('show');
+	      }
+	    }
+	  }
+	}
+
+</script>
+
 
 {% endblock content %}

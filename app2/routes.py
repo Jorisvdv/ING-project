@@ -33,7 +33,7 @@ from lib.Simulation import Simulation
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
-from lib.LogProcessing import get_endpoint_matrix, show_dash_graphs
+from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
 from lib.Seasonality import TransactionInterval as Seasonality
 
 # Global vars
@@ -64,6 +64,14 @@ def install(client):
     # global simulation count
     simc = 0
     
+
+    # declare the index route
+    @client.route('/test')
+    def test():
+        return render_template('test.html')
+
+
+
     # declare the index route
     @client.route('/')
     def index():
@@ -74,9 +82,23 @@ def install(client):
         -------
         string
         """
+
+        # Scan the logfile directory
         log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
-        
-        return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
+
+        if log_filenames and 'f' in request.args:
+            print("A")
+            # Parse URL request file f using last_created default 
+            f = request.args.get('f')
+            return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames), f=f)
+
+        elif log_filenames:
+            print("B")
+            return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames), f='')
+        else:
+            print("C")
+            return render_template('index.html', log_filenames=[], len_logfiles=0, f='')
+
 
     # declare endpoint for retrieving forms
     @client.route('/forms/<name>')
@@ -224,7 +246,7 @@ def install(client):
             f = request.args.get('f', default=last_created)
             print("Getting endpoint_matrix for logfile:", f)
 
-            return get_endpoint_matrix(f)
+            return get_endpoint_json(f)
 
         else:
             json_convert = {"data": 0, "message": "No logfile found."}
@@ -272,7 +294,7 @@ def install(client):
 
 
 
-    @client.route('/download-logfile') 
+    @client.route('/download-logs') 
     def download_logfile():
         """
         Function to download logfiles.
@@ -293,20 +315,3 @@ def install(client):
                          attachment_filename=f,
                          as_attachment=True)
 
-
-    @client.route('/download') 
-    def download_logs():
-        """
-        Returns download page
-
-        URL args
-        -------
-        f: simulation logfile 
-
-        Returns
-        -------
-        GET: .csv (download)
-        """
-
-        # Parse URL request file f using last_created default 
-        return render_template('downlaod.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
