@@ -14,7 +14,7 @@ import os
 from os import listdir
 from os import path
 from os.path import isfile, join
-from flask import request, render_template
+from flask import request, render_template, send_file
 from flask.json import jsonify, load
 import csv
 import pandas as pd
@@ -33,10 +33,22 @@ from lib.Simulation import Simulation
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
-from lib.LogProcessing import get_endpoint_matrix
+from lib.LogProcessing import get_endpoint_matrix, show_dash_graphs
 
 # Global vars
 LOG_PATH = 'logs'
+
+def install_dash(dashapp):
+    """
+    Function to deploy and show Dash visualizations
+
+    Parameters
+    ----------
+    dashapp: Dash
+        Dash application to install the routes on.
+    """
+    show_dash_graphs(dashapp)
+
 
 def install(client):
     """
@@ -62,7 +74,7 @@ def install(client):
         string
         """
         log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
-
+        
         return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
 
     # declare endpoint for retrieving forms
@@ -256,4 +268,41 @@ def install(client):
 
 
 
+    @client.route('/download-logfile') 
+    def download_logfile():
+        """
+        Function to download logfiles.
 
+        URL args
+        -------
+        f: simulation logfile 
+
+        Returns
+        -------
+        GET: .csv (download)
+        """
+
+        # Parse URL request file f using last_created default 
+        f = request.args.get('f')
+        return send_file('logs/'+f,
+                         mimetype='text/csv',
+                         attachment_filename=f,
+                         as_attachment=True)
+
+
+    @client.route('/download') 
+    def download_logs():
+        """
+        Returns download page
+
+        URL args
+        -------
+        f: simulation logfile 
+
+        Returns
+        -------
+        GET: .csv (download)
+        """
+
+        # Parse URL request file f using last_created default 
+        return render_template('downlaod.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))

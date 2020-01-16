@@ -14,10 +14,10 @@
 	    <div class="w3-bar w3-orange w3-card w3-left-align w3-large">
 	      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-orange"
 	        href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
-	      <a href="#Home" class="w3-bar-item w3-button w3-padding-large w3-white">Home</a>
+	      <a href="#Home" class="w3-bar-item w3-button w3-padding-large w3-white">Simulation</a>
+	     <a href="#Visualisation" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Visualisation</a>
 	      <a href="#Projectdescription" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Project description</a>
 	      <a href="#Discreteeventsimulation" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Discrete event simulation</a>
-	      <a href="#Visualisation" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Visualisationsimulation</a>
 	      <a href="#Errorintroduction" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Error introduction</a>
 	      <a href="#Logfile" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Download logfiles</a>
 	      
@@ -37,7 +37,7 @@
 	  <header class="w3-container w3-orange w3-center" style="padding:128px 16px">
 	    <h1 class="w3-margin w3-jumbo">Discrete Event Simulation</h1>
 	    <p class="w3-xlarge">Start simulation by introducing parameters</p>
-	    <button class="w3-button w3-white w3-padding-large w3-large w3-margin-top" onlick="myFunctions () ">Run simulation</button>
+	    <button class="w3-button w3-white w3-padding-large w3-large w3-margin-top" onlick="myFunctions()">Run simulation</button>
 
 	    <!-- define content container -->
         <div id="main"></div>
@@ -49,6 +49,50 @@
 	  </header>
 
 	  <!-- First Grid -->
+	  <div id="Visualisation" class="w3-row-padding w3-padding-64 w3-container">
+	    <div class="w3-content">
+	    	<h1>Visualization</h1>
+	    <!--
+	      <div class="w3-twothird">
+	        <h1>Visualization</h1>
+	        <h5 class="w3-padding-32">The main motivation for this project is to have real-life-like IT metrics to be able
+	          to do feed our R&D and analytics initiatives with meaningful data.</h5>
+
+	        <p class="w3-text-grey"> The project aims to create a large scale database of annotated machine metrics in the
+	          form of time series. This database, will later be used in a PhD project to test deep learning methods on. The
+	          metrics will be an output of a discrete event simulation model of a realistic system with a certain workload,
+	          such as log-ins or incoming transactions to be processed, and topology of servers communicating with each
+	          other. Independent
+	          failures and cascading failures will be simulated in the system to see the effect on the machine metrics,
+	          later to be annotated as anomalies. </p>
+	      </div>
+			-->
+	      <!-- Create a div where the graph will take place -->
+	      <div> <h2>Hover me!</h2> </div>
+	     <div alt="Server Communication" id="my_dataviz"></div>
+
+
+	     <!-- Dropdown menu for Visualizations -->
+	     <div class="dropdown">
+		  <button onclick="myFunction2()" class="dropbtn">Select Simulation</button>
+		  <div id="myDropdown" class="dropdown-content">
+		  	{%for i in range(0, len_logfiles)%} 
+			    <a href="/visualization?f={{ log_filenames[i] }}" target="_blank">{{ log_filenames[i] }}</a>
+			{%endfor%} 
+		  </div>
+		</div>
+
+
+
+	     <!-- Dash visualizations iframe --> 
+	     <div id="mainFrameDiv" style="--aspect-ratio: 16/9;">
+			<iframe src="http://localhost:8050/dash/" width=1000 height=600> </iframe>
+		</div>
+
+	    </div>
+	  </div>
+
+
 	  
 	  <div id="Projectdescription" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
@@ -103,43 +147,7 @@
 
 
 
-	  <!-- Third Grid -->
-	  <div id="Visualisation" class="w3-row-padding w3-padding-64 w3-container">
-	    <div class="w3-content">
-	      <div class="w3-twothird">
-	        <h1>Visualisation</h1>
-	        <h5 class="w3-padding-32">The main motivation for this project is to have real-life-like IT metrics to be able
-	          to do feed our R&D and analytics initiatives with meaningful data.</h5>
-
-	        <p class="w3-text-grey"> The project aims to create a large scale database of annotated machine metrics in the
-	          form of time series. This database, will later be used in a PhD project to test deep learning methods on. The
-	          metrics will be an output of a discrete event simulation model of a realistic system with a certain workload,
-	          such as log-ins or incoming transactions to be processed, and topology of servers communicating with each
-	          other. Independent
-	          failures and cascading failures will be simulated in the system to see the effect on the machine metrics,
-	          later to be annotated as anomalies. </p>
-	      </div>
-
-	      <!-- Create a div where the graph will take place -->
-	     <div align="right" alt="Server Communication" id="my_dataviz"></div>
-
-	     <!-- Dropdown menu for Visualizations -->
-	     <div class="dropdown">
-		  <button onclick="myFunction()" class="dropbtn">Select Simulation</button>
-		  <div id="myDropdown" class="dropdown-content">
-		  	{%for i in range(0, len_logfiles)%} 
-			    <a href="/visualization?f={{ log_filenames[i] }}" target="_blank">{{ log_filenames[i] }}</a>
-			{%endfor%} 
-		  </div>
-		</div>
-
-	     <!-- Dash visualizations iframe --> 
-	     <div id="mainFrameDiv" style="--aspect-ratio: 16/9;">
-			<iframe src="http://localhost:8050/dash/" width=1000 height=600> </iframe>
-		</div>
-
-	    </div>
-	  </div>
+	  
 
 	  <!-- Fourth Grid -->
 	  <div id="Errorintroduction" class="w3-row-padding w3-light-grey w3-padding-64 w3-container">
@@ -168,14 +176,13 @@
 
 
 
-
 	  <div id="Logfile" class="w3-container w3-black w3-center w3-opacity w3-padding-64">
-	    
-	    <button class="w3-button w3-buttoncolor w3-padding-large w3-large w3-margin-top" onlick="myFunctions () ">Download logfiles</button>
+	    <button class="w3-button w3-buttoncolor w3-padding-large w3-large w3-margin-top" onclick="window.location.href = '/download-logs?f=Manual_Log.csv';">Download logfiles</button>
 	  </div>
 
+
 	  <!-- Footer -->
-	  <footer class="w3-container w3-padding-64 w3-center w3-opacity">
+	  <footer class="w3-container w3-padding-64 w3-center w3-opacity"> 
 	    <div class="w3-xlarge w3-padding-32">
 	      <i class="fa fa-facebook-official w3-hover-opacity"></i>
 	      <i class="fa fa-instagram w3-hover-opacity"></i>
@@ -203,7 +210,7 @@
 
 		/* When the user clicks on the button, 
 		toggle between hiding and showing the dropdown content */
-		function myFunction() {
+		function myFunction2() {
 		  document.getElementById("myDropdown").classList.toggle("show");
 		}
 

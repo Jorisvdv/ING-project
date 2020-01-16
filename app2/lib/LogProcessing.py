@@ -30,8 +30,8 @@ def get_endpoint_matrix(f):
     log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
 
     # Create 'final_matrix' (initially a zeros matrix)
-    rows = log_df['Server'].unique()
-    cols = log_df['To_Server'].unique()
+    rows = log_df['Server'].dropna().unique()
+    cols = log_df['To_Server'].dropna().unique()
     final_matrix = pd.DataFrame(0, index=cols, columns=rows)
 
     # Filter by Server and To_Server
@@ -45,8 +45,11 @@ def get_endpoint_matrix(f):
         final_matrix.loc[row['To_Server']][row['Server']] = row['count']
 
     # Convert 'final_matrix' df to array and prepare data for jsonify
-    final_matrix_numpy = final_matrix.values.tolist()
-    json_convert = {"data": final_matrix_numpy, "message": "Success"}
+    final_matrix_arr = final_matrix.values.tolist()
+    json_convert = {"data": 
+                        {"matrix": final_matrix_arr, 
+                        "names":rows.tolist()}, 
+                    "message": "Success"}
 
     return jsonify(json_convert)
 
@@ -135,7 +138,6 @@ def show_dash_graphs(dashapp):
         for idx, metric in enumerate(metrics):
             metric_outliers[metric] = [list(outlier_list[idx].keys()), list(outlier_list[idx].values())]
 
-        print(dff["Time_floor"].shape, dff[column].shape)
         aux_X = list(range(0, dff[column].shape[0]))
 
         fig = [

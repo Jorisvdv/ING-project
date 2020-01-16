@@ -39,8 +39,8 @@ class Client(object):
         self._client.config.update(config)
 
         # we need to install all routes onto the client
+        routes.install_dash(self._dashapp)
         routes.install(self._client)
-        show_dash_graphs(self._dashapp)
 
 
     def run(self):
@@ -52,6 +52,15 @@ class Client(object):
 
         self._dashapp.run_server(debug=True)
 
+    def get_dashapp(self):
+        """
+        Method to return the Dash app object. 
+
+        Returns
+        ----------
+        dashapp: Dash app object
+        """
+        return self._dashapp
 
 # run as main
 if __name__ == "__main__":
