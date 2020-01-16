@@ -36,7 +36,7 @@ class Server(Resource):
 
         # setup the initial state of this server
         self._state = {
-            'name':  "server#%s" % kwargs['uuid'],
+            'name':  "%s#%s" % (kwargs['kind'], kwargs['uuid']),
             'kind':  kwargs['kind'],
             'time':  round(self._env.now, 4),
             'queue': len(self.queue),
@@ -97,7 +97,6 @@ class Server(Resource):
         state.update({
             "id": kwargs['process_id'] if 'process_id' in kwargs else None,
             "requested_by": kwargs['requested_by'] if 'requested_by' in kwargs else None,
-            "process_id": kwargs['process_id'] if 'process_id' in kwargs else None
         })
 
         # we need to construct a logmessage, which we can log on this server

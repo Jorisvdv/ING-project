@@ -68,8 +68,12 @@ class Processor(Process):
                 # we need to get access to a server, so we can start a process
                 server = self.servers(kind).server()
 
+                # add the open request to the collection of open servers, so 
+                # we can release it later on
+                open_servers.append(server)
+
                 # get the client who requested this process
-                requested_by = 'client' if idx > 0 else kinds[idx - 1]
+                requested_by = 'client' if idx > 0 else open_servers[idx - 1].state()['name']
 
                 # ask the server for a new request
                 request = server.request(requested_by=requested_by, process_id=uuid4())
@@ -77,10 +81,6 @@ class Processor(Process):
                 # yield the request and timeout
                 yield request
                 yield self.environment.timeout(server.latency())
-
-                # add the open request to the collection of open servers, so 
-                # we can release it later on
-                open_servers.append(server)
 
             # release all server requests
             for server in open_servers:
