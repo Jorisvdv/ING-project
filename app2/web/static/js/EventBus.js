@@ -107,4 +107,13 @@ export const EventBus = (superclass) => class extends superclass {
         // allow chaining
         return this;
     }
+
+    /**
+     *  Cleanup.
+     */
+    remove() {
+
+        // drop all references to the events
+        this[events] = null;
+    }
 };

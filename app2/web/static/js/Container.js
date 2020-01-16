@@ -55,6 +55,16 @@ export class Container {
     }
 
     /**
+     *  Getter method to expose all installed instances.
+     *  @return Array
+     */
+    get installed() {
+
+        // expose a copy of the list of instances
+        return Array.from(this[instances]);
+    }
+
+    /**
      *  Method to append classes to the container.
      *  @param  Function    Constructor function of the class. Should accept
      *                      a parent element as first parameter.
@@ -139,3 +149,45 @@ export class Container {
         this[container] = null;
     }
 };
+
+/**
+ *  Proxy class definition that exposes two additional methods: "on" and "off".
+ *  These reflect the native `EventTarget.addEventListener` and 
+ *  `removeEventListener` methods.
+ */
+export const EventContainer = (() => new Proxy(Container, {
+
+    /**
+     *  Constructor trap.
+     *  @param  Object      Target constructor
+     *  @param  variadic    Additional arguments.
+     */
+    construct(Target, args) {
+
+        // construct a new container
+        const target = new Target(...args);
+
+        // expose the object as another proxy, in which we can intercept 
+        // method calls
+        return new Proxy(target, {
+
+            /**
+             *  Getter method trap.
+             *  @param  Object  Target object.
+             *  @param  String  Name of the method of property called.
+             *  @return mixed
+             */
+            get(target, property) {
+
+                // check if we called "on"
+                if (property == "on") return (...args) => target[container].addEventListener(...args);
+
+                // check if we called "off"
+                if (property == "off") return (...args) => target[container].removeEventListener(...args);
+
+                // return the original call
+                if (property in target) return target[property];
+            }
+        });
+    }
+}))();
