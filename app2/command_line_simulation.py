@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 File to start simulation from command line interface
 """
@@ -20,15 +21,15 @@ import os
 logging.basicConfig(level=logging.INFO)
 
 
-location_logs = os.path.join(sys.path[0], "ClI_Logs")
+location_logs = os.path.join(sys.path[0], "CLI_Logs")
 settings = {"servers": [{"size": 5,
-                         "capacity": 100,
+                         "capacity": 10,
                          "kind": "balance"},
                         {"size": 5,
-                         "capacity": 100,
+                         "capacity": 10,
                          "kind": "credit"}],
             "process": "balance,credit",
-            "runtime": 10}
+            "runtime": 100}
 
 
 # global simulation count

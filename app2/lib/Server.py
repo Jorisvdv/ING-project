@@ -7,10 +7,10 @@ more than a resource with some additional patches.
 """
 
 # dependencies
-from simpy import Resource
+from simpy import PreemptiveResource
 from numpy.random import exponential
 
-class Server(Resource):
+class Server(PreemptiveResource):
 
     def __init__(self, *args, **kwargs):
         """
@@ -80,6 +80,10 @@ class Server(Resource):
         requested_by: string
             Name of the entity that requested this process (e.g. client or another
             server).
+        message: string
+            Description of the request.
+        priority: int
+            See simpy.PreemptiveResource.request.
         """
         # update the state of the server
         self._state.update(
@@ -99,15 +103,21 @@ class Server(Resource):
             "requested_by": kwargs['requested_by'] if 'requested_by' in kwargs else None,
         })
 
+        # the message that describes this request
+        message = kwargs['message'] if 'message' in kwargs else "Requesting"
+
         # we need to construct a logmessage, which we can log on this server
         # and push onto the environment
-        msg = ';'.join([str(_) for _ in state.values()])
+        msg = f"{state['time']};{state['requested_by']};INFO;{state['cpu']};{state['memory']};{state['id']};{state['name']};{message}"
 
         # push the log to the environment
         self._env.push(msg)
 
+        # parse parameters for the super class method
+        priority = kwargs['priority'] if 'priority' in kwargs else 1
+
         # call the parent class for the original method
-        return super().request()
+        return super().request(priority=priority)
 
     def state(self):
         """

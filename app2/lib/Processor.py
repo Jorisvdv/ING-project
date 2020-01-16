@@ -11,6 +11,7 @@ to which server, in a sequence.
 # dependencies
 from lib.Process import Process
 from uuid import uuid4
+from simpy import Interrupt
 
 class Processor(Process):
 
@@ -72,15 +73,33 @@ class Processor(Process):
                 # we can release it later on
                 open_servers.append(server)
 
-                # get the client who requested this process
-                requested_by = 'client' if idx > 0 else open_servers[idx - 1].state()['name']
+                # attempt to parse a server request
+                try:
 
-                # ask the server for a new request
-                request = server.request(requested_by=requested_by, process_id=uuid4())
+                    # get the client who requested this process
+                    requested_by = { "name": 'client', "kind": "client" } if idx < 1 else open_servers[idx - 1].state()
 
-                # yield the request and timeout
-                yield request
-                yield self.environment.timeout(server.latency())
+                    # ask the server for a new request
+                    request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=uuid4(), message=f"Requesting {kind} by {requested_by['kind']}")
+
+                    # yield the request and timeout
+                    yield request
+                    yield self.environment.timeout(server.latency())
+
+                # handle interruptions
+                except Interrupt as interrupt:
+
+                    # TODO Actually log to an error log.
+
+                    # Check if error is due to interuption using error_generator
+                    if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
+
+                        # Manually print timeout message
+                        print(f"ERROR: message {i} timeout at time {start + timeout_time}")
+
+                    else:
+                        # Use interrupt clause to write error message
+                        print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
 
             # release all server requests
             for server in open_servers:
