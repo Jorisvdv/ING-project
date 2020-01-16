@@ -12,7 +12,7 @@ print(os.getcwd())
 
 csv_filename = "test_simulation/Seasonality/seasonality_values.csv"
 seasonality_df = pd.read_csv(csv_filename, sep=";")
-print(seasonality_df.head())
+# print(seasonality_df.head())
 
 timeout_time = 0.5
 error_duration = (3, 5)
@@ -21,7 +21,8 @@ errorwait = (2, 5)
 runtime = 10
 
 
-def message(env, server, i, interval_generator=None):
+def message(env, server, i, timeout_time, interval_generator=None):
+    start = env.now
     # Enter all message processes here, for now random timeout
     try:
         if interval_generator is not None:
@@ -36,16 +37,16 @@ def message(env, server, i, interval_generator=None):
         # Check if error is due to interuption using error_generator
         if isinstance(interrupt.cause, simpy.resources.resource.Preempted):
             # Manually print timeout message
-            print(f"ERROR: message {i} timeout at time {env.now}")
+            print(f"ERROR: message {i} timeout at time {start + timeout_time}")
         else:
             # Use interrupt clause to write error message
             print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
 
 
-def message_generator(env, server, interval_generator=None):
+def message_generator(env, server, timeout_time, interval_generator=None):
     for i in range(1000):
 
-        message_process = env.process(message(env, server, i, interval_generator))
+        message_process = env.process(message(env, server, i, timeout_time, interval_generator))
         yield message_process | env.timeout(timeout_time)
 
         # If message not triggered then timeout is past
@@ -76,5 +77,5 @@ if __name__ == "__main__":
     t_interval = TransactionInterval(csv_filename, enviroment=env, max_volume=100)
     serv = simpy.PreemptiveResource(env, capacity=5)
     env.process(error_generator(env, serv))
-    env.process(message_generator(env, serv, t_interval))
+    env.process(message_generator(env, serv, timeout_time, t_interval))
     env.run(until=runtime)
