@@ -15,7 +15,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 
-location_logs = "app2/CLI_Logs"
+location_logs = "logs"
 settings = {"servers": [{"size": 5,
                          "capacity": 1000,
                          "kind": "balance"}],
@@ -48,7 +48,7 @@ def run_simulation(id, settings_simulation, logs=location_logs):
 
     # now that we have an output dir, we can construct our logger which we can use for
     # the simulation
-    logger = Logger("simulation cli#" + str(simc), directory=location_logs)
+    logger = Logger("simulation-cli#" + str(simc), directory=location_logs)
 
     # we can use the logger for the simulation, so we know where all logs will be written
     simulation.use(logger)

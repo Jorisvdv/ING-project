@@ -34,6 +34,7 @@ from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
 from lib.LogProcessing import get_endpoint_matrix
+from lib.Seasonality import TransactionInterval as Seasonality
 
 # Global vars
 LOG_PATH = 'logs'
@@ -154,9 +155,12 @@ def install(client):
             # we can use the logger for the simulation, so we know where all logs will be written
             simulation.use(logger)
 
+            # we need a new form of seasonality
+            seasonality = Seasonality(join('seasonality', 'week.csv'))
+
             # now, we can put the process in the simulation, which will know
             # how to define the process
-            simulation.process(Processor, kinds=request.form['process'].split(','))
+            simulation.process(Processor, seasonality=seasonality, kinds=request.form['process'].split(','))
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.
