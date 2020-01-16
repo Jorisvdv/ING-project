@@ -8,6 +8,7 @@ more than a resource with some additional patches.
 
 # dependencies
 from simpy import Resource
+from numpy.random import exponential
 
 class Server(Resource):
 
@@ -95,7 +96,8 @@ class Server(Resource):
         state = self._state.copy()
         state.update({
             "id": kwargs['process_id'] if 'process_id' in kwargs else None,
-            "requested_by": kwargs['requested_by'] if 'requested_by' in kwargs else None
+            "requested_by": kwargs['requested_by'] if 'requested_by' in kwargs else None,
+            "process_id": kwargs['process_id'] if 'process_id' in kwargs else None
         })
 
         # we need to construct a logmessage, which we can log on this server
@@ -143,7 +145,7 @@ class Server(Resource):
 
         # expose the calculated memory usage based on the queue, users, and
         # scaled capacity
-        return (state.users + state.queue) / (self.capacity() * 10)
+        return (state['users'] + state['queue']) / (self.capacity * 10)
 
     def cpu(self):
         """
