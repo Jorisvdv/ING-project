@@ -21,6 +21,10 @@ import pandas as pd
 import numpy as np
 import time
 from datetime import datetime
+import zipfile
+import io
+import pathlib
+import flask as fl
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -288,21 +292,26 @@ def install(client):
     @client.route('/download-logs') 
     def download_logfile():
         """
-        Function to download logfiles.
-
-        URL args
-        -------
-        f: simulation logfile 
+        Function to download logfiles in a .zip file.
 
         Returns
         -------
-        GET: .csv (download)
+        GET: .zip file (download)
         """
 
-        # Parse URL request file f using last_created default 
-        f = request.args.get('f')
-        return send_file('logs/'+f,
-                         mimetype='text/csv',
-                         attachment_filename=f,
-                         as_attachment=True)
+        base_path = pathlib.Path(LOG_PATH)
+        data = io.BytesIO()
+
+        with zipfile.ZipFile(data, mode='w') as z:
+            for f_name in base_path.iterdir():
+                z.write(f_name)
+
+        data.seek(0)
+
+        return fl.send_file(
+            data,
+            mimetype='application/zip',
+            as_attachment=True,
+            attachment_filename='logs.zip'
+        )
 
