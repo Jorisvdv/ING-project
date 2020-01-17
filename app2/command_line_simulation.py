@@ -9,8 +9,8 @@ from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
 from lib.Seasonality import TransactionInterval as Seasonality
-import sys
 import os
+import glob
 
 
 # dependencies
@@ -20,8 +20,11 @@ import os
 # and behave the same
 logging.basicConfig(level=logging.INFO)
 
+# Find location of file and set log location relative to that
+file_dir = os.path.dirname(__file__)
+location_logs = os.path.join(file_dir, "CLI_Logs")
+file_prefix = "simulation_cli#"
 
-location_logs = os.path.join(sys.path[0], "CLI_Logs")
 settings = {"servers": [{"size": 5,
                          "capacity": 10,
                          "kind": "balance"},
@@ -32,8 +35,10 @@ settings = {"servers": [{"size": 5,
             "runtime": 100}
 
 
-# global simulation count
-simc = 0
+# get simulation count by counting number of simulation files in folder
+sim_count = len(glob.glob(location_logs+'/'+file_prefix+'*'))
+# Interate sim_count to next number
+sim_count += 1
 
 
 def run_simulation(id, settings_simulation, logs=location_logs):
@@ -57,13 +62,13 @@ def run_simulation(id, settings_simulation, logs=location_logs):
 
     # now that we have an output dir, we can construct our logger which we can use for
     # the simulation
-    logger = Logger("simulation-cli#" + str(simc), directory=location_logs)
+    logger = Logger(file_prefix + str(simc), directory=location_logs)
 
     # we can use the logger for the simulation, so we know where all logs will be written
     simulation.use(logger)
 
     # we need a new form of seasonality
-    seasonality = Seasonality(os.path.join(sys.path[0], 'seasonality', 'week.csv'), max_volume=1000)
+    seasonality = Seasonality(os.path.join(file_dir, 'seasonality', 'week.csv'), max_volume=1000)
 
     # now, we can put the process in the simulation, which will know
     # how to define the process
@@ -77,4 +82,4 @@ def run_simulation(id, settings_simulation, logs=location_logs):
 
 
 if __name__ == "__main__":
-    run_simulation(1, settings)
+    run_simulation(sim_count, settings)

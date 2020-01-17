@@ -1,5 +1,5 @@
 """
-This file contains a set of methods to process a simulation logfile. 
+This file contains a set of methods to process a simulation logfile.
 Such calculations are later used to generate visualizations.
 
 @author Antonio Samaniego / Milos Dragojevic
@@ -24,7 +24,9 @@ import dash_html_components as html
 from lib.OutlierDetection import detect_outliers
 
 # Global vars
-LOG_PATH = 'logs'
+# Set location of log folder relative to this script
+LOG_PATH = os.path.join(os.path.dirname(__file__), 'logs')
+
 
 def get_endpoint_json(f):
     # Read in the log data
@@ -39,31 +41,30 @@ def get_endpoint_json(f):
     filtered_log_df = log_df[['Server', 'To_Server']]
 
     # Group by unique combinations and count occurrences
-    endpoint_df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+    endpoint_df = filtered_log_df.groupby(
+        ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
 
     endpoint_json = {
-        "nodes":[], 
-        "links":[]
+        "nodes": [],
+        "links": []
     }
 
     groups = cols
     for idx, g in enumerate(groups):
         endpoint_json["nodes"].append({
-                                       "id": g, 
-                                       "group": idx + 1
-                                      })
-        
+            "id": g,
+            "group": idx + 1
+        })
 
     for idx, r in endpoint_df.iterrows():
         endpoint_json["links"].append({
-                                        "source": r['Server'], 
-                                        "target": r['To_Server'], 
-                                        "value": r['count']
-                                      })
+            "source": r['Server'],
+            "target": r['To_Server'],
+            "value": r['count']
+        })
 
     return jsonify(endpoint_json)
 
-    
 
 def get_endpoint_matrix(f):
     # Read in the log data
@@ -78,7 +79,8 @@ def get_endpoint_matrix(f):
     filtered_log_df = log_df[['Server', 'To_Server']]
 
     # Group by unique combinations and count occurrences
-    endpoint_df = filtered_log_df.groupby(['Server', 'To_Server']).size().reset_index().rename(columns={0:'count'})
+    endpoint_df = filtered_log_df.groupby(
+        ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
 
     # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
     for index, row in endpoint_df.iterrows():
@@ -86,13 +88,12 @@ def get_endpoint_matrix(f):
 
     # Convert 'final_matrix' df to array and prepare data for jsonify
     final_matrix_arr = final_matrix.values.tolist()
-    json_convert = {"data": 
-                        {"matrix": final_matrix_arr, 
-                        "names":rows.tolist()}, 
+    json_convert = {"data":
+                    {"matrix": final_matrix_arr,
+                        "names": rows.tolist()},
                     "message": "Success"}
 
     return jsonify(json_convert)
-
 
 
 def show_dash_graphs(dashapp):
@@ -107,7 +108,7 @@ def show_dash_graphs(dashapp):
     -------
         Dash Graph
     """
-    df = pd.read_csv('logs/Manual_Log_Filtered.csv', sep = ",", error_bad_lines=False)
+    df = pd.read_csv('logs/Manual_Log_Filtered.csv', sep=",", error_bad_lines=False)
 
     dashapp.layout = html.Div([
         dash_table.DataTable(
@@ -126,8 +127,8 @@ def show_dash_graphs(dashapp):
             selected_columns=[],
             selected_rows=[],
             page_action="native",
-            page_current= 0,
-            page_size= 10,
+            page_current=0,
+            page_size=10,
         ),
         html.Div(id='datatable-interactivity-container')
     ])
@@ -138,7 +139,7 @@ def show_dash_graphs(dashapp):
     )
     def update_styles(selected_columns):
         return [{
-            'if': { 'column_id': i },
+            'if': {'column_id': i},
             'background_color': '#D2F3FF'
         } for i in selected_columns]
 
@@ -169,14 +170,16 @@ def show_dash_graphs(dashapp):
         sim_file = 'Manual_Log_Filtered.csv'
         metrics = ["CPU Usage", "Memory Usage"]
         num_std_dev = 3
-        
+
         for column in metrics:
             if column in dff:
-                outlier_list.append(detect_outliers(list(dff[column]), s=num_std_dev, filename='outliers_' + column + '_' + sim_file))
+                outlier_list.append(detect_outliers(
+                    list(dff[column]), s=num_std_dev, filename='outliers_' + column + '_' + sim_file))
 
         metric_outliers = {}
         for idx, metric in enumerate(metrics):
-            metric_outliers[metric] = [list(outlier_list[idx].keys()), list(outlier_list[idx].values())]
+            metric_outliers[metric] = [list(outlier_list[idx].keys()),
+                                       list(outlier_list[idx].values())]
 
         aux_X = list(range(0, dff[column].shape[0]))
 
