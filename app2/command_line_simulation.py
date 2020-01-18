@@ -12,9 +12,6 @@ from lib.Seasonality import TransactionInterval as Seasonality
 import os
 import glob
 
-
-# dependencies
-
 # we need to setup logging configuration here,
 # so all other loggers will properly function
 # and behave the same
@@ -26,20 +23,23 @@ location_logs = os.path.join(file_dir, "CLI_Logs")
 file_prefix = "simulation_cli#"
 
 settings = {"servers": [{"size": 5,
-                         "capacity": 10,
+                         "capacity": 1000,
                          "kind": "balance"},
                         {"size": 5,
-                         "capacity": 10,
-                         "kind": "credit"}],
-            "process": "balance,credit",
+                         "capacity": 1000,
+                         "kind": "credit"},
+                        {"size": 5,
+                         "capacity": 1000,
+                         "kind": "payment"}],
+            "process": "balance,credit,payment",
             "runtime": 100}
 
 
 # get simulation count by counting number of simulation files in folder
 sim_count = len(glob.glob(location_logs+'/'+file_prefix+'*'))
+
 # Interate sim_count to next number
 sim_count += 1
-
 
 def run_simulation(id, settings_simulation, logs=location_logs):
     #
