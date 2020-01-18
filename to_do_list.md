@@ -15,23 +15,26 @@
 
 # Bugs:
 * [ ] Simulation only prints out 21 lines of log (both from frontend and command line)  
-* [ ] Frontend fails if most recent file is not in correct format (reason moving Manual_Log_Filtered.csv and alteration file search method)  
+* [ ] Frontend fails if most recent file is not in correct format (reason moving Manual_Log_Filtered.csv and alteration file search method)
+## relative paths
+* OutlierDetection.py:  
+    * [ ] 15: OUT_DIR  
+* Logger.py:  
+    * [ ] defaults: directory="logs"
+* LogProcessing.py:  
+    * [ ] LOG_PATH = 'logs'  
+    * [ ] logs/Manual_Log_Filtered.csv  
 
 
 # Defined variables/distributions/proposed changes:  
 ## lib folder  
 * Envoirment.py: None  
 * Logger.py:  
-    * [ ] defaults: directory="logs", level = 20 (20 is level INFO)  
-* LogProcessing.py:  
-    * [x] LOG_PATH = 'logs'  
-    * [ ] logs/Manual_Log_Filtered.csv  
+    * [ ] defaults: directory="logs", level = 20 (20 is level INFO)    
 * Middleware.py: None  
 * MultiServers.py: None
-* OutlierDetection.py:  
-    * [x] 15: OUT_DIR = 'logs/outliers/'  
-    * [ ] 17: moving_average: default: 3 (maybe a bit small for this large amount of records)  
-    * [ ] 35: detect_outliers: n=3, s=2, filename='outliers.csv'  
+    * [ ] 17: moving_average:  
+     35: detect_outliers: n=3, default: 3 (maybe a bit small for this large amount of records)  
     * [ ] 68: outlier_writer: delimiter=',' (rest of csv have ";" delimiter)  
 * Process.py:  
 ## main app2 folder  
@@ -39,7 +42,7 @@
     * [ ] Abstract simulation to separate module  
     * [ ] 181: wrong format log_filenames  
     * [ ] 187: fixed filename seasonality, change to default  
-    * [ ] 187: made max_volume flexible  
+    * [ ] 187: make max_volume flexible  
     * [ ] 224: Replace complicated most recent file search to more default functions  
     * [ ] 272: Replace complicated most recent file search to more default functions  
     * [ ] 306: Only save files of selected simulation  
