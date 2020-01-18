@@ -26,6 +26,11 @@
         "label": "Simulation process as sequence of servers (comma seperated).",
         "placeholder": "Enter a list of types of servers (comma seperated)"
     }, {
+        "name": "max_volume",
+        "type": "number",
+        "label": "Max volume of transactions per second",
+        "placeholder": "Enter a capacity"
+    }, {
         "button": true,
         "type": "submit",
         "text": "Start simulation"

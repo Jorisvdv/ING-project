@@ -25,7 +25,7 @@ from lib.OutlierDetection import detect_outliers
 
 # Global vars
 # Set location of log folder relative to this script
-LOG_PATH = os.path.join(os.path.dirname(__file__), 'logs')
+LOG_PATH = 'logs'
 
 
 def get_endpoint_json(f):
