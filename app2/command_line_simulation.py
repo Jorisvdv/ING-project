@@ -19,54 +19,39 @@ from datetime import datetime
 logging.basicConfig(level=logging.INFO)
 
 # Find location of file and set log location relative to that
-file_dir = os.path.dirname(__file__)
+file_dir = os.path.dirname(os.path.abspath(__file__))
 location_logs = os.path.join(file_dir, "CLI_Logs")
 seasonality_file = os.path.join(file_dir, 'seasonality', 'week.csv')
 file_prefix = "log"
+# print(file_dir, location_logs, seasonality_file, file_prefix, sep='\n')
 
-# {0:05d}'.format(12)
 
 settings = {"servers": [{"size": 5,
                          "capacity": 1000,
                          "kind": "balance"},
                         {"size": 5,
-<<<<<<< HEAD
                          "capacity": 1000,
                          "kind": "credit"},
                         {"size": 5,
                          "capacity": 1000,
                          "kind": "payment"}],
-            "process": "balance,credit,payment",
-            "runtime": 100}
-=======
-                         "capacity": 10,
-                         "kind": "credit"}],
-            "process": "balance,credit",
-            "runtime": 1000,
+            "process": "balance,payment,credit",
+            "runtime": 100,
             "max_volume": 1000}
->>>>>>> 1234356531ea1e84aac0e9003bcfd0ffca990edf
 
 
 # get simulation count by counting number of simulation files in folder
-sim_count = len(glob.glob(location_logs+'/'+file_prefix+'*'))
+sim_count = len(glob.glob(os.path.join(location_logs, file_prefix+'*')))
 
 # Interate sim_count to next number
 sim_count += 1
 
-<<<<<<< HEAD
-def run_simulation(id, settings_simulation, logs=location_logs):
-    #
-    # increment the simulation count
-    simc = id
-=======
 
 def run_simulation(simc, settings_simulation, name_run="Test_Run",
                    seasonality_file=os.path.join(os.path.dirname(__file__),
                                                  'seasonality', 'week.csv'),
                    logs=os.path.join(os.path.dirname(__file__), "CLI_Logs"),
                    file_prefix="log"):
->>>>>>> 1234356531ea1e84aac0e9003bcfd0ffca990edf
-
     # we need a new simulation which we can run.
     simulation = Simulation()
 
@@ -79,10 +64,12 @@ def run_simulation(simc, settings_simulation, name_run="Test_Run",
 
         # append a new server pool to the multiserver system
         servers.append(Servers(simulation.environment,
-                               size=server['size'], capacity=server['capacity'], kind=server['kind']))
+                               size=server['size'], capacity=server['capacity'],
+                               kind=server['kind']))
 
     # Get the current date and time to append to the logger file name
     log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
     # now that we have an output dir, we can construct our logger which we can use for
     # the simulation
     logger = Logger("{0}_{1:04d}_{2}".format(
@@ -110,3 +97,4 @@ if __name__ == "__main__":
     run_simulation(simc=sim_count, settings_simulation=settings,
                    seasonality_file=seasonality_file, logs=location_logs,
                    file_prefix=file_prefix)
+    pass

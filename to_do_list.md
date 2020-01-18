@@ -6,7 +6,8 @@
     3. [ ] Connection break  
     4. [ ] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
 * [ ] Finalise plotly drop down selection  
-* [ ] Add latency to logs and visualisation  
+* [ ] Add latency to logs
+    * [ ] Add latency to visualisation
 * [ ] Add crash and restart when memory overload  
 * [ ] Add timeout error (with appropriate logger level)  
 * [ ] Add error introduction (with seperate logger (see Manual_Error_Log.csv))  

@@ -13,6 +13,7 @@ from lib.Process import Process
 from uuid import uuid4
 from simpy import Interrupt
 
+
 class Processor(Process):
 
     def __init__(self, *args, **kwargs):
@@ -59,6 +60,7 @@ class Processor(Process):
             # timeout before proceeding to the next transaction
             yield self.environment.timeout(self._seasonality.interval(self.environment.now))
 
+
 class Subprocess(Process):
 
     def __init__(self, *args, **kwargs):
@@ -93,6 +95,8 @@ class Subprocess(Process):
         # collection of servers processing a request
         open_servers = []
 
+        open_requests = []
+
         # sequence of server kinds
         kinds = self._kinds
 
@@ -102,7 +106,7 @@ class Subprocess(Process):
             # we need to get access to a server, so we can start a process
             server = self.servers(kind).server()
 
-            # add the open request to the collection of open servers, so 
+            # add the open request to the collection of open servers, so
             # we can release it later on
             open_servers.append(server)
 
@@ -110,10 +114,15 @@ class Subprocess(Process):
             try:
 
                 # get the client who requested this process
-                requested_by = { "name": 'client', "kind": "client" } if idx < 1 else open_servers[idx - 1].state()
+                requested_by = {"name": 'client',
+                                "kind": "client"} if idx < 1 else open_servers[idx - 1].state()
 
                 # ask the server for a new request
-                request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=uuid4(), message=f"Requesting {kind} by {requested_by['kind']}")
+                request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=uuid4(
+                ), message=f"Requesting {kind} by {requested_by['kind']}")
+
+                # Add request to list of open open_requests
+                open_requests.append(request)
 
                 # yield the request and timeout
                 yield request
@@ -135,7 +144,7 @@ class Subprocess(Process):
                     print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
 
         # release all server requests
-        for server in open_servers:
+        for server, request in zip(open_servers, open_requests):
 
             # release the server request
             server.release(request=request)
