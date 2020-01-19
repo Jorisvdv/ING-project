@@ -12,6 +12,7 @@ to which server, in a sequence.
 from lib.Process import Process
 from uuid import uuid4
 from simpy import Interrupt
+import pandas as pd
 
 
 class Processor(Process):
@@ -92,41 +93,71 @@ class Subprocess(Process):
         ------
         simpy.Timeout|simpy.Process
         """
-        # collection of servers processing a request
-        open_servers = []
-
-        open_requests = []
 
         # sequence of server kinds
         kinds = self._kinds
 
+        # collection of servers processing a request
+        request_df = pd.DataFrame(columns=["open_servers", "open_requests", "kind"],
+                                  index=range(len(kinds)))
+
         # we need to iterate over all kinds
         for (idx, kind) in enumerate(kinds):
+            return_loop = None
+            # Test if request is back at a previously accessed server
+            if kind in request_df["kind"].values:
+                # Remember first location of server
+                return_loop = request_df.index[request_df['kind'] == kind].tolist()
+                # Get same server as before:
+                server = request_df.loc[return_loop[0], "open_servers"]
+            else:
+                # we need to get access to a server, so we can start a process
+                server = self.servers(kind).server()
 
-            # we need to get access to a server, so we can start a process
-            server = self.servers(kind).server()
+            # Set kind of server in DataFrame
+            request_df.loc[idx, "kind"] = kind
 
             # add the open request to the collection of open servers, so
             # we can release it later on
-            open_servers.append(server)
+
+            request_df.loc[idx, "open_servers"] = server
 
             # attempt to parse a server request
             try:
 
                 # get the client who requested this process
                 requested_by = {"name": 'client',
-                                "kind": "client"} if idx < 1 else open_servers[idx - 1].state()
+                                "kind": "client"} if idx < 1 else request_df.loc[idx - 1, "open_servers"].state()
 
                 # ask the server for a new request
                 request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=uuid4(
                 ), message=f"Requesting {kind} by {requested_by['kind']}")
 
                 # Add request to list of open open_requests
-                open_requests.append(request)
+                request_df.loc[idx, "open_requests"] = request
 
                 # yield the request and timeout
                 yield request
                 yield self.environment.timeout(server.latency())
+
+                # When request is processed and return loop index exists
+                # Release in between servers
+                if return_loop:
+                    drop_indexes = []
+                    # release all server requests between occurances of the same kind
+                    for row in request_df.iloc[return_loop[0]:idx, :].itertuples(index=True):
+                        # Get server and corresponding request
+                        server = getattr(row, "open_servers")
+                        request = getattr(row, "open_requests")
+
+                        # release the server request
+                        server.release(request=request)
+
+                        # Add index to remove list
+                        drop_indexes.append(getattr(row, "Index"))
+
+                    # remove closed request from DataFrame
+                    request_df = request_df.drop(drop_indexes, axis=0)
 
             # handle interruptions
             except Interrupt as interrupt:
@@ -144,7 +175,10 @@ class Subprocess(Process):
                     print(f"ERROR: message {i} {interrupt.cause} at time {env.now}")
 
         # release all server requests
-        for server, request in zip(open_servers, open_requests):
+        for row in request_df.itertuples(index=False):
+            # Get server and corresponding request
+            server = getattr(row, "open_servers")
+            request = getattr(row, "open_requests")
 
             # release the server request
             server.release(request=request)

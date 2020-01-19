@@ -12,13 +12,21 @@
     * [ ] Add filtering on server kind to plotly
     * [ ] Take mean for all servers of a specific kind
 * [ ] Add crash and restart when memory overload  
-* [ ] Add timeout error (with appropriate logger level)  
+* [ ] Add timeout error (with appropriate logger level)
+    * [ ] Move message code out of Subprocess (see test_simulation/simulation_seasonality_error.py for inspiration)
 * [ ] Add error introduction (with seperate logger (see Manual_Error_Log.csv))  
 * [ ] Different routes for request type  
+    * [ ] Backend
+    * [ ] Frontend
 * [ ] Visual interface (see java modelling tool and Areana? for inspiration)
+* [x] Release server requests appropriately
+
+# Implementation:
+* [ ] Create API documentation (low priority, can be done after report is written)  
+* [ ] Test diffent scenarios for possible results in powerpoint/poster
 
 # Bugs:
-* [ ] Simulation only prints out 21 lines of log (both from frontend and command line)  
+* [x] Simulation only prints out 21 lines of log (both from frontend and command line)  
 * [x] Frontend fails if most recent file is not in correct format (fixed by filtering logs by filenames)
 ## relative paths
 * OutlierDetection.py:  
@@ -38,6 +46,7 @@
 * LogProcessing.py:
     * [x] LOG_PATH (change to relative to file)
     * [x] 172: add "latency" to metrics
+    * [ ] 173: num_std_dev = 3
 * Middleware.py: None  
 * MultiServers.py: None
     * [ ] 17: moving_average:  

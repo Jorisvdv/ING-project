@@ -35,7 +35,7 @@ settings = {"servers": [{"size": 5,
                         {"size": 5,
                          "capacity": 1000,
                          "kind": "payment"}],
-            "process": "balance,payment,credit",
+            "process": "balance,payment,balance,credit",
             "runtime": 100,
             "max_volume": 1000}
 
