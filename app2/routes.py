@@ -31,6 +31,7 @@ import zipfile
 import io
 import pathlib
 import flask as fl
+import glob
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -45,6 +46,7 @@ LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), 'logs'))
 Seasonality_folder = os.path.normpath(os.path.join(os.path.dirname(__file__),
                                                    'seasonality'))
 Seasonality_file = 'week.csv'
+file_prefix = "log"
 
 
 def install_dash(dashapp):
@@ -84,8 +86,10 @@ def install(client):
         """
 
         # Scan the logfile directory
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
-            join(LOG_PATH, f)) and not f.startswith('.')]
+        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+
+        # Return only the filename to get no errors with old functions
+        log_filenames = [os.path.basename(filename) for filename in list_of_files]
 
         if log_filenames and 'f' in request.args:
             # Parse URL request file f using last_created default
@@ -181,9 +185,13 @@ def install(client):
                 servers.append(Servers(simulation.environment, size=int(
                     request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
 
-            # now that we have an output dir, we can construct our logger which we can use for
-            # the simulation
-            logger = Logger("simulation#" + str(simc))
+            # Get the current date and time to append to the logger file name
+            log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
+
+            # now that we have an output dir, we can construct our logger which
+            # we can use for the simulation
+            logger = Logger("{0}_{1:04d}_{2}".format(
+                file_prefix, simc, log_timestamp), directory=LOG_PATH)
 
             # we can use the logger for the simulation, so we know where all logs will be written
             simulation.use(logger)
@@ -229,22 +237,16 @@ def install(client):
         """
 
         # Scan the logfile directory
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
-            join(LOG_PATH, f)) and not f.startswith('.')]
+        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+
+        # Return only the filename to get no errors with old functions
+        log_filenames = [os.path.basename(filename) for filename in list_of_files]
 
         # Only process/return endpoint_matrix if a logfile exists
         if log_filenames:
 
-            # By default, find the most recently created file
-            creation_dict = {}
-            for file in log_filenames:
-                (mode, ino, dev, nlink, uid, gid, size, atime, mtime,
-                 ctime) = os.stat(os.path.join(LOG_PATH, file))
-                creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
-
-            creation_dict = {k: v for k, v in sorted(
-                creation_dict.items(), key=lambda item: item[1])}
-            last_created = list(creation_dict.keys())[-1]
+            last_created = os.path.basename(max(list_of_files,
+                                                key=os.path.getctime))
 
             # Parse URL request file f using last_created default
             f = request.args.get('f', default=last_created)
@@ -272,22 +274,16 @@ def install(client):
         """
 
         # Scan the logfile directory
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
-            join(LOG_PATH, f)) and not f.startswith('.')]
+        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+
+        # Return only the filename to get no errors with old functions
+        log_filenames = [os.path.basename(filename) for filename in list_of_files]
 
         # Only process/return endpoint_matrix if a logfile exists
         if log_filenames:
 
-            # By default, find the most recently created file, else return index page
-            creation_dict = {}
-            for file in log_filenames:
-                (mode, ino, dev, nlink, uid, gid, size, atime, mtime,
-                 ctime) = os.stat(os.path.join(LOG_PATH, file))
-                creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
-
-            creation_dict = {k: v for k, v in sorted(
-                creation_dict.items(), key=lambda item: item[1])}
-            last_created = list(creation_dict.keys())[-1]
+            last_created = os.path.basename(max(list_of_files,
+                                                key=os.path.getctime))
 
             # Parse URL request file f using last_created default
             sim_file = request.args.get('f', default=last_created)

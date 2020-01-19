@@ -221,7 +221,7 @@ def show_dash_graphs(dashapp):
             # check if column exists - user may have deleted it
             # If `column.deletable=False`, then you don't
             # need to do this check.
-            for column in ["CPU Usage", "Memory Usage"] if column in dff
+            for column in metrics if column in dff
         ]
 
         return fig

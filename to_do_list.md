@@ -6,17 +6,20 @@
     3. [ ] Connection break  
     4. [ ] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
 * [ ] Finalise plotly drop down selection  
-* [ ] Add latency to logs
+* [ ] Add latency and kind servers to logs
     * [ ] Add latency to visualisation
+    * [ ] Color network graph based on server kind
+    * [ ] Add filtering on server kind to plotly
+    * [ ] Take mean for all servers of a specific kind
 * [ ] Add crash and restart when memory overload  
 * [ ] Add timeout error (with appropriate logger level)  
 * [ ] Add error introduction (with seperate logger (see Manual_Error_Log.csv))  
 * [ ] Different routes for request type  
-* [ ] Visual interface (see java modelling tool for inspiration)  
+* [ ] Visual interface (see java modelling tool and Areana? for inspiration)
 
 # Bugs:
 * [ ] Simulation only prints out 21 lines of log (both from frontend and command line)  
-* [ ] Frontend fails if most recent file is not in correct format (reason moving Manual_Log_Filtered.csv and alteration file search method)
+* [x] Frontend fails if most recent file is not in correct format (fixed by filtering logs by filenames)
 ## relative paths
 * OutlierDetection.py:  
     * [x] 15: OUT_DIR  
@@ -31,7 +34,10 @@
 ## lib folder  
 * Envoirment.py: None  
 * Logger.py:  
-    * [ ] defaults: directory="logs", level = 20 (20 is level INFO)    
+    * [x] defaults: directory="logs", level = 20 (20 is level INFO)  
+* LogProcessing.py:
+    * [x] LOG_PATH (change to relative to file)
+    * [x] 172: add "latency" to metrics
 * Middleware.py: None  
 * MultiServers.py: None
     * [ ] 17: moving_average:  
@@ -41,11 +47,11 @@
 ## main app2 folder  
 * routes.py  
     * [ ] Abstract simulation to separate module  
-    * [ ] 181: wrong format log_filenames  
-    * [ ] 187: fixed filename seasonality, change to default  
+    * [X] 181: wrong format log_filenames  
+    * [X] 187: fixed filename seasonality, change to default  
     * [x] 187: make max_volume flexible  
-    * [ ] 224: Replace complicated most recent file search to more default functions  
-    * [ ] 272: Replace complicated most recent file search to more default functions  
+    * [x] 224: Replace complicated most recent file search to more default functions  
+    * [x] 272: Replace complicated most recent file search to more default functions  
     * [ ] 306: Only save files of selected simulation  
     * [ ] 315: name logs based on simulation run number  
 

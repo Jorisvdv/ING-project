@@ -69,7 +69,7 @@ def detect_outliers(t, n=3, s=2, filename='outliers.csv'):
             outliers[idx] = v
 
     # Save on output .csv file
-    with open(OUT_DIR+filename, mode='w') as outlier_file:
+    with open(os.path.join(OUT_DIR, filename), mode='w') as outlier_file:
         outlier_writer = csv.writer(outlier_file, delimiter=',',
                                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
         outlier_writer.writerow(['idx', 'value'])
