@@ -10,6 +10,12 @@ part clean from these declarations.
 """
 
 # third party dependencies
+from lib.Seasonality import TransactionInterval as Seasonality
+from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
+from lib.Processor import Processor
+from lib.Logger import Logger
+from lib.Servers import Servers
+from lib.Simulation import Simulation
 import os
 from os import listdir
 from os import path
@@ -33,15 +39,13 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # dependencies
-from lib.Simulation import Simulation
-from lib.Servers import Servers
-from lib.Logger import Logger
-from lib.Processor import Processor
-from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
-from lib.Seasonality import TransactionInterval as Seasonality
 
 # Global vars
-LOG_PATH = 'logs'
+LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), 'logs'))
+Seasonality_folder = os.path.normpath(os.path.join(os.path.dirname(__file__),
+                                                   'seasonality'))
+Seasonality_file = 'week.csv'
+
 
 def install_dash(dashapp):
     """
@@ -80,10 +84,11 @@ def install(client):
         """
 
         # Scan the logfile directory
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
+            join(LOG_PATH, f)) and not f.startswith('.')]
 
         if log_filenames and 'f' in request.args:
-            # Parse URL request file f using last_created default 
+            # Parse URL request file f using last_created default
             f = request.args.get('f')
             return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames), f=f)
 
@@ -92,7 +97,6 @@ def install(client):
 
         else:
             return render_template('index.html', log_filenames=[], len_logfiles=0, f='')
-
 
     # declare endpoint for retrieving forms
     @client.route('/forms/<name>')
@@ -118,7 +122,7 @@ def install(client):
         if not path.exists(fp):
 
             # tell the user there's no form
-            return jsonify({ "error": "file does not exist" })
+            return jsonify({"error": "file does not exist"})
 
         # open the file
         with open(fp) as form:
@@ -139,11 +143,11 @@ def install(client):
 
             servers: list
                 List containing configurations for a server pool as dicts.
-                { capacity: int, size: int, kind: string } 
+                { capacity: int, size: int, kind: string }
                 For example, { size: 10, capacity: 10, kind: 'regular' }.
 
             process: list
-                List specifying how a process should go (from server to server). 
+                List specifying how a process should go (from server to server).
                 This should contain a sequence of server kinds.
                 For example, ["regular", "balance", "pay"].
 
@@ -174,7 +178,8 @@ def install(client):
             for kind in request.form['kinds'].split(','):
 
                 # append a new server pool to the multiserver system
-                servers.append(Servers(simulation.environment, size=int(request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
+                servers.append(Servers(simulation.environment, size=int(
+                    request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
 
             # now that we have an output dir, we can construct our logger which we can use for
             # the simulation
@@ -184,11 +189,14 @@ def install(client):
             simulation.use(logger)
 
             # we need a new form of seasonality
-            seasonality = Seasonality(join('seasonality', 'week.csv'), max_volume=1000)
+            seasonality = Seasonality(os.path.join(Seasonality_folder,
+                                                   Seasonality_file),
+                                      max_volume=request.form['max_volume'])
 
             # now, we can put the process in the simulation, which will know
             # how to define the process
-            simulation.process(Processor, seasonality=seasonality, kinds=[kind.strip() for kind in request.form['process'].split(',')])
+            simulation.process(Processor, seasonality=seasonality, kinds=[
+                               kind.strip() for kind in request.form['process'].split(',')])
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.
@@ -205,13 +213,12 @@ def install(client):
             # expose the data of that simulation
             return jsonify({})
 
-
     @client.route('/get_endpoint_data')
     def get_endpoint_data():
         """
         Function to process the .csv logfile and return an endpoint_matrix
         in JSON format.
-        
+
         Parameters
         ----------
         f: logfile name
@@ -221,8 +228,9 @@ def install(client):
         GET: JSON
         """
 
-        # Scan the logfile directory 
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
+        # Scan the logfile directory
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
+            join(LOG_PATH, f)) and not f.startswith('.')]
 
         # Only process/return endpoint_matrix if a logfile exists
         if log_filenames:
@@ -230,13 +238,15 @@ def install(client):
             # By default, find the most recently created file
             creation_dict = {}
             for file in log_filenames:
-                (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(os.path.join(LOG_PATH, file))
+                (mode, ino, dev, nlink, uid, gid, size, atime, mtime,
+                 ctime) = os.stat(os.path.join(LOG_PATH, file))
                 creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
 
-            creation_dict = {k: v for k, v in sorted(creation_dict.items(), key=lambda item: item[1])}
+            creation_dict = {k: v for k, v in sorted(
+                creation_dict.items(), key=lambda item: item[1])}
             last_created = list(creation_dict.keys())[-1]
 
-            # Parse URL request file f using last_created default 
+            # Parse URL request file f using last_created default
             f = request.args.get('f', default=last_created)
             print("Getting endpoint_matrix for logfile:", f)
 
@@ -246,8 +256,6 @@ def install(client):
         else:
             json_convert = {"data": 0, "message": "No logfile found."}
             return jsonify(json_convert)
-
-
 
     @client.route('/visualization')
     def show_visualization():
@@ -264,7 +272,8 @@ def install(client):
         """
 
         # Scan the logfile directory
-        log_filenames = [f for f in listdir(LOG_PATH) if isfile(join(LOG_PATH, f)) and not f.startswith('.')]
+        log_filenames = [f for f in listdir(LOG_PATH) if isfile(
+            join(LOG_PATH, f)) and not f.startswith('.')]
 
         # Only process/return endpoint_matrix if a logfile exists
         if log_filenames:
@@ -272,13 +281,15 @@ def install(client):
             # By default, find the most recently created file, else return index page
             creation_dict = {}
             for file in log_filenames:
-                (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(os.path.join(LOG_PATH, file))
+                (mode, ino, dev, nlink, uid, gid, size, atime, mtime,
+                 ctime) = os.stat(os.path.join(LOG_PATH, file))
                 creation_dict[file] = datetime.strptime(time.ctime(mtime), '%a %b %d %H:%M:%S %Y')
 
-            creation_dict = {k: v for k, v in sorted(creation_dict.items(), key=lambda item: item[1])}
+            creation_dict = {k: v for k, v in sorted(
+                creation_dict.items(), key=lambda item: item[1])}
             last_created = list(creation_dict.keys())[-1]
 
-            # Parse URL request file f using last_created default 
+            # Parse URL request file f using last_created default
             sim_file = request.args.get('f', default=last_created)
             print("Generating visualizations for:", sim_file)
 
@@ -287,9 +298,7 @@ def install(client):
         else:
             return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
 
-
-
-    @client.route('/download-logs') 
+    @client.route('/download-logs')
     def download_logfile():
         """
         Function to download logfiles in a .zip file.
@@ -314,4 +323,3 @@ def install(client):
             as_attachment=True,
             attachment_filename='logs.zip'
         )
-

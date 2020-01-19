@@ -25,7 +25,7 @@ from lib.OutlierDetection import detect_outliers
 
 # Global vars
 # Set location of log folder relative to this script
-LOG_PATH = 'logs'
+LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs'))
 
 
 def get_endpoint_json(f):
@@ -108,7 +108,8 @@ def show_dash_graphs(dashapp):
     -------
         Dash Graph
     """
-    df = pd.read_csv('logs/Manual_Log_Filtered.csv', sep=",", error_bad_lines=False)
+    df = pd.read_csv(os.path.join(LOG_PATH, 'Manual_Log_Filtered.csv'),
+                     sep=",", error_bad_lines=False)
 
     dashapp.layout = html.Div([
         dash_table.DataTable(

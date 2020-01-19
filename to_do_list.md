@@ -19,12 +19,12 @@
 * [ ] Frontend fails if most recent file is not in correct format (reason moving Manual_Log_Filtered.csv and alteration file search method)
 ## relative paths
 * OutlierDetection.py:  
-    * [ ] 15: OUT_DIR  
+    * [x] 15: OUT_DIR  
 * Logger.py:  
-    * [ ] defaults: directory="logs"
+    * [x] defaults: directory="logs"
 * LogProcessing.py:  
-    * [ ] LOG_PATH = 'logs'  
-    * [ ] logs/Manual_Log_Filtered.csv  
+    * [x] LOG_PATH = 'logs'  
+    * [x] logs/Manual_Log_Filtered.csv  
 
 
 # Defined variables/distributions/proposed changes:  
@@ -43,7 +43,7 @@
     * [ ] Abstract simulation to separate module  
     * [ ] 181: wrong format log_filenames  
     * [ ] 187: fixed filename seasonality, change to default  
-    * [ ] 187: make max_volume flexible  
+    * [x] 187: make max_volume flexible  
     * [ ] 224: Replace complicated most recent file search to more default functions  
     * [ ] 272: Replace complicated most recent file search to more default functions  
     * [ ] 306: Only save files of selected simulation  

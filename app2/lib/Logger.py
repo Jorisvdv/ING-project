@@ -1,6 +1,6 @@
 """
-Class for logging. This class can be used for logging processes that 
-occur within a simulation given a certain level. This can be installed 
+Class for logging. This class can be used for logging processes that
+occur within a simulation given a certain level. This can be installed
 a middleware on a simulation.
 
 @file   lib/Logger.py
@@ -13,12 +13,16 @@ from lib.Middleware import Middleware
 import logging
 import os
 
+# get location log files relative to this file
+LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs'))
+
+
 class Logger(Middleware):
 
-    def __init__(self, name, directory="logs"):
+    def __init__(self, name, directory=LOG_PATH):
         """
         Constructor.
-        
+
         Parameters
         ----------
         name: string
@@ -88,6 +92,6 @@ class Logger(Middleware):
         # log the message
         if message:
             self.log(message)
-        
+
         # allow chaining
         return self

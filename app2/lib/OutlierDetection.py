@@ -13,8 +13,7 @@ import math
 import numpy as np
 
 # Set location of log folder relative to this script
-
-OUT_DIR = os.path.join('logs', 'outliers')
+OUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs/outliers'))
 
 
 def moving_average(t, n=3):
