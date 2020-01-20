@@ -13,7 +13,7 @@ from dash.dependencies import Input, Output
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-df = pd.read_csv('Manual_Log_Filtered.csv')
+df = pd.read_csv('Manual_Log_Filtered_New.csv')
 print(df.columns)
 
 servers = df['Server'].unique()
@@ -25,15 +25,17 @@ print(metrics)
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    dcc.RadioItems(
+    html.Div([
+        html.Div([
+        dcc.Dropdown(
         id='servers-radio',
         options=[{'label': k, 'value': k} for k in servers],
         value='A'
-    ),
-
-    html.Hr(),
-
-    dcc.RadioItems(id='metrics-radio'),
+        )],style={'width': '48%', 'display': 'inline-block'}),
+        
+        html.Div([
+        dcc.Dropdown(id='metrics-radio')] ,style={'width': '48%', 'float': 'right', 'display': 'inline-block'})
+        ]),
 
     html.Hr(),
 
