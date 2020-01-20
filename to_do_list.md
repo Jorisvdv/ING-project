@@ -5,7 +5,7 @@
     2. [ ] Infinite loop  
     3. [ ] Connection break  
     4. [ ] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
-* [ ] Finalise plotly drop down selection  
+* [x] Finalise plotly drop down selection  
 * [ ] Add latency and kind servers to logs
     * [ ] Add latency to visualisation
     * [ ] Color network graph based on server kind
