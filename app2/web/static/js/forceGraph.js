@@ -16,14 +16,14 @@ function forceGraph(forcegraphDataUrl) {
         if (error) throw error;
 
         var link = svg.append("g")
-            .attr("class", "links")
+          .attr("class", "links")
           .selectAll("line")
           .data(graph.links)
           .enter().append("line")
-            .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+          .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
         var node = svg.append("g")
-            .attr("class", "nodes")
+          .attr("class", "nodes")
           .selectAll("g")
           .data(graph.nodes)
           .enter().append("g")
