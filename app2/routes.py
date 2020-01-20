@@ -272,6 +272,8 @@ def install(client):
         else:
             return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
 
+
+
     @client.route('/download-logs')
     def download_logfile():
         """
@@ -281,7 +283,7 @@ def install(client):
         -------
         GET: .zip file (download)
         """
-
+        print(LOG_PATH)
         base_path = pathlib.Path(LOG_PATH)
         data = io.BytesIO()
 

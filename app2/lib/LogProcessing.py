@@ -108,6 +108,7 @@ def show_dash_graphs(dashapp):
     -------
         Dash Graph
     """
+    print(LOG_PATH)
     df = pd.read_csv(os.path.join(LOG_PATH, 'Manual_Log_Filtered.csv'),
                      sep=",", error_bad_lines=False)
 
