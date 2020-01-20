@@ -46,6 +46,9 @@ class Servers(object):
         # assign some parameters as properties
         self._kind = kind
 
+        # disabled state of this pool
+        self._disabled = False
+
     @property
     def kind(self):
         """
@@ -56,6 +59,27 @@ class Servers(object):
         string
         """
         return self._kind
+
+    def disabled(self, state):
+        """
+        Method to disable this pool of servers. This will make sure that no
+        server is available anymore.
+
+        Parameters
+        ----------
+        state: bool
+            Disabled or not.
+
+        Returns
+        -------
+        self
+        """
+
+        # change the disabled state
+        self._disabled = bool(state)
+
+        # allow chaining
+        return self
 
     def server(self, **kwargs):
         """
@@ -72,8 +96,12 @@ class Servers(object):
 
         Returns
         -------
-        Server
+        Server|None
         """
+        # check if we are disabled
+        if self._disabled:
+            return None
+
         # we need a reference to the pool of servers
         pool = self._pool
 
