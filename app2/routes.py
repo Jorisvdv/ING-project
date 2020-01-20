@@ -168,7 +168,8 @@ def install(client):
 
             # now that we have an output dir, we can construct our logger which
             # we can use for the simulation
-            logger = Logger("{0}_{1:04d}_{2}".format(file_prefix, simc, log_timestamp), directory=LOG_PATH)
+            name = "{0}_{1:04d}_{2}".format(file_prefix, simc, log_timestamp)
+            logger = Logger(name, directory=LOG_PATH)
 
             # we also need a logger for all error events that happen in the simulation
             error_logger = Logger(f"error-{name}", directory=LOG_PATH)
@@ -178,7 +179,7 @@ def install(client):
             environment.logger(error_logger, type="error")
 
             # we need a new form of seasonality
-            seasonality = Seasonality(join(Seasonality_folder, Seasonality_file), max_volume=request.form['max_volume'])
+            seasonality = Seasonality(join(Seasonality_folder, Seasonality_file), max_volume=int(request.form['max_volume']))
 
             # now, we can put the process in the simulation
             Processor(environment, servers, seasonality=seasonality, kinds=[kind.strip() for kind in request.form['process'].split(',')])
