@@ -10,7 +10,7 @@ part clean from these declarations.
 """
 
 # third party dependencies
-from os.path import isfile, join, normpath, dirname, basename, getctime
+from os.path import isfile, join, normpath, dirname, basename, getctime, exists
 from flask import request, render_template, send_file
 from flask.json import jsonify, load
 from datetime import datetime
@@ -99,10 +99,10 @@ def install(client):
         GET: string
         """
         # construct the path to the form
-        fp = path.join(path.dirname(__file__), 'web', 'forms', name)
+        fp = join(dirname(__file__), 'web', 'forms', name)
 
         # we need to have a valid path
-        if not path.exists(fp):
+        if not exists(fp):
 
             # tell the user there's no form
             return jsonify({"error": "file does not exist"})
