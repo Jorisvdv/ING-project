@@ -10,27 +10,13 @@ part clean from these declarations.
 """
 
 # third party dependencies
-from lib.Seasonality import TransactionInterval as Seasonality
-from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
-from lib.Processor import Processor
-from lib.Logger import Logger
-from lib.Servers import Servers
-from lib.Simulation import Simulation
-import os
-from os import listdir
-from os import path
-from os.path import isfile, join
+from os.path import isfile, join, normpath, dirname, basename, getctime
 from flask import request, render_template, send_file
 from flask.json import jsonify, load
-import csv
-import pandas as pd
-import numpy as np
-import time
 from datetime import datetime
 import zipfile
 import io
 import pathlib
-import flask as fl
 import glob
 
 # we need to setup logging configuration here,
@@ -40,26 +26,18 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # dependencies
+from lib.Seasonality import TransactionInterval as Seasonality
+from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
+from lib.Processor import Processor
+from lib.Logger import Logger
+from lib.Servers import Servers
+from lib.Simulation import Simulation
 
-# Global vars
-LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), 'logs'))
-Seasonality_folder = os.path.normpath(os.path.join(os.path.dirname(__file__),
-                                                   'seasonality'))
-Seasonality_file = 'week.csv'
-file_prefix = "log"
-
-
-def install_dash(dashapp):
-    """
-    Function to deploy and show Dash visualizations
-
-    Parameters
-    ----------
-    dashapp: Dash
-        Dash application to install the routes on.
-    """
-    show_dash_graphs(dashapp)
-
+# GLOBALS
+LOG_PATH            = normpath(join(dirname(__file__), 'logs'))
+Seasonality_folder  = normpath(join(dirname(__file__), 'seasonality'))
+Seasonality_file    = 'week.csv'
+file_prefix         = "log"
 
 def install(client):
     """
@@ -86,10 +64,10 @@ def install(client):
         """
 
         # Scan the logfile directory
-        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+        list_of_files = glob.glob(join(LOG_PATH, 'log_*.csv'))
 
         # Return only the filename to get no errors with old functions
-        log_filenames = [os.path.basename(filename) for filename in list_of_files]
+        log_filenames = [basename(filename) for filename in list_of_files]
 
         if log_filenames and 'f' in request.args:
             # Parse URL request file f using last_created default
@@ -197,7 +175,7 @@ def install(client):
             simulation.use(logger)
 
             # we need a new form of seasonality
-            seasonality = Seasonality(os.path.join(Seasonality_folder,
+            seasonality = Seasonality(join(Seasonality_folder,
                                                    Seasonality_file),
                                       max_volume=request.form['max_volume'])
 
@@ -237,16 +215,16 @@ def install(client):
         """
 
         # Scan the logfile directory
-        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+        list_of_files = glob.glob(join(LOG_PATH, 'log_*.csv'))
 
         # Return only the filename to get no errors with old functions
-        log_filenames = [os.path.basename(filename) for filename in list_of_files]
+        log_filenames = [basename(filename) for filename in list_of_files]
 
         # Only process/return endpoint_matrix if a logfile exists
         if log_filenames:
 
-            last_created = os.path.basename(max(list_of_files,
-                                                key=os.path.getctime))
+            last_created = basename(max(list_of_files,
+                                                key=getctime))
 
             # Parse URL request file f using last_created default
             f = request.args.get('f', default=last_created)
@@ -283,7 +261,7 @@ def install(client):
         if log_filenames:
 
             last_created = os.path.basename(max(list_of_files,
-                                                key=os.path.getctime))
+                                                key=getctime))
 
             # Parse URL request file f using last_created default
             sim_file = request.args.get('f', default=last_created)
@@ -313,7 +291,7 @@ def install(client):
 
         data.seek(0)
 
-        return fl.send_file(
+        return send_file(
             data,
             mimetype='application/zip',
             as_attachment=True,
