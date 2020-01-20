@@ -84,7 +84,7 @@ def update_graph(servers,metrics):
         )],
         'layout': dict(
             xaxis={
-                'title': "Timefloor"
+                'title': "Time"
             },
             yaxis={
                 'title': metrics
