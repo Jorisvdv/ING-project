@@ -26,12 +26,13 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # dependencies
+from lib.Environment import Environment
+from lib.MultiServers import MultiServers
+from lib.Servers import Servers
 from lib.Seasonality import TransactionInterval as Seasonality
 from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
 from lib.Processor import Processor
 from lib.Logger import Logger
-from lib.Servers import Servers
-from lib.Simulation import Simulation
 
 # GLOBALS
 LOG_PATH            = normpath(join(dirname(__file__), 'logs'))
@@ -149,45 +150,43 @@ def install(client):
             # increment the simulation count
             simc += 1
 
-            # we need a new simulation which we can run.
-            simulation = Simulation()
+            # we need a new environment which we can run.
+            environment = Environment()
 
-            # let's add a basic server pool to the simulation
-            servers = simulation.servers()
+            # we need a server pool
+            servers = MultiServers()
 
             # iterate over all of the servers that need to be configured that
             # we received from the client
             for kind in request.form['kinds'].split(','):
 
                 # append a new server pool to the multiserver system
-                servers.append(Servers(simulation.environment, size=int(
-                    request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
+                servers.append(Servers(environment, size=int(request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
 
             # Get the current date and time to append to the logger file name
             log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
 
             # now that we have an output dir, we can construct our logger which
             # we can use for the simulation
-            logger = Logger("{0}_{1:04d}_{2}".format(
-                file_prefix, simc, log_timestamp), directory=LOG_PATH)
+            logger = Logger("{0}_{1:04d}_{2}".format(file_prefix, simc, log_timestamp), directory=LOG_PATH)
+
+            # we also need a logger for all error events that happen in the simulation
+            error_logger = Logger(f"error-{name}", directory=LOG_PATH)
 
             # we can use the logger for the simulation, so we know where all logs will be written
-            simulation.use(logger)
+            environment.logger(logger)
+            environment.logger(error_logger, type="error")
 
             # we need a new form of seasonality
-            seasonality = Seasonality(join(Seasonality_folder,
-                                                   Seasonality_file),
-                                      max_volume=request.form['max_volume'])
+            seasonality = Seasonality(join(Seasonality_folder, Seasonality_file), max_volume=request.form['max_volume'])
 
-            # now, we can put the process in the simulation, which will know
-            # how to define the process
-            simulation.process(Processor, seasonality=seasonality, kinds=[
-                               kind.strip() for kind in request.form['process'].split(',')])
+            # now, we can put the process in the simulation
+            Processor(environment, servers, seasonality=seasonality, kinds=[kind.strip() for kind in request.form['process'].split(',')])
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.
             # for example, day or week.
-            simulation.run(runtime=int(request.form['runtime']))
+            environment.run(until=int(request.form['runtime']))
 
             # expose the id of the simulation
             return jsonify(simc)

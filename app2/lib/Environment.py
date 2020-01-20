@@ -17,10 +17,63 @@ class Environment(simpy.Environment):
         """
         Constructor.
         """
+
+        # call the parent class
         super().__init__(*args, **kwargs)
 
-        # install a collection of middlewares
+        # collection of loggers
+        self._loggers = { "info": [], "error": [] }
+
+        # collection of middlewares
         self._middleware = []
+
+    def log(self, message, type="info"):
+        """
+        Method to log a message to the environment.
+
+        Parameters
+        ----------
+        type: string
+            Type of log message. Supported types are:
+            - info:     Regular info messages.
+            - error:    Error messages.
+        message: string
+            Message to log.
+
+        Returns
+        -------
+        self
+        """
+
+        # log the message on all loggers of the given type
+        [Logger.log(message) for Logger in self._loggers[type]]
+
+        # allow chaining
+        return self
+
+    def logger(self, Logger, type="info"):
+        """
+        Method to install a logger for a specific type of log on this environment.
+
+        Parameters
+        ----------
+        type: string
+            Type of logger. Supported types are:
+            - info:     Regular info logger.
+            - error:    Error logger.
+        Logger: Logger
+            Logger instance that will log those messages.
+
+        Returns
+        -------
+        self
+        """
+
+        # install the logger
+        self._loggers[type].append(Logger)
+
+        # allow chaining
+        return self
 
     def use(self, middleware):
         """

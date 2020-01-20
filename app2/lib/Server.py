@@ -108,10 +108,10 @@ class Server(PreemptiveResource):
 
         # we need to construct a logmessage, which we can log on this server
         # and push onto the environment
-        msg = f"{state['time']};{state['requested_by']};INFO;{state['cpu']};{state['memory']};{state['id']};{state['name']};{message}"
+        msg = f"{state['time']};{state['requested_by']};INFO;{state['cpu']};{state['memory']};{state['latency']};{state['id']};{state['name']};{message}"
 
         # push the log to the environment
-        self._env.push(msg)
+        self._env.log(msg)
 
         # parse parameters for the super class method
         priority = kwargs['priority'] if 'priority' in kwargs else 1

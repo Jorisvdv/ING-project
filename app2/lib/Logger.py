@@ -62,7 +62,7 @@ class Logger(Middleware):
         message: string
             Message to log.
         level: integer
-            Level of logging (default: 10).
+            Level of logging (default: 20).
 
         Returns
         -------

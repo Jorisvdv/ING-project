@@ -6,7 +6,8 @@ Script to run the simulation as CLI tool.
 """
 
 # dependencies
-from lib.Simulation import Simulation
+from lib.Environment import Environment
+from lib.MultiServers import MultiServers
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.Processor import Processor
@@ -51,37 +52,40 @@ def main(n, config, seasonality, log_dir, log_prefix):
     -------
     bool
     """
-    # we need a new simulation which we can run.
-    simulation = Simulation()
+    # we need a new environment which we can run.
+    environment = Environment()
 
-    # let's add a basic server pool to the simulation
-    servers = simulation.servers()
+    # we need a server pool
+    servers = MultiServers()
 
     # iterate over all of the servers that need to be configured that
     # we received from the client
     for server in config['servers']:
 
         # append a new server pool to the multiserver system
-        servers.append(Servers(simulation.environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
+        servers.append(Servers(environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
 
     # we need a logger that will log all events that happen in the simulation
     name    = "{0}_{1:04d}_{2}".format(log_prefix, n, datetime.now().strftime("%Y-%m-%d_%H-%M"))
     logger  = Logger(name, directory=log_dir)
 
+    # we also need a logger for all error events that happen in the simulation
+    error_logger = Logger(f"error-{name}", directory=log_dir)
+
     # we can use the logger for the simulation, so we know where all logs will be written
-    simulation.use(logger)
+    environment.logger(logger)
+    environment.logger(error_logger, type="error")
 
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, max_volume=config["max_volume"])
 
-    # now, we can put the process in the simulation, which will know
-    # how to define the process
-    simulation.process(Processor, seasonality=seasonality, kinds=config['process'])
+    # now, we can put the process in the simulation
+    Processor(environment, servers, seasonality=seasonality, kinds=config['process'])
 
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
     # for example, day or week.
-    return simulation.run(runtime=int(config['runtime']))
+    return environment.run(until=int(config['runtime']))
 
 # run this as main
 if __name__ == "__main__":
@@ -93,7 +97,7 @@ if __name__ == "__main__":
             "capacity": 1000,
             "kind":     "balance"
         }, {
-            "size":     5,
+            "size":     2,
             "capacity": 1000,
             "kind":     "credit"
         }, {
