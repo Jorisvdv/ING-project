@@ -22,7 +22,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 
 # local dependencies
-from lib.OutlierDetection import detect_outliers
+from lib.OutlierDetection import moving_average, detect_outliers
 
 # Global vars
 # Set location of log folder relative to this script
@@ -137,9 +137,19 @@ def show_dash_graphs(dashapp):
                     id='std-radio',
                     options=[{'label': i[0], 'value': i[1]} for i in std_dict.items()],
                     value=2
+                ),
+                dcc.Checklist(
+                    id='show-mv-avg',
+                    options=[
+                        {'label': 'Show Rolling Average', 'value': 'Yes'}
+                    ],
+                    value=['Yes'],
+                    labelStyle={'display': 'inline-block'}
                 )],
                 style={'width': '48%',  'float': 'right', 'display': 'inline-block'}
-            )
+            ),
+
+
 
         ]),
 
@@ -172,12 +182,10 @@ def show_dash_graphs(dashapp):
         Output('indicator-graphic', 'figure'),
         [Input('servers-radio', 'value'),
          Input('metrics-radio', 'value'),
-         Input('std-radio', 'value')])
+         Input('std-radio', 'value'),
+         Input('show-mv-avg', 'value')])
 
-    def update_graph(servers, metrics, std):
-        
-        if not std:
-            std = 3
+    def update_graph(servers, metrics, std, show_mv_avg):
 
         dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
 
@@ -191,8 +199,7 @@ def show_dash_graphs(dashapp):
         outliers_X = list(outliers.keys())
         outliers_Y = list(outliers.values())
 
-        return {
-            'data': [
+        data = [
                     dict(
                             x=dff["Time_floor"],
                             y=dff["Value"],
@@ -211,8 +218,31 @@ def show_dash_graphs(dashapp):
                             marker= {"color": 'red'},
                             name="Outliers"
                         )
-                    ],
+                ]
+  
+        # Moving average
+        if show_mv_avg:
+            n = 10
+            mv_avg_Y = moving_average(list(dff["Value"]))
+            mv_avg_X = list(range(0+n-1, len(mv_avg_Y)+n-1))
 
+            data.append(
+                        dict(
+                            x=mv_avg_X,
+                            y=mv_avg_Y,
+                            mode='line',
+                            marker={
+                                'size': 8,
+                                'opacity': 0.8,
+                                'line': {'width': 0.5, 'color': 'white'},
+                                'color': '#ffe063'
+                            },
+                            name="Rolling Average"
+                        )
+                )
+
+        return {
+            'data': data,
             'layout': dict(
                 xaxis={
                     'title': "Time"
@@ -224,6 +254,7 @@ def show_dash_graphs(dashapp):
                 hovermode='closest'
             )
         }
+
 
 
 

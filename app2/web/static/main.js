@@ -61,6 +61,7 @@ onload = function() {
                 console.log(res);
             });
 
+            // Redirect to '/' with corresponding logfile (parameter f)
             window.location.href = "/?f=Manual_Log.csv";
 
         });

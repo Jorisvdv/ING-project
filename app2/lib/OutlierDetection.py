@@ -16,7 +16,7 @@ import numpy as np
 OUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs/outliers'))
 
 
-def moving_average(t, n=3):
+def moving_average(t, n=10):
     """
     Function to calculate moving/rolling average of a 1-dimensional numerical array.
 
