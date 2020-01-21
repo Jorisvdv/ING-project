@@ -7,14 +7,9 @@
     <!-- define meta data -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--<meta name="viewport" initial-scale="1" width="device-width" height="device-height" />-->
     <meta name="description" content="A webclient for a discrete event modeling system, commissioned by the University of Amsterdam." />
 
-    <!-- include third party dependencies -->
-    <script deferred src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.js"></script>
-    <!-- use in production: https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js -->
-
-    <!-- include first party dependencies -->
+    <!-- include dependencies -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v=388">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v=53800">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
@@ -32,6 +27,13 @@
     <!--<script src="{{ url_for('static', filename='js/baseD3.js') }}?v=71"></script>-->
     <script src="{{ url_for('static', filename='js/forceGraph.js') }}?v=2711"></script>
 
+    <!-- include js -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/snap.js/1.9.3/snap.min.js"></script>
+    <script src="{{ url_for('static', filename='js/forceGraph.js') }}?v=13"></script>
+    <script deferred type="module" src="{{ url_for('static', filename='main.js') }}?v=22"></script>
   </head>
 
   <body>
