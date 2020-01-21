@@ -8,8 +8,8 @@
 * [x] Finalise plotly drop down selection  
 * [ ] Add latency and kind servers to logs
     * [ ] Add latency to visualisation
-    * [ ] Color network graph based on server kind
-    * [ ] Add filtering on server kind to plotly
+    * [X] Color network graph based on server kind
+    * [X] Add filtering on server kind to plotly
     * [ ] Take mean for all servers of a specific kind
 * [ ] Add crash and restart when memory overload  
 * [ ] Add timeout error (with appropriate logger level)
@@ -49,9 +49,9 @@
     * [ ] 173: num_std_dev = 3
 * Middleware.py: None  
 * MultiServers.py: None
-    * [ ] 17: moving_average:  
-     35: detect_outliers: n=3, default: 3 (maybe a bit small for this large amount of records)  
-    * [ ] 68: outlier_writer: delimiter=',' (rest of csv have ";" delimiter)  
+    * [X ] 17: moving_average:  
+     35: detect_outliers: n=3, default: 3 (maybe a bit small for this large amount of records)  -> Changed to n=10
+    * [X] 68: outlier_writer: delimiter=',' (rest of csv have ";" delimiter)  
 * Process.py:  
 ## main app2 folder  
 * routes.py  

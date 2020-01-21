@@ -36,7 +36,7 @@ def moving_average(t, n=3):
 # Detects outliers based on std and moving average, and saves them on a .csv file
 
 
-def detect_outliers(t, n=3, s=2, filename='outliers.csv'):
+def detect_outliers(t, n=10, s=2, filename='outliers.csv'):
     """
     Function to detect outliers based on whether an element is s standard deviations (std)
     away from the corresponding rolling mean. Results are both returned in a dict and
@@ -70,7 +70,7 @@ def detect_outliers(t, n=3, s=2, filename='outliers.csv'):
 
     # Save on output .csv file
     with open(os.path.join(OUT_DIR, filename), mode='w') as outlier_file:
-        outlier_writer = csv.writer(outlier_file, delimiter=',',
+        outlier_writer = csv.writer(outlier_file, delimiter=';',
                                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
         outlier_writer.writerow(['idx', 'value'])
         for k, v in outliers.items():
