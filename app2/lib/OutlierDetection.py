@@ -18,7 +18,7 @@ OUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs/outl
 
 def moving_average(t, n=3):
     """
-    Function to calculate moving/rolling average of a 1-dimensional array of numbers.
+    Function to calculate moving/rolling average of a 1-dimensional numerical array.
 
     Parameters
     ----------
@@ -39,7 +39,7 @@ def moving_average(t, n=3):
 def detect_outliers(t, n=3, s=2, filename='outliers.csv'):
     """
     Function to detect outliers based on whether an element is s standard deviations (std)
-    away from the corresponding rolling mean value. Results are both returned in a dict and
+    away from the corresponding rolling mean. Results are both returned in a dict and
     saved into an output .csv file.
 
     Parameters

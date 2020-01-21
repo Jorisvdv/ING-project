@@ -83,11 +83,16 @@
 		</div>
 
 
+		<hr>
+
+	     <h3>Metrics</h3>
+
 
 	     <!-- Dash visualizations iframe --> 
-	     <div id="mainFrameDiv" style="--aspect-ratio: 16/9;">
-			<iframe src="http://localhost:8050/dash/" width=1000 height=600> </iframe>
+	     <div id="mainFrameDiv" style="--aspect-ratio: 16/13;">
+			<iframe id="dash-iframe" src="http://localhost:8050/dash/" frameBorder="0" scrolling="no" style="overflow: hidden"> </iframe>
 		</div>
+
 
 	    </div>
 	  </div>
@@ -207,13 +212,18 @@
 
 <!--<script type="text/javascript" src="{{ url_for('static', filename='js/JSindex.js') }}?v=44"></script>-->
 <script type="text/javascript">
+
 	var forcegraphDataUrl;
+	var visualization = document.getElementById("Visualisation");
 
 	if ("{{ f }}") {
 		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
+		visualization.style.visibility = 'visible'
 	}
 	else {
 		forcegraphDataUrl = "/get_endpoint_data";
+		visualization.innerHTML = "";
+
 	}
 
 	forceGraph(forcegraphDataUrl);

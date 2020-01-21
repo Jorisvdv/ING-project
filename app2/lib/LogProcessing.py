@@ -15,6 +15,7 @@ import json
 import pandas as pd
 import numpy as np
 from flask.json import jsonify, load
+import dash
 import dash_table
 from dash.dependencies import Input, Output
 import dash_core_components as dcc
@@ -108,121 +109,122 @@ def show_dash_graphs(dashapp):
     -------
         Dash Graph
     """
-    print(LOG_PATH)
-    df = pd.read_csv(os.path.join(LOG_PATH, 'Manual_Log_Filtered.csv'),
-                     sep=",", error_bad_lines=False)
+
+    f = 'Manual_Log_Filtered_New.csv'
+
+    df = pd.read_csv(os.path.join(LOG_PATH, f))
+    servers = df['Server'].unique()
+    metrics = df['variable'].unique()
+    std_dict = {'Std = 1':1, 'Std = 2':2, 'Std = 3':3, 'Std = 4':4}
 
     dashapp.layout = html.Div([
-        dash_table.DataTable(
-            id='datatable-interactivity',
-            columns=[
-                {"name": i, "id": i, "deletable": True, "selectable": True} for i in df.columns
-            ],
-            data=df.to_dict('records'),
-            editable=True,
-            filter_action="native",
-            sort_action="native",
-            sort_mode="multi",
-            column_selectable="single",
-            row_selectable="multi",
-            row_deletable=True,
-            selected_columns=[],
-            selected_rows=[],
-            page_action="native",
-            page_current=0,
-            page_size=10,
-        ),
-        html.Div(id='datatable-interactivity-container')
-    ])
+        html.Div([
 
-    @dashapp.callback(
-        Output('datatable-interactivity', 'style_data_conditional'),
-        [Input('datatable-interactivity', 'selected_columns')]
-    )
-    def update_styles(selected_columns):
-        return [{
-            'if': {'column_id': i},
-            'background_color': '#D2F3FF'
-        } for i in selected_columns]
-
-    @dashapp.callback(
-        Output('datatable-interactivity-container', "children"),
-        [Input('datatable-interactivity', "derived_virtual_data"),
-         Input('datatable-interactivity', "derived_virtual_selected_rows")])
-    def update_graphs(rows, derived_virtual_selected_rows):
-        # When the table is first rendered, `derived_virtual_data` and
-        # `derived_virtual_selected_rows` will be `None`. This is due to an
-        # idiosyncracy in Dash (unsupplied properties are always None and Dash
-        # calls the dependent callbacks when the component is first rendered).
-        # So, if `rows` is `None`, then the component was just rendered
-        # and its value will be the same as the component's dataframe.
-        # Instead of setting `None` in here, you could also set
-        # `derived_virtual_data=df.to_rows('dict')` when you initialize
-        # the component.
-        if derived_virtual_selected_rows is None:
-            derived_virtual_selected_rows = []
-
-        dff = df if rows is None else pd.DataFrame(rows)
-
-        colors = ['#7FDBFF' if i in derived_virtual_selected_rows else '#0074D9'
-                  for i in range(len(dff))]
-
-        # Outliers
-        outlier_list = []
-        sim_file = 'Manual_Log_Filtered.csv'
-        metrics = ["CPU Usage", "Memory Usage"]
-        num_std_dev = 3
-
-        for column in metrics:
-            if column in dff:
-                outlier_list.append(detect_outliers(
-                    list(dff[column]), s=num_std_dev, filename='outliers_' + column + '_' + sim_file))
-
-        metric_outliers = {}
-        for idx, metric in enumerate(metrics):
-            metric_outliers[metric] = [list(outlier_list[idx].keys()),
-                                       list(outlier_list[idx].values())]
-
-        aux_X = list(range(0, dff[column].shape[0]))
-
-        fig = [
-            dcc.Graph(
-                id=column,
-                figure={
-                    "data": [
-                        {
-                            # "x": dff["Time_floor"],
-                            "x": aux_X,
-                            "y": dff[column],
-                            "type": "line",
-                            "marker": {"color": colors},
-                            "name": "usage"
-                        },
-                        {
-                            "x": metric_outliers[column][0],
-                            "y": metric_outliers[column][1],
-                            'mode': 'markers',
-                            "marker": {"color": 'red'},
-                            "name": "outliers"
-                        }
-                    ],
-                    "layout": {
-                        "xaxis": {"automargin": True},
-                        "yaxis": {
-                            "automargin": True,
-                            "title": {"text": column}
-                        },
-                        "height": 250,
-                        "margin": {"t": 10, "l": 10, "r": 10},
-                    },
-                },
+            html.Div('Server', style={'color': 'black', 'fontSize': 14}),
+            html.Div([
+                dcc.Dropdown(
+                    id='servers-radio',
+                    options=[{'label': k, 'value': k} for k in servers],
+                    value='A'
+                )],
+                style={'width': '48%', 'display': 'inline-block'}
+            ),
+            
+            
+            html.Div([
+                html.Div('Outlier Std Threshold', style={'color': 'black', 'fontSize': 14}),
+                dcc.Dropdown(
+                    id='std-radio',
+                    options=[{'label': i[0], 'value': i[1]} for i in std_dict.items()],
+                    value=2
+                )],
+                style={'width': '48%',  'float': 'right', 'display': 'inline-block'}
             )
 
+        ]),
 
-            # check if column exists - user may have deleted it
-            # If `column.deletable=False`, then you don't
-            # need to do this check.
-            for column in metrics if column in dff
-        ]
+        html.Div('Metric', style={'color': 'black', 'fontSize': 14}),
+        html.Div([
+            dcc.Dropdown(id='metrics-radio')],
+            style={'width': '48%', 'display': 'inline-block'}
+        ),
 
-        return fig
+        html.Div(id='display-selected-values'),
+        dcc.Graph(id='indicator-graphic')
+
+
+    ])
+
+
+    @dashapp.callback(
+        Output('metrics-radio', 'options'),
+        [Input('servers-radio', 'value')])
+    def set_metrics_options(selected_country):
+        return [{'label': i, 'value': i} for i in metrics]
+
+    @dashapp.callback(
+        Output('metrics-radio', 'value'),
+        [Input('metrics-radio', 'options')])
+    def set_metrics_value(available_options):
+        return available_options[0]['value']
+
+    @dashapp.callback(
+        Output('indicator-graphic', 'figure'),
+        [Input('servers-radio', 'value'),
+         Input('metrics-radio', 'value'),
+         Input('std-radio', 'value')])
+
+    def update_graph(servers, metrics, std):
+        
+        if not std:
+            std = 3
+
+        dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
+
+        # Outliers
+        outliers = detect_outliers(
+                                    list(dff["Value"]), 
+                                    s=std, 
+                                    filename='outliers_' + metrics + '_' + 'Manual_Log_Filtered_New.csv'
+                    )
+
+        outliers_X = list(outliers.keys())
+        outliers_Y = list(outliers.values())
+
+        return {
+            'data': [
+                    dict(
+                            x=dff["Time_floor"],
+                            y=dff["Value"],
+                            mode='line',
+                            marker={
+                                'size': 15,
+                                'opacity': 0.5,
+                                'line': {'width': 0.5, 'color': 'white'}
+                            },
+                            name="Usage"
+                        ),
+                    dict(
+                            x=outliers_X,
+                            y=outliers_Y,
+                            mode='markers',
+                            marker= {"color": 'red'},
+                            name="Outliers"
+                        )
+                    ],
+
+            'layout': dict(
+                xaxis={
+                    'title': "Time"
+                },
+                yaxis={
+                    'title': metrics
+                },
+                margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
+                hovermode='closest'
+            )
+        }
+
+
+
+

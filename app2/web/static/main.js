@@ -60,6 +60,9 @@ onload = function() {
                 // test output
                 console.log(res);
             });
+
+            window.location.href = "/?f=Manual_Log.csv";
+
         });
     });
 };

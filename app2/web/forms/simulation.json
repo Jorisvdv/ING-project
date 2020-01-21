@@ -33,6 +33,7 @@
     }, {
         "button": true,
         "type": "submit",
+        "id": "start-simulation",
         "text": "Start simulation"
     }]
 }

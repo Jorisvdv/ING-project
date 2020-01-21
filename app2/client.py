@@ -29,8 +29,16 @@ class Client(object):
         """
         # we need to construct a flask application, which will be the
         # backbone of the web client
-        self._client = Flask(__name__, static_url_path='', static_folder="web/static", template_folder="web/templates")
-        self._dashapp = Dash(__name__, server=self._client, routes_pathname_prefix='/dash/')
+        self._client = Flask(__name__, 
+                            static_url_path='', 
+                            static_folder="web/static", 
+                            template_folder="web/templates"
+                            )
+        self._dashapp = Dash(__name__, 
+                            server=self._client, 
+                            routes_pathname_prefix='/dash/', 
+                            external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
+                            )
 
         # we need to setup some configuration variables, these may need to change
         # when running in production

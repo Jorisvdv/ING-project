@@ -10,6 +10,7 @@ part clean from these declarations.
 """
 
 # third party dependencies
+import os
 from os.path import isfile, join, normpath, dirname, basename, getctime, exists
 from flask import request, render_template, send_file
 from flask.json import jsonify, load
@@ -217,6 +218,8 @@ def install(client):
         # Scan the logfile directory
         list_of_files = glob.glob(join(LOG_PATH, 'log_*.csv'))
 
+        print(LOG_PATH)
+
         # Return only the filename to get no errors with old functions
         log_filenames = [basename(filename) for filename in list_of_files]
 
@@ -283,7 +286,7 @@ def install(client):
         -------
         GET: .zip file (download)
         """
-        print(LOG_PATH)
+
         base_path = pathlib.Path(LOG_PATH)
         data = io.BytesIO()
 
@@ -299,3 +302,7 @@ def install(client):
             as_attachment=True,
             attachment_filename='logs.zip'
         )
+
+
+
+
