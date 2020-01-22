@@ -49,7 +49,7 @@
     * [ ] 173: num_std_dev = 3
 * Middleware.py: None  
 * MultiServers.py: None
-    * [X ] 17: moving_average:  
+    * [X] 17: moving_average:  
      35: detect_outliers: n=3, default: 3 (maybe a bit small for this large amount of records)  -> Changed to n=10
     * [X] 68: outlier_writer: delimiter=',' (rest of csv have ";" delimiter)  
 * Process.py:  
