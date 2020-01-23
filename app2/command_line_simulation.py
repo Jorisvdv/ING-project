@@ -74,6 +74,10 @@ def main(n, config, seasonality, log_dir, log_prefix):
     # we also need a logger for all error events that happen in the simulation
     error_logger = Logger(f"error-{name}", directory=log_dir, show_stdout=True)
 
+    # # Start QueueListener
+    # if hasattr(logger,"listener"):
+    #     logger.listener.start()
+
     # Enter first line for correct .csv headers
     logger.log(
         'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
@@ -92,7 +96,11 @@ def main(n, config, seasonality, log_dir, log_prefix):
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
     # for example, day or week.
-    return environment.run(until=int(config['runtime']))
+    environment.run(until=int(config['runtime']))
+
+    # Start QueueListener
+    if hasattr(logger, "listener"):
+        logger.listener.stop()
 
 
 # run this as main
@@ -102,15 +110,15 @@ if __name__ == "__main__":
     config = {
         "servers": [{
             "size":     5,
-            "capacity": 1000,
+            "capacity": 100,
             "kind":     "balance"
         }, {
             "size":     2,
-            "capacity": 1000,
+            "capacity": 50,
             "kind":     "credit"
         }, {
             "size":     5,
-            "capacity": 1000,
+            "capacity": 100,
             "kind":     "payment"
         }],
         "process":    ["balance", "payment", "balance", "credit"],
