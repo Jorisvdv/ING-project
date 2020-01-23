@@ -62,16 +62,19 @@ class Processor(Process):
         # run indefinitely
         while True:
 
+            # timeout before proceeding to the next transaction
+            yield self.environment.timeout(self._seasonality.interval(self.environment.now))
+
             # init a new subprocess
             process = Subprocess(self.environment, self._servers, kinds=self._kinds).process
 
             # timeout before proceeding to the next transaction
             yield process | self.environment.timeout(self._timeout)
-            yield self.environment.timeout(self._seasonality.interval(self.environment.now))
-
-            # see if the processed timed out, so that we can interrupt it
-            if not process.triggered:
-                process.interrupt("TIMEOUT")
+            # yield self.environment.timeout(self._seasonality.interval(self.environment.now))
+            #
+            # # see if the processed timed out, so that we can interrupt it
+            # if not process.triggered:
+            #     process.interrupt("TIMEOUT")
 
 
 class Subprocess(Process):

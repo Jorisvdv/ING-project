@@ -12,6 +12,8 @@ a middleware on a simulation.
 from lib.Middleware import Middleware
 import logging
 import os
+from logging.handlers import QueueHandler, QueueListener
+import queue
 
 # get location log files relative to this file
 LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs'))
@@ -19,7 +21,7 @@ LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs'))
 
 class Logger(Middleware):
 
-    def __init__(self, name, directory=LOG_PATH, show_stdout=True):
+    def __init__(self, name, directory=LOG_PATH, show_stdout=True, usequeue=False):
         """
         Constructor.
 
@@ -51,8 +53,15 @@ class Logger(Middleware):
         # we need a new file handler so the logs are written to the file
         filehandler = logging.FileHandler(os.path.join(directory, name+".csv"), mode='a')
 
-        # add the file handler to the logger so all logs will be outputted there
-        self._logger.addHandler(filehandler)
+        if usequeue:
+            log_queue = queue.Queue(-1)
+            queue_handler = QueueHandler(log_queue)
+            self._logger.addHandler(queue_handler)
+            self.listener = QueueListener(log_queue, filehandler)
+
+        else:
+            # add the file handler to the logger so all logs will be outputted there
+            self._logger.addHandler(filehandler)
 
         # assign the directory
         self._directory = directory
