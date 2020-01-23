@@ -60,7 +60,7 @@ onload = function() {
 
                 // test output
                 console.log(res);
-
+                /*
                 var simID = res
 
                 api.get('/simulation', {id: simID}).then((res) => {
@@ -68,9 +68,11 @@ onload = function() {
                     console.log(res);
                     
                 });
+                */
+
             });
 
-            console.log(simID)
+            // console.log(simID)
             // Redirect to '/' with corresponding logfile (parameter f)
             // window.location.href = "/?f=Manual_Log.csv#Visualisation";
 
