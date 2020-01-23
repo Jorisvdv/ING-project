@@ -69,19 +69,19 @@ def main(n, config, seasonality, log_dir, log_prefix):
 
     # we need a logger that will log all events that happen in the simulation
     name = "{0}_{1:04d}_{2}".format(log_prefix, n, datetime.now().strftime("%Y-%m-%d_%H-%M"))
-    logger = Logger(name, directory=log_dir)
+    logger = Logger(name, directory=log_dir, show_stdout=True)
 
     # we also need a logger for all error events that happen in the simulation
-    error_logger = Logger(f"error-{name}", directory=log_dir)
+    error_logger = Logger(f"error-{name}", directory=log_dir, show_stdout=True)
+
+    # Enter first line for correct .csv headers
+    logger.log(
+        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
+    error_logger.log('Time;Server;Error type;Start-Stop')
 
     # we can use the logger for the simulation, so we know where all logs will be written
     environment.logger(logger)
     environment.logger(error_logger, type="error")
-
-    # Enter first line for correct .csv headers
-    logger.info(
-        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
-    error_logger.info('Time;Server;Error type;Start-Stop')
 
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, max_volume=config["max_volume"])
@@ -114,8 +114,8 @@ if __name__ == "__main__":
             "kind":     "payment"
         }],
         "process":    ["balance", "payment", "balance", "credit"],
-        "runtime":    10,
-        "max_volume": 100
+        "runtime":    100,
+        "max_volume": 1000
     }
 
     # Find location of file and set log location relative to that

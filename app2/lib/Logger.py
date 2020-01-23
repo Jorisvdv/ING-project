@@ -19,7 +19,7 @@ LOG_PATH = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs'))
 
 class Logger(Middleware):
 
-    def __init__(self, name, directory=LOG_PATH):
+    def __init__(self, name, directory=LOG_PATH, show_stdout=True):
         """
         Constructor.
 
@@ -43,6 +43,10 @@ class Logger(Middleware):
 
         # we need to get the logger with the given name
         self._logger = logging.getLogger(name)
+
+        if not show_stdout:
+            # Do not propagate to higer level to keep message out of stout
+            self._logger.propagate = False
 
         # we need a new file handler so the logs are written to the file
         filehandler = logging.FileHandler(os.path.join(directory, name+".csv"), mode='a')

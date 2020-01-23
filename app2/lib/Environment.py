@@ -11,6 +11,7 @@ us to add some additional middleware functionality.
 # dependencies
 import simpy
 
+
 class Environment(simpy.Environment):
 
     def __init__(self, *args, **kwargs):
@@ -22,12 +23,12 @@ class Environment(simpy.Environment):
         super().__init__(*args, **kwargs)
 
         # collection of loggers
-        self._loggers = { "info": [], "error": [] }
+        self._loggers = {"info": [], "error": []}
 
         # collection of middlewares
         self._middleware = []
 
-    def log(self, message, type="info"):
+    def log(self, message, level=20, type="info"):
         """
         Method to log a message to the environment.
 
@@ -46,7 +47,7 @@ class Environment(simpy.Environment):
         """
 
         # log the message on all loggers of the given type
-        [Logger.log(message) for Logger in self._loggers[type]]
+        [Logger.log(message, level) for Logger in self._loggers[type]]
 
         # allow chaining
         return self
@@ -139,4 +140,3 @@ class Environment(simpy.Environment):
 
         # call the original method
         return super().step()
-

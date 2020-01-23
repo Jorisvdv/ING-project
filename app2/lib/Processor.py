@@ -18,6 +18,7 @@ from numpy.random import randint
 # dependencies
 from lib.Process import Process
 
+
 class Processor(Process):
 
     def __init__(self, *args, **kwargs):
@@ -47,6 +48,9 @@ class Processor(Process):
         # optional sequence of kinds
         self._kinds = kwargs['kinds'] if 'kinds' in kwargs else ['regular']
 
+        # optional timeout duration
+        self._timeout = kwargs['timeout'] if 'timeout' in kwargs else 0.0005
+
     def run(self):
         """
         Generator method to run the process.
@@ -62,12 +66,13 @@ class Processor(Process):
             process = Subprocess(self.environment, self._servers, kinds=self._kinds).process
 
             # timeout before proceeding to the next transaction
-            yield process | self.environment.timeout(0.0005)
+            yield process | self.environment.timeout(self._timeout)
             yield self.environment.timeout(self._seasonality.interval(self.environment.now))
 
             # see if the processed timed out, so that we can interrupt it
             if not process.triggered:
                 process.interrupt("TIMEOUT")
+
 
 class Subprocess(Process):
 
@@ -105,7 +110,8 @@ class Subprocess(Process):
         kinds = self._kinds
 
         # collection of servers processing a request
-        request_df = pd.DataFrame(columns=["open_servers", "open_requests", "kind"], index=range(len(kinds)))
+        request_df = pd.DataFrame(
+            columns=["open_servers", "open_requests", "kind"], index=range(len(kinds)))
 
         # we need to iterate over all kinds
         for (idx, kind) in enumerate(kinds):
@@ -154,7 +160,8 @@ class Subprocess(Process):
                     raise Exception("SERVER UNAVAILABLE")
 
                 # ask the server for a new request
-                request = server.request(exclude=[server], requested_by=requested_by['name'], process_id=process_id, message=f"Requesting {kind} by {requested_by['kind']}")
+                request = server.request(exclude=[server], requested_by=requested_by['name'],
+                                         process_id=process_id, message=f"Requesting {kind} by {requested_by['kind']}")
 
                 # Add request to list of open open_requests
                 request_df.loc[idx, "open_requests"] = request
@@ -192,17 +199,20 @@ class Subprocess(Process):
                 if isinstance(interrupt.cause, Preempted):
 
                     # Manually print timeout message
-                    self.environment.log(f"ERROR: message {process_id} timeout at time {self.environment.now}", type="error")
+                    self.environment.log(
+                        f"ERROR: message {process_id} timeout at time {self.environment.now}", type="error")
                 else:
 
                     # Use interrupt clause to write error message
-                    self.environment.log(f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{server.state()['name']};{interrupt.cause}", type="error")
+                    self.environment.log(
+                        f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{server.state()['name']};{interrupt.cause}", type="error")
 
             # handle exceptions
             except Exception as e:
 
                 # log to the error log
-                self.environment.log(f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{e}", type="error")
+                self.environment.log(
+                    f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{e}", type="error")
 
         # release all server requests
         for row in request_df.itertuples(index=False):
