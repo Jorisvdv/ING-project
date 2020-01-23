@@ -42,6 +42,7 @@ onload = function() {
          */
         form.on('submit', (e) => {
 
+            console.log(form)
             /**
              *  Data to post to the api as formdata.
              *  @var    FormData
@@ -56,11 +57,12 @@ onload = function() {
              *  values of the form.
              *  @var    Promise
              */
+            console.log(formdata)
             api.post('/simulation', formdata).then((res) => {
 
                 // test output
                 console.log(res);
-                /*
+                
                 var simID = res
 
                 api.get('/simulation', {id: simID}).then((res) => {
@@ -68,7 +70,7 @@ onload = function() {
                     console.log(res);
                     
                 });
-                */
+                
 
             });
 

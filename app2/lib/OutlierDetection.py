@@ -16,7 +16,7 @@ import numpy as np
 OUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs/outliers'))
 
 
-def moving_average(t, n=10):
+def moving_average(t):
     """
     Function to calculate moving/rolling average of a 1-dimensional numerical array.
 
@@ -29,6 +29,9 @@ def moving_average(t, n=10):
     -------
         Moving average of t
     """
+    window_pct = 0.05
+    n = math.ceil(len(t) * window_pct)
+
     ret = np.cumsum(t)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1:] / n
@@ -36,7 +39,7 @@ def moving_average(t, n=10):
 # Detects outliers based on std and moving average, and saves them on a .csv file
 
 
-def detect_outliers(t, n=10, s=2, filename='outliers.csv'):
+def detect_outliers(t, s=2, filename='outliers.csv'):
     """
     Function to detect outliers based on whether an element is s standard deviations (std)
     away from the corresponding rolling mean. Results are both returned in a dict and
@@ -55,13 +58,16 @@ def detect_outliers(t, n=10, s=2, filename='outliers.csv'):
     -------
         outliers: dict containing {'timestamp': outlier_value}
     """
-    if n == 1:
+    if len(t) == 1:
         print('Time series length is 1 (no possible outliers). No output file created.')
         return None
 
-    mov_avg_t = moving_average(t, n=n)      # Moving/rolling average
+    mov_avg_t = moving_average(t)      # Moving/rolling average
     std_dev = np.std(t[0:len(mov_avg_t-1)])  # Std
 
+    window_pct = 0.05
+    n = math.ceil(len(t) * window_pct)
+    
     outliers = {}
     for idx, v in enumerate(t[1:]):
         # More than s stds from the corresponding set/window's rolling mean

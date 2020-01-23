@@ -45,23 +45,66 @@ def get_endpoint_json(f):
     endpoint_df = filtered_log_df.groupby(
         ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
 
+    # divide count by total count
+    # endpoint_df['count'] = endpoint_df['count'] / endpoint_df['count'].sum()
+
+    import collections
+
+    x = list(rows)
+    y = list(cols)
+    groups = []
+
+    for element in x:
+        node_type = element.split('#')[0]
+        if node_type not in groups:
+            groups.append(node_type)
+
+    for element in y:
+        node_type = element.split('#')[0]
+        if node_type not in groups:
+            groups.append(node_type)
+
+    group_dict = dict(zip(groups, list(range(1, len(groups) + 1))))
+
+    print(group_dict)
+    print(groups)
+    print(x)
+    print(y)
+    print(collections.Counter(x) == collections.Counter(y))
+
+
     endpoint_json = {
         "nodes": [],
         "links": []
     }
 
-    groups = cols
+    for element in x:
+        node_type = element.split('#')[0]
+        endpoint_json["nodes"].append({
+            "id": element,
+            "group": group_dict[node_type]
+        })
+
+    for element in y:
+        node_type = element.split('#')[0]
+        endpoint_json["nodes"].append({
+            "id": element,
+            "group": group_dict[node_type]
+        })
+
+    '''
     for idx, g in enumerate(groups):
         endpoint_json["nodes"].append({
             "id": g,
             "group": idx + 1
         })
+    '''
 
     for idx, r in endpoint_df.iterrows():
         endpoint_json["links"].append({
             "source": r['Server'],
             "target": r['To_Server'],
-            "value": r['count']
+            "value": r['count'] 
         })
 
     return jsonify(endpoint_json)
@@ -117,7 +160,7 @@ def get_log_filtered(f):
 
     df = df.reset_index()
     df = df.drop(['index'], axis=1)
-    df["Time"] = df["Time"].div(60)
+    # df["Time"] = df["Time"].div(60)
     df["Time_floor"] = np.floor(df["Time"]).astype("int")
     df = df.groupby(['Server', 'Time_floor'], as_index=False).mean()
     df = df.drop(['Time'], axis=1)
@@ -169,7 +212,7 @@ def show_dash_graphs(dashapp, f, eventId):
                     dcc.Dropdown(
                         id='servers-radio-{}'.format(eventId),
                         options=[{'label': k, 'value': k} for k in servers],
-                        value='A'
+                        value='client'
                     )],
                     style={'width': '48%', 'display': 'inline-block'}
                 ),
@@ -264,7 +307,8 @@ def show_dash_graphs(dashapp, f, eventId):
 
             # Moving average
             if show_mv_avg:
-                n = 10
+                window_pct = 0.05
+                n = math.ceil(len(list(dff["Value"])) * window_pct)
                 mv_avg_Y = moving_average(list(dff["Value"]))
                 mv_avg_X = list(range(0+n-1, len(mv_avg_Y)+n-1))
 
