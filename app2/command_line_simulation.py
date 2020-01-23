@@ -69,14 +69,14 @@ def main(n, config, seasonality, log_dir, log_prefix):
 
     # we need a logger that will log all events that happen in the simulation
     name = "{0}_{1:04d}_{2}".format(log_prefix, n, datetime.now().strftime("%Y-%m-%d_%H-%M"))
-    logger = Logger(name, directory=log_dir, show_stdout=True)
+    logger = Logger(name, directory=log_dir, show_stdout=False, usequeue=False)
 
     # we also need a logger for all error events that happen in the simulation
-    error_logger = Logger(f"error-{name}", directory=log_dir, show_stdout=True)
+    error_logger = Logger(f"error-{name}", directory=log_dir, show_stdout=False)
 
-    # # Start QueueListener
-    # if hasattr(logger,"listener"):
-    #     logger.listener.start()
+    # Start QueueListener
+    if hasattr(logger, "listener"):
+        logger.listener.start()
 
     # Enter first line for correct .csv headers
     logger.log(
@@ -102,9 +102,13 @@ def main(n, config, seasonality, log_dir, log_prefix):
     if hasattr(logger, "listener"):
         logger.listener.stop()
 
+    return name
+
 
 # run this as main
 if __name__ == "__main__":
+    # For timing get current time
+    starttime = datetime.now()
 
     # configuration for the simulation to run
     config = {
@@ -136,4 +140,7 @@ if __name__ == "__main__":
     n = len(glob.glob(os.path.join(log_dir, log_prefix+'*'))) + 1
 
     # run main
-    main(n=n, config=config, seasonality=seasonality, log_dir=log_dir, log_prefix=log_prefix)
+    location_file = main(n=n, config=config, seasonality=seasonality,
+                         log_dir=log_dir, log_prefix=log_prefix)
+    print(f"Simulation is done and can be found at {os.path.join(log_dir,location_file)}.")
+    print(f"Total time {datetime.now() - starttime}")

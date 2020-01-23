@@ -69,7 +69,7 @@ class Processor(Process):
             process = Subprocess(self.environment, self._servers, kinds=self._kinds).process
 
             # timeout before proceeding to the next transaction
-            yield process | self.environment.timeout(self._timeout)
+            yield process  # | self.environment.timeout(self._timeout)
             # yield self.environment.timeout(self._seasonality.interval(self.environment.now))
             #
             # # see if the processed timed out, so that we can interrupt it

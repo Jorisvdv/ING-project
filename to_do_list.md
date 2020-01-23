@@ -7,7 +7,7 @@
     4. [ ] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
 * [x] Finalise plotly drop down selection  
 * [ ] Add latency and kind servers to logs
-    * [ ] Add latency to visualisation
+    * [X] Add latency to visualisation
     * [X] Color network graph based on server kind
     * [X] Add filtering on server kind to plotly
     * [ ] Take mean for all servers of a specific kind
@@ -22,6 +22,8 @@
     * [ ] Frontend
 * [ ] Visual interface (see java modelling tool and Areana? for inspiration)
 * [x] Release server requests appropriately
+* [ ] add description to filename
+* [ ] Reformat Subprocess to property include timeout
 
 # Implementation:
 * [ ] Create API documentation (low priority, can be done after report is written)  
@@ -38,6 +40,8 @@
 * LogProcessing.py:  
     * [x] LOG_PATH = 'logs'  
     * [x] logs/Manual_Log_Filtered.csv  
+* Processor.py
+    * [ ] Fix no load when returning to same server
 
 
 # Defined variables/distributions/proposed changes:  
