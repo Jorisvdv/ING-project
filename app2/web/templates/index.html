@@ -15,7 +15,7 @@
 	      <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-orange"
 	        href="javascript:void(0);" onclick="myFunction()" title="Toggle Navigation Menu"><i class="fa fa-bars"></i></a>
 	      <a href="#Home" class="w3-bar-item w3-button w3-padding-large w3-white">Simulation</a>
-	     <a href="#Visualisation" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Visualisation</a>
+	     <a href="#Visualization" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Visualization</a>
 	      <a href="#Projectdescription" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Project description</a>
 	      <a href="#Discreteeventsimulation" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Discrete event simulation</a>
 	      <a href="#Errorintroduction" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white">Error introduction</a>
@@ -55,9 +55,9 @@
 	    <div class="w3-content">
 	    	<h5>Logfile: <font color="grey">{{ f }}</font></h5>
 
-		     <div id="forceGraph" alt="Server Communication">
-		     		<svg width="700" height="400"></svg>
-		     </div>
+			     <div id="forceGraph" alt="Server Communication">
+			     		<svg width="800" height="600"></svg>
+			     </div>
 
 			<hr>
 
@@ -227,17 +227,16 @@
 
 	}
 	else {
-		visualizationDiv.innerHTML = ""
+		if ("{{ len_logfiles }}" != 0) {
+			visualizationDiv.innerHTML = ""
+		}
+		else {
+			dropdownMenu.innerHTML = ""
+			noLogfileDiv.innerHTML = "No logfiles were found. Please run a simulation first."
+		}
 	}
 
-	if ("{{ len_logfiles }}" != 0) {
-		visualizationDiv.innerHTML = dropdownMenu.innerHTML
-		dropdownMenu.innerHTML = ""
-	}
-	else {
-		dropdownMenu.innerHTML = ""
-		noLogfileDiv.innerHTML = "No logfiles were found. Please run a simulation first."
-	}
+	
 
 	// Used to toggle the menu on small screens when clicking on the menu button
 	function myFunction() {

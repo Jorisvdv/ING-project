@@ -45,11 +45,6 @@ def get_endpoint_json(f):
     endpoint_df = filtered_log_df.groupby(
         ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
 
-    # divide count by total count
-    # endpoint_df['count'] = endpoint_df['count'] / endpoint_df['count'].sum()
-
-    import collections
-
     x = list(rows)
     y = list(cols)
     groups = []
@@ -65,13 +60,6 @@ def get_endpoint_json(f):
             groups.append(node_type)
 
     group_dict = dict(zip(groups, list(range(1, len(groups) + 1))))
-
-    print(group_dict)
-    print(groups)
-    print(x)
-    print(y)
-    print(collections.Counter(x) == collections.Counter(y))
-
 
     endpoint_json = {
         "nodes": [],
@@ -270,13 +258,21 @@ def show_dash_graphs(dashapp, f, eventId):
              Input('metrics-radio-{}'.format(eventId), 'value'),
              Input('std-radio-{}'.format(eventId), 'value'),
              Input('show-mv-avg-{}'.format(eventId), 'value')])
+
         def update_graph(servers, metrics, std, show_mv_avg):
 
             dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
 
+            # Metrics
+            X = list(range(0, dff["Time_floor"].size))
+            Y = dff["Value"]
+
             # Outliers
+            n = math.floor(len(Y) * 0.1)    # 10% of series length by default
+
             outliers = detect_outliers(
                 list(dff["Value"]),
+                n=n,
                 s=std,
                 filename='outliers_' + metrics + '_' + f_filtered
             )
@@ -286,8 +282,8 @@ def show_dash_graphs(dashapp, f, eventId):
 
             data = [
                 dict(
-                    x=dff["Time_floor"],
-                    y=dff["Value"],
+                    x=X,
+                    y=Y,
                     mode='line',
                     marker={
                         'size': 15,
@@ -307,10 +303,9 @@ def show_dash_graphs(dashapp, f, eventId):
 
             # Moving average
             if show_mv_avg:
-                window_pct = 0.05
-                n = math.ceil(len(list(dff["Value"])) * window_pct)
-                mv_avg_Y = moving_average(list(dff["Value"]))
-                mv_avg_X = list(range(0+n-1, len(mv_avg_Y)+n-1))
+                mv_avg_Y = moving_average(list(dff["Value"]), n)
+                mv_avg_X = list(range(0+n-1, len(list(dff["Value"]))))
+                
 
                 data.append(
                     dict(

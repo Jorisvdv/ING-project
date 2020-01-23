@@ -5,11 +5,13 @@ function forceGraph(forcegraphDataUrl) {
           width = +svg.attr("width"),
           height = +svg.attr("height");
 
+      var radius = 6;
+
       var color = d3.scaleOrdinal(d3.schemeCategory20);
 
       var simulation = d3.forceSimulation()
           // .force("link", d3.forceLink().distance(200).id(function(d) { return d.id; }))
-          .force("link", d3.forceLink().distance(200).id(function(d) { return d.id; }))
+          .force("link", d3.forceLink().distance(400).id(function(d) { return d.id; }))
           .force("charge", d3.forceManyBody())
           .force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -57,18 +59,25 @@ function forceGraph(forcegraphDataUrl) {
             .links(graph.links);
 
         function ticked() {
-          link
-              .attr("x1", function(d) { return d.source.x; })
-              .attr("y1", function(d) { return d.source.y; })
-              .attr("x2", function(d) { return d.target.x; })
-              .attr("y2", function(d) { return d.target.y; });
 
-          node
-              .attr("transform", function(d) {
+            node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+                .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+                
+            link
+                .attr("x1", function(d) { return d.source.x; })
+                .attr("y1", function(d) { return d.source.y; })
+                .attr("x2", function(d) { return d.target.x; })
+                .attr("y2", function(d) { return d.target.y; });
+
+            node
+                .attr("transform", function(d) {
                 return "translate(" + d.x + "," + d.y + ")";
               })
-        }
-      });
+
+
+          }
+        });
+
 
       function dragstarted(d) {
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();

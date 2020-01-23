@@ -16,7 +16,7 @@ import numpy as np
 OUT_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), '../logs/outliers'))
 
 
-def moving_average(t):
+def moving_average(t, n=10):
     """
     Function to calculate moving/rolling average of a 1-dimensional numerical array.
 
@@ -29,9 +29,6 @@ def moving_average(t):
     -------
         Moving average of t
     """
-    window_pct = 0.05
-    n = math.ceil(len(t) * window_pct)
-
     ret = np.cumsum(t)
     ret[n:] = ret[n:] - ret[:-n]
     return ret[n - 1:] / n
@@ -39,7 +36,7 @@ def moving_average(t):
 # Detects outliers based on std and moving average, and saves them on a .csv file
 
 
-def detect_outliers(t, s=2, filename='outliers.csv'):
+def detect_outliers(t, n=10, s=2, filename='outliers.csv'):
     """
     Function to detect outliers based on whether an element is s standard deviations (std)
     away from the corresponding rolling mean. Results are both returned in a dict and
@@ -49,7 +46,7 @@ def detect_outliers(t, s=2, filename='outliers.csv'):
     ----------
         t: 1-dimensional array of numbers (e.g. int, float).
         n: Window length for moving average step calculation (e.g. n=5 means
-            every average step is calculated with 5 elements). Default: n=3
+            every moving average step is calculated with 5 elements). Default: n=10
         s: Number of std away from the rolling mean from which a value is
            considered to be an outlier. Default s=2
         filename: Output .csv filename. Default filename='outliers.csv'
@@ -62,16 +59,16 @@ def detect_outliers(t, s=2, filename='outliers.csv'):
         print('Time series length is 1 (no possible outliers). No output file created.')
         return None
 
-    mov_avg_t = moving_average(t)      # Moving/rolling average
+    mov_avg_t = moving_average(t)            # Moving/rolling average
     std_dev = np.std(t[0:len(mov_avg_t-1)])  # Std
 
-    window_pct = 0.05
-    n = math.ceil(len(t) * window_pct)
-    
     outliers = {}
-    for idx, v in enumerate(t[1:]):
+    for idx, v in enumerate(t):
         # More than s stds from the corresponding set/window's rolling mean
-        if v - (s * std_dev) > mov_avg_t[math.floor(idx % n)]:
+        current_mov_avg = mov_avg_t[math.floor(idx % n)]
+        if v > current_mov_avg and (v - (s*std_dev)) > current_mov_avg: 
+            outliers[idx] = v
+        elif v < current_mov_avg and (v + (s*std_dev)) < current_mov_avg:
             outliers[idx] = v
 
     # Save on output .csv file

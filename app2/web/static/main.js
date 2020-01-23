@@ -63,14 +63,6 @@ onload = function() {
                 // test output
                 console.log(res);
                 
-                var simID = res
-
-                api.get('/simulation', {id: simID}).then((res) => {
-                    // test output
-                    console.log(res);
-                    
-                });
-                
 
             });
 

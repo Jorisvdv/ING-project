@@ -287,10 +287,12 @@ def install(client, dashapp):
             json_convert = {"data": 0, "message": "No logfile found."}
             return jsonify(json_convert)
 
+
+
     @client.route('/download-logs')
     def download_logfile():
         """
-        Function to download logfiles in a .zip file.
+        Function to zip and download logfiles in /logs.
 
         Returns
         -------
@@ -333,3 +335,4 @@ def install(client, dashapp):
 
         else:
             return jsonify({"message": "No logfile parameter (f) was given in the request."})
+
