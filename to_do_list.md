@@ -11,6 +11,8 @@
     * [X] Color network graph based on server kind
     * [X] Add filtering on server kind to plotly
     * [ ] Take mean for all servers of a specific kind
+    * [X] Use INFO to filter graphs
+    * [ ] Plot occurences of errors in plotly graph
 * [ ] Add crash and restart when memory overload  
 * [ ] Add timeout error (with appropriate logger level)
     * [ ] Move message code out of Subprocess (see test_simulation/simulation_seasonality_error.py for inspiration)
