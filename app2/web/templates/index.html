@@ -7,7 +7,7 @@
         <!--<img id="top_logo" src="{{ url_for('static', filename='img/ING_logo.jpg')}}?v=1" alt="ING Logo" align="middle" height="140" width="340">-->
 
 
-	  <img src="{{ url_for('static', filename='img/ING_logo.jpg')}}" alt="ING Logo" align="middle" height="175" width="380" style="padding-top: 20px;">
+	  <img src="{{ url_for('static', filename='img/ING_logo.jpg')}}" alt="ING Logo" align="middle" height="175" width="400" style="padding-top: 20px;">
 	  <!-- Navbar -->
 
 	  <div id="mytopnav" class="w3-top">
@@ -47,62 +47,45 @@
 	  
 	  </header>
 
-	  <!-- First Grid -->
-	  <div id="Visualisation" class="w3-row-padding w3-padding-64 w3-container">
+	  <!-- Visualization Grid -->
+	  <div id="Visualization" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
 	    	<h1>Visualization</h1>
-	    <!--
-	      <div class="w3-twothird">
-	        <h1>Visualization</h1>
-	        <h5 class="w3-padding-32">The main motivation for this project is to have real-life-like IT metrics to be able
-	          to do feed our R&D and analytics initiatives with meaningful data.</h5>
+	    	<h5>Logfile: <font color="grey">{{ f }}</font></h5>
 
-	        <p class="w3-text-grey"> The project aims to create a large scale database of annotated machine metrics in the
-	          form of time series. This database, will later be used in a PhD project to test deep learning methods on. The
-	          metrics will be an output of a discrete event simulation model of a realistic system with a certain workload,
-	          such as log-ins or incoming transactions to be processed, and topology of servers communicating with each
-	          other. Independent
-	          failures and cascading failures will be simulated in the system to see the effect on the machine metrics,
-	          later to be annotated as anomalies. </p>
-	      </div>
-			-->
-	      <!-- Create a div where the graph will take place -->
-	      <!--<div align="center" alt="Server Communication" id="my_dataviz"></div>-->
-	     <div alt="Server Communication">
-	     		<svg width="700" height="400"></svg>
-	     </div>
+		     <div id="forceGraph" alt="Server Communication">
+		     		<svg width="700" height="400"></svg>
+		     </div>
 
-		<hr>
+			<hr>
 
-	     <h3>Metrics</h3>
+		    <h3>Metrics</h3>
 
-
-	     <!-- Dash visualizations iframe --> 
-	     <div id="mainFrameDiv" style="--aspect-ratio: 16/13;">
-			<iframe id="dash-iframe" src="http://localhost:8050/dash/" frameBorder="0" scrolling="no" style="overflow: hidden"> </iframe>
-		</div>
-
+		    <!-- Dash visualizations iframe --> 
+		    <div id="mainFrameDiv" style="--aspect-ratio: 16/13;">
+				<iframe id="dash-iframe" src="http://localhost:8050/dash/" frameBorder="0" scrolling="no" style="overflow: hidden"> </iframe>
+			</div>
 
 	    </div>
 	  </div>
 
 
-	  <hr>
-
 	  <!-- Dropdown menu for Visualizations -->
 	    <div id="dropdwon-div" class="dropdown">
+	    	<hr>
 	    	<h3 style="margin-bottom: 20px;">Previous Simulations</h3>
 
 		  <button onclick="myFunction2()" class="dropbtn">Select Simulation</button>
 		  <div id="myDropdown" class="dropdown-content">
 		  	{%for i in range(0, len_logfiles)%} 
-			    <a href="/?f={{ log_filenames[i] }}">{{ log_filenames[i] }}</a>
+			    <a href="/?f={{ log_filenames[i] }}#Visualization">{{ log_filenames[i] }}</a>
 			{%endfor%} 
 		  </div>
+		  <hr>
 		</div>
 
 
-		<hr>
+		
 	  
 	  <div id="Projectdescription" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
@@ -220,29 +203,30 @@
 	var forcegraphDataUrl;
 	var dashGraphUrl;
 	var xhttp = new XMLHttpRequest();
-	var visualization = document.getElementById("Visualisation");
+	var visualizationDiv = document.getElementById("Visualization");
 	var dropdownMenu = document.getElementById("dropdwon-div");
 
 	if ("{{ f }}") {
-		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
-		dashGraphUrl = "/generate-dash-graph?f=".concat("{{ f }}");
-		visualization.style.visibility = 'visible'
 
+		// Generate forceGraph with corresponding logfile f
+		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
 		forceGraph(forcegraphDataUrl);
 
 		// Call to /generate-dash-graph with given logfile f
-		xhttp.open("GET", dashGraphUrl, true);
-		xhttp.send();
+		// dashGraphUrl = "/generate-dash-graph?f=".concat("{{ f }}");
+		// xhttp.open("GET", dashGraphUrl, true);
+		// xhttp.send();
+
 	}
 	else {
-		visualization.innerHTML = "";
+		visualizationDiv.innerHTML = ""
 	}
 
-	if ("{{ log_filenames }}") {
+	if ("{{ len_logfiles }}" != 0) {
 		dropdownMenu.style.visibility = 'visible'
 	}
 	else {
-		dropdownMenu.style.visibility = ""
+		dropdownMenu.innerHTML = ""
 	}
 
 	// Used to toggle the menu on small screens when clicking on the menu button

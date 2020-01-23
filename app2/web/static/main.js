@@ -72,7 +72,7 @@ onload = function() {
 
             console.log(simID)
             // Redirect to '/' with corresponding logfile (parameter f)
-            // window.location.href = "/?f=Manual_Log.csv";
+            // window.location.href = "/?f=Manual_Log.csv#Visualisation";
 
         });
     });

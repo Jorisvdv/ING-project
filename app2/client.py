@@ -13,6 +13,8 @@ from flask import Flask
 from dash import Dash
 import dash
 import dash_html_components as html
+import webbrowser
+from threading import Timer
 
 # dependencies
 import routes
@@ -63,8 +65,15 @@ class Client(object):
         self._dashapp.run_server(debug=True)
         
 
+
+def open_browser():
+    webbrowser.open_new('http://127.0.0.1:8050/')
+
+
 # run as main
 if __name__ == "__main__":
+
+    # Timer(1, open_browser).start();
 
     # run a new client
     Client({
