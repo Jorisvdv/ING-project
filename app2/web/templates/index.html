@@ -48,9 +48,11 @@
 	  </header>
 
 	  <!-- Visualization Grid -->
+	  <h1 style="margin-top: 50px;">Visualization</h1>
+	  <div id="no-logfile-div"></div>
+	  
 	  <div id="Visualization" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
-	    	<h1>Visualization</h1>
 	    	<h5>Logfile: <font color="grey">{{ f }}</font></h5>
 
 		     <div id="forceGraph" alt="Server Communication">
@@ -69,7 +71,6 @@
 	    </div>
 	  </div>
 
-
 	  <!-- Dropdown menu for Visualizations -->
 	    <div id="dropdwon-div" class="dropdown">
 	    	<hr>
@@ -86,7 +87,7 @@
 
 
 		
-	  
+	  <hr>
 	  <div id="Projectdescription" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
 	        
@@ -204,6 +205,7 @@
 	var dashGraphUrl;
 	var xhttp = new XMLHttpRequest();
 	var visualizationDiv = document.getElementById("Visualization");
+	var noLogfileDiv = document.getElementById("no-logfile-div");
 	var dropdownMenu = document.getElementById("dropdwon-div");
 
 	if ("{{ f }}") {
@@ -227,6 +229,7 @@
 	}
 	else {
 		dropdownMenu.innerHTML = ""
+		noLogfileDiv.innerHTML = "No logfiles were found. Please run a simulation first."
 	}
 
 	// Used to toggle the menu on small screens when clicking on the menu button
