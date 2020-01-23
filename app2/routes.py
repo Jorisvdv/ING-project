@@ -262,41 +262,6 @@ def install(client, dashapp):
             json_convert = {"data": 0, "message": "No logfile found."}
             return jsonify(json_convert)
 
-    @client.route('/visualization')
-    def show_visualization():
-        """
-        Function to generate the D3/Dash visualizations of a given simulation logfile (.csv)
-
-        URL args
-        -------
-        f: simulation logfile - (By default takes the first .csv in /logs)
-
-        Returns
-        -------
-        GET: JSON
-        """
-
-        # Scan the logfile directory
-        list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
-
-        # Return only the filename to get no errors with old functions
-        log_filenames = [os.path.basename(filename) for filename in list_of_files]
-
-        # Only process/return endpoint_matrix if a logfile exists
-        if log_filenames:
-
-            last_created = os.path.basename(max(list_of_files,
-                                                key=getctime))
-
-            # Parse URL request file f using last_created default
-            sim_file = request.args.get('f', default=last_created)
-
-            return render_template('visualization.html', sim_file=sim_file)
-
-        else:
-            return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames))
-
-
 
     @client.route('/download-logs')
     def download_logfile():
@@ -339,7 +304,7 @@ def install(client, dashapp):
         if 'f' in request.args:
             f = request.args.get('f')
             eventId = datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
-            
+
             show_dash_graphs(dashapp, f, eventId)
 
             return ({"message": "Dash graphs successfully generated."})
