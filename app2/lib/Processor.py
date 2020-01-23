@@ -116,6 +116,7 @@ class Subprocess(Process):
         # we need to iterate over all kinds
         for (idx, kind) in enumerate(kinds):
 
+            # TODO: Move to error module
             # reenable or disable a server pool randomly
             self.servers(kind).disabled(randint(0, 100) > 98)
 
@@ -200,19 +201,19 @@ class Subprocess(Process):
 
                     # Manually print timeout message
                     self.environment.log(
-                        f"ERROR: message {process_id} timeout at time {self.environment.now}", type="error")
+                        f"ERROR: message {process_id} TIMEOUT at time {self.environment.now}", level=40)
                 else:
 
                     # Use interrupt clause to write error message
                     self.environment.log(
-                        f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{server.state()['name']};{interrupt.cause}", type="error")
+                        f"{self.environment.now};{requested_by['name']};ERROR;;;;{process_id};{server.state()['name']};Error due to {interrupt.cause}", level=40)
 
             # handle exceptions
             except Exception as e:
 
                 # log to the error log
                 self.environment.log(
-                    f"{self.environment.now};{requested_by['name']};ERROR;{process_id};{e}", type="error")
+                    f"{self.environment.now};{requested_by['name']};ERROR;;;;{process_id};;Error due to {e}", level=40)
 
         # release all server requests
         for row in request_df.itertuples(index=False):
