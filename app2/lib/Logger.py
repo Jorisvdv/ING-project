@@ -45,12 +45,12 @@ class Logger(Middleware):
         self._logger = logging.getLogger(name)
 
         # we need a new file handler so the logs are written to the file
-        filehandler = logging.FileHandler(os.path.join(directory, name), mode='a')
+        filehandler = logging.FileHandler(os.path.join(directory, name+".csv"), mode='a')
 
         # add the file handler to the logger so all logs will be outputted there
         self._logger.addHandler(filehandler)
 
-        # assignt the directory
+        # assign the directory
         self._directory = directory
 
     def log(self, message, level=20):

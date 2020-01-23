@@ -24,6 +24,7 @@ from datetime import datetime
 import logging
 logging.basicConfig(level=logging.INFO)
 
+
 def main(n, config, seasonality, log_dir, log_prefix):
     """
     Main loop that runs a simulation. This simulation can be configured by passing
@@ -63,11 +64,12 @@ def main(n, config, seasonality, log_dir, log_prefix):
     for server in config['servers']:
 
         # append a new server pool to the multiserver system
-        servers.append(Servers(environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
+        servers.append(
+            Servers(environment, size=server['size'], capacity=server['capacity'], kind=server['kind']))
 
     # we need a logger that will log all events that happen in the simulation
-    name    = "{0}_{1:04d}_{2}".format(log_prefix, n, datetime.now().strftime("%Y-%m-%d_%H-%M"))
-    logger  = Logger(name, directory=log_dir)
+    name = "{0}_{1:04d}_{2}".format(log_prefix, n, datetime.now().strftime("%Y-%m-%d_%H-%M"))
+    logger = Logger(name, directory=log_dir)
 
     # we also need a logger for all error events that happen in the simulation
     error_logger = Logger(f"error-{name}", directory=log_dir)
@@ -75,6 +77,11 @@ def main(n, config, seasonality, log_dir, log_prefix):
     # we can use the logger for the simulation, so we know where all logs will be written
     environment.logger(logger)
     environment.logger(error_logger, type="error")
+
+    # Enter first line for correct .csv headers
+    logger.info(
+        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
+    error_logger.info('Time;Server;Error type;Start-Stop')
 
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, max_volume=config["max_volume"])
@@ -86,6 +93,7 @@ def main(n, config, seasonality, log_dir, log_prefix):
     # to the current time (measurements). this should be the seasonality of the system.
     # for example, day or week.
     return environment.run(until=int(config['runtime']))
+
 
 # run this as main
 if __name__ == "__main__":
@@ -105,16 +113,16 @@ if __name__ == "__main__":
             "capacity": 1000,
             "kind":     "payment"
         }],
-        "process":    ["balance","payment","balance","credit"],
-        "runtime":    100,
-        "max_volume": 1000
+        "process":    ["balance", "payment", "balance", "credit"],
+        "runtime":    10,
+        "max_volume": 100
     }
 
     # Find location of file and set log location relative to that
-    file_dir    = os.path.dirname(os.path.abspath(__file__))
-    log_dir     = os.path.join(file_dir, "CLI_Logs")
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+    log_dir = os.path.join(file_dir, "CLI_Logs")
     seasonality = os.path.join(file_dir, 'seasonality', 'week.csv')
-    log_prefix  = "log"
+    log_prefix = "log"
 
     # get simulation count by counting number of simulation files in folder
     n = len(glob.glob(os.path.join(log_dir, log_prefix+'*'))) + 1
