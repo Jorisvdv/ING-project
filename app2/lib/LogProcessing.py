@@ -103,30 +103,30 @@ def get_log_filtered(f):
 
     Parameters
     ----------
-        f: logfile 
+        f: logfile
 
     Returns
     -------
         filtered_logfile_name: string
     """
 
-    df = pd.read_csv(os.path.join(LOG_PATH, f), sep = ";", error_bad_lines=False)
+    df = pd.read_csv(os.path.join(LOG_PATH, f), sep=";", error_bad_lines=False)
 
     # Split dataframe into three dataframes based on Server
-    df = df.drop(['Message_type', 'Transaction_ID','To_Server', 'Message'], axis=1)
+    df = df.drop(['Message_type', 'Transaction_ID', 'To_Server', 'Message'], axis=1)
 
     df = df.reset_index()
     df = df.drop(['index'], axis=1)
-    df["Time"]=df["Time"].div(60)
+    df["Time"] = df["Time"].div(60)
     df["Time_floor"] = np.floor(df["Time"]).astype("int")
-    df = df.groupby(['Server','Time_floor'], as_index=False).mean()
+    df = df.groupby(['Server', 'Time_floor'], as_index=False).mean()
     df = df.drop(['Time'], axis=1)
 
     df_melt = pd.melt(
-                    df, 
-                    id_vars = ["Server", "Time_floor"], 
-                    value_vars = ["CPU Usage","Memory Usage"], 
-                    value_name = "Value"
+        df,
+        id_vars=["Server", "Time_floor"],
+        value_vars=["CPU Usage", "Memory Usage", "Latency"],
+        value_name="Value"
     )
 
     df_melt = df_melt.sort_values(by=["Server", "Time_floor"])
@@ -137,8 +137,6 @@ def get_log_filtered(f):
     return file_out_filtered
 
 
-
-
 def show_dash_graphs(dashapp, f, eventId):
     """
     Function to generate Dash visualizations for a given simulation logfile.
@@ -146,7 +144,7 @@ def show_dash_graphs(dashapp, f, eventId):
     Parameters
     ----------
         dashapp: Dash app object
-        f: logfile 
+        f: logfile
         eventId: current time, in order to avoid callback duplicates
 
     Returns
@@ -161,7 +159,7 @@ def show_dash_graphs(dashapp, f, eventId):
 
         servers = df['Server'].unique()
         metrics = df['variable'].unique()
-        std_dict = {'Std = 1':1, 'Std = 2':2, 'Std = 3':3, 'Std = 4':4}
+        std_dict = {'Std = 1': 1, 'Std = 2': 2, 'Std = 3': 3, 'Std = 4': 4}
 
         dashapp.layout = html.Div([
             html.Div([
@@ -175,8 +173,8 @@ def show_dash_graphs(dashapp, f, eventId):
                     )],
                     style={'width': '48%', 'display': 'inline-block'}
                 ),
-                
-                
+
+
                 html.Div([
                     html.Div('Outlier Std Threshold', style={'color': 'black', 'fontSize': 14}),
                     dcc.Dropdown(
@@ -211,7 +209,6 @@ def show_dash_graphs(dashapp, f, eventId):
 
         ])
 
-
         @dashapp.callback(
             Output('metrics-radio-{}'.format(eventId), 'options'),
             [Input('servers-radio-{}'.format(eventId), 'value')])
@@ -230,42 +227,41 @@ def show_dash_graphs(dashapp, f, eventId):
              Input('metrics-radio-{}'.format(eventId), 'value'),
              Input('std-radio-{}'.format(eventId), 'value'),
              Input('show-mv-avg-{}'.format(eventId), 'value')])
-
         def update_graph(servers, metrics, std, show_mv_avg):
 
             dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
 
             # Outliers
             outliers = detect_outliers(
-                                        list(dff["Value"]), 
-                                        s=std, 
-                                        filename='outliers_' + metrics + '_' + f_filtered
-                        )
+                list(dff["Value"]),
+                s=std,
+                filename='outliers_' + metrics + '_' + f_filtered
+            )
 
             outliers_X = list(outliers.keys())
             outliers_Y = list(outliers.values())
 
             data = [
-                        dict(
-                                x=dff["Time_floor"],
-                                y=dff["Value"],
-                                mode='line',
-                                marker={
-                                    'size': 15,
-                                    'opacity': 0.5,
-                                    'line': {'width': 0.5, 'color': 'white'}
-                                },
-                                name="Usage"
-                            ),
-                        dict(
-                                x=outliers_X,
-                                y=outliers_Y,
-                                mode='markers',
-                                marker= {"color": 'red'},
-                                name="Outliers"
-                            )
-                    ]
-      
+                dict(
+                    x=dff["Time_floor"],
+                    y=dff["Value"],
+                    mode='line',
+                    marker={
+                        'size': 15,
+                        'opacity': 0.5,
+                        'line': {'width': 0.5, 'color': 'white'}
+                    },
+                    name="Usage"
+                ),
+                dict(
+                    x=outliers_X,
+                    y=outliers_Y,
+                    mode='markers',
+                    marker={"color": 'red'},
+                    name="Outliers"
+                )
+            ]
+
             # Moving average
             if show_mv_avg:
                 n = 10
@@ -273,19 +269,19 @@ def show_dash_graphs(dashapp, f, eventId):
                 mv_avg_X = list(range(0+n-1, len(mv_avg_Y)+n-1))
 
                 data.append(
-                            dict(
-                                x=mv_avg_X,
-                                y=mv_avg_Y,
-                                mode='line',
-                                marker={
-                                    'size': 8,
-                                    'opacity': 0.8,
-                                    'line': {'width': 0.5, 'color': 'white'},
-                                    'color': '#ffe063'
-                                },
-                                name="Rolling Average"
-                            )
+                    dict(
+                        x=mv_avg_X,
+                        y=mv_avg_Y,
+                        mode='line',
+                        marker={
+                            'size': 8,
+                            'opacity': 0.8,
+                            'line': {'width': 0.5, 'color': 'white'},
+                            'color': '#ffe063'
+                        },
+                        name="Rolling Average"
                     )
+                )
 
             return {
                 'data': data,
@@ -303,7 +299,3 @@ def show_dash_graphs(dashapp, f, eventId):
 
     else:
         print("Filtered logfile could not be generated. Check get_log_filtered() for details.")
-
-
-
-
