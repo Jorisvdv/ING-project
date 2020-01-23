@@ -19,6 +19,7 @@ import zipfile
 import io
 import pathlib
 import glob
+from uuid import uuid4
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -34,6 +35,7 @@ from lib.Seasonality import TransactionInterval as Seasonality
 from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
 from lib.Processor import Processor
 from lib.Logger import Logger
+from lib.LogProcessing import show_dash_graphs
 
 # GLOBALS
 LOG_PATH            = normpath(join(dirname(__file__), 'logs'))
@@ -41,7 +43,8 @@ Seasonality_folder  = normpath(join(dirname(__file__), 'seasonality'))
 Seasonality_file    = 'week.csv'
 file_prefix         = "log"
 
-def install(client):
+def install(client, dashapp):
+
     """
     Function to install all routes onto a flask webclient.
 
@@ -80,6 +83,7 @@ def install(client):
             return render_template('index.html', log_filenames=log_filenames, len_logfiles=len(log_filenames), f='')
 
         else:
+            print("No logfiles were found in /logs. Please run a simulation first.")
             return render_template('index.html', log_filenames=[], len_logfiles=0, f='')
 
     # declare endpoint for retrieving forms
@@ -195,10 +199,31 @@ def install(client):
 
         if request.method == "GET":
 
-            # fetch data of a simulation
+            if 'id' in request.args:
+                logfile_id = "{:04d}".format(int(request.args.get('id')))
 
-            # expose the data of that simulation
-            return jsonify({})
+            # Scan the logfile directory
+            list_of_files = glob.glob(os.path.join(LOG_PATH, 'log_*.csv'))
+
+            # Return only the filename to get no errors with old functions
+            log_filenames = [os.path.basename(filename) for filename in list_of_files]
+
+            if log_filenames:
+
+                logfile_ids = [f.split('_')[1] for f in log_filenames]
+                name_id_dict = dict(zip(logfile_ids, log_filenames))
+
+                if logfile_id in logfile_ids:
+                    # Logfile associated to given ID was successfully found
+                    return jsonify({"data": name_id_dict[logfile_id], "message": "success"})
+
+                else:
+                    # No logfile associated to given ID was found
+                    return jsonify({"message": "No logfile (.csv) with given ID exists."})
+            else:
+                # No logfiles found (/logs is empty)
+                return jsonify({"message": "No logfiles were found in /logs."})
+
 
     @client.route('/get_endpoint_data')
     def get_endpoint_data():
@@ -218,8 +243,6 @@ def install(client):
         # Scan the logfile directory
         list_of_files = glob.glob(join(LOG_PATH, 'log_*.csv'))
 
-        print(LOG_PATH)
-
         # Return only the filename to get no errors with old functions
         log_filenames = [basename(filename) for filename in list_of_files]
 
@@ -231,7 +254,6 @@ def install(client):
 
             # Parse URL request file f using last_created default
             f = request.args.get('f', default=last_created)
-            print("Getting endpoint_matrix for logfile:", f)
 
             return get_endpoint_json(f)
             # return get_endpoint_matrix(f)
@@ -268,7 +290,6 @@ def install(client):
 
             # Parse URL request file f using last_created default
             sim_file = request.args.get('f', default=last_created)
-            print("Generating visualizations for:", sim_file)
 
             return render_template('visualization.html', sim_file=sim_file)
 
@@ -304,5 +325,28 @@ def install(client):
         )
 
 
+
+    @client.route('/generate-dash-graph')
+    def generate_dash_graph():
+        """
+        Function to generate dash graphs for a given logfile
+
+        Returns
+        -------
+        GET: Success/Failure message (JSON)
+        """
+
+        if 'f' in request.args:
+            f = request.args.get('f')
+            eventId = datetime.now().strftime('%Y%m-%d%H-%M%S-') + str(uuid4())
+            
+            show_dash_graphs(dashapp, f, eventId)
+
+            return ({"message": "Dash graphs successfully generated."})
+
+        else:
+            return jsonify({"message": "No logfile parameter (f) was given in the request."})
+
+        
 
 

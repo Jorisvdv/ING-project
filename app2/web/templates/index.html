@@ -210,26 +210,27 @@
 
 </center>
 
-<!--<script type="text/javascript" src="{{ url_for('static', filename='js/JSindex.js') }}?v=44"></script>-->
 <script type="text/javascript">
 
 	var forcegraphDataUrl;
+	var dashGraphUrl;
+	var xhttp = new XMLHttpRequest();
 	var visualization = document.getElementById("Visualisation");
 
 	if ("{{ f }}") {
 		forcegraphDataUrl = "/get_endpoint_data?f=".concat("{{ f }}");
+		dashGraphUrl = "/generate-dash-graph?f=".concat("{{ f }}");
 		visualization.style.visibility = 'visible'
+
+		forceGraph(forcegraphDataUrl);
+
+		// Call to /generate-dash-graph with given logfile f
+		xhttp.open("GET", dashGraphUrl, true);
+		xhttp.send();
 	}
 	else {
-		forcegraphDataUrl = "/get_endpoint_data";
-		visualization.innerHTML = "";
-
+		visualization.innerHTML = "{{ f }}";
 	}
-
-	forceGraph(forcegraphDataUrl);
-
-	// var chordiagramDataUrl = "{{ url_for('get_endpoint_data') }}";
-
 
 	// Used to toggle the menu on small screens when clicking on the menu button
 	function myFunction() {

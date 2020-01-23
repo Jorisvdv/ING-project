@@ -11,10 +11,11 @@ simulation.
 # 3rd party dependencies
 from flask import Flask
 from dash import Dash
+import dash
+import dash_html_components as html
 
 # dependencies
 import routes
-from lib.LogProcessing import show_dash_graphs
 
 class Client(object):
 
@@ -34,19 +35,25 @@ class Client(object):
                             static_folder="web/static", 
                             template_folder="web/templates"
                             )
+
+        # Dash app
         self._dashapp = Dash(__name__, 
                             server=self._client, 
                             routes_pathname_prefix='/dash/', 
                             external_stylesheets=['https://codepen.io/chriddyp/pen/bWLwgP.css']
                             )
 
+        # Launch Dash app
+        self._dashapp.layout = html.Div(children=[
+            html.H6(children='Dash app successfully launched.'),
+        ])
+
         # we need to setup some configuration variables, these may need to change
         # when running in production
         self._client.config.update(config)
 
         # we need to install all routes onto the client
-        show_dash_graphs(self._dashapp)
-        routes.install(self._client)
+        routes.install(self._client, self._dashapp)
 
     def run(self):
         """
@@ -54,6 +61,7 @@ class Client(object):
         """
         # run the dash application
         self._dashapp.run_server(debug=True)
+        
 
 # run as main
 if __name__ == "__main__":
@@ -64,3 +72,5 @@ if __name__ == "__main__":
         'ENV':     'development',
         'DEBUG':    True
     }).run()
+
+

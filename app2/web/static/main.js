@@ -27,6 +27,7 @@ onload = function() {
      */
     const mainContainer = document.getElementById('main');
 
+
     /**
      *  Form for starting a simulation.
      */
@@ -59,10 +60,19 @@ onload = function() {
 
                 // test output
                 console.log(res);
+
+                var simID = res
+
+                api.get('/simulation', {id: simID}).then((res) => {
+                    // test output
+                    console.log(res);
+                    
+                });
             });
 
+            console.log(simID)
             // Redirect to '/' with corresponding logfile (parameter f)
-            window.location.href = "/?f=Manual_Log.csv";
+            // window.location.href = "/?f=Manual_Log.csv";
 
         });
     });
