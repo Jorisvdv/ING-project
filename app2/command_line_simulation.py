@@ -78,6 +78,11 @@ def main(n, config, seasonality, log_dir, log_prefix):
     environment.logger(logger)
     environment.logger(error_logger, type="error")
 
+    # Enter first line for correct .csv headers
+    logger.info(
+        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
+    error_logger.info('Time;Server;Error type;Start-Stop')
+
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, max_volume=config["max_volume"])
 

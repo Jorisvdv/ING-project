@@ -10,6 +10,14 @@ part clean from these declarations.
 """
 
 # third party dependencies
+from lib.LogProcessing import show_dash_graphs
+from lib.Logger import Logger
+from lib.Processor import Processor
+from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
+from lib.Seasonality import TransactionInterval as Seasonality
+from lib.Servers import Servers
+from lib.MultiServers import MultiServers
+from lib.Environment import Environment
 import os
 from os.path import isfile, join, normpath, dirname, basename, getctime, exists
 from flask import request, render_template, send_file
@@ -28,23 +36,15 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # dependencies
-from lib.Environment import Environment
-from lib.MultiServers import MultiServers
-from lib.Servers import Servers
-from lib.Seasonality import TransactionInterval as Seasonality
-from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
-from lib.Processor import Processor
-from lib.Logger import Logger
-from lib.LogProcessing import show_dash_graphs
 
 # GLOBALS
-LOG_PATH            = normpath(join(dirname(__file__), 'logs'))
-Seasonality_folder  = normpath(join(dirname(__file__), 'seasonality'))
-Seasonality_file    = 'week.csv'
-file_prefix         = "log"
+LOG_PATH = normpath(join(dirname(__file__), 'logs'))
+Seasonality_folder = normpath(join(dirname(__file__), 'seasonality'))
+Seasonality_file = 'week.csv'
+file_prefix = "log"
+
 
 def install(client, dashapp):
-
     """
     Function to install all routes onto a flask webclient.
 
@@ -55,7 +55,7 @@ def install(client, dashapp):
     """
 
     # global simulation count
-    simc = 0
+    simc = len(glob.glob(os.path.join(LOG_PATH, file_prefix+'*')))
 
     # declare the index route
     @client.route('/')
@@ -166,7 +166,8 @@ def install(client, dashapp):
             for kind in request.form['kinds'].split(','):
 
                 # append a new server pool to the multiserver system
-                servers.append(Servers(environment, size=int(request.form['size']), capacity=int(request.form['capacity']), kind=kind.strip()))
+                servers.append(Servers(environment, size=int(request.form['size']), capacity=int(
+                    request.form['capacity']), kind=kind.strip()))
 
             # Get the current date and time to append to the logger file name
             log_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M")
@@ -179,15 +180,22 @@ def install(client, dashapp):
             # we also need a logger for all error events that happen in the simulation
             error_logger = Logger(f"error-{name}", directory=LOG_PATH)
 
+            # Enter first line for correct .csv headers
+            logger.info(
+                'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
+            error_logger.info('Time;Server;Error type;Start-Stop')
+
             # we can use the logger for the simulation, so we know where all logs will be written
             environment.logger(logger)
             environment.logger(error_logger, type="error")
 
             # we need a new form of seasonality
-            seasonality = Seasonality(join(Seasonality_folder, Seasonality_file), max_volume=int(request.form['max_volume']))
+            seasonality = Seasonality(join(Seasonality_folder, Seasonality_file),
+                                      max_volume=int(request.form['max_volume']))
 
             # now, we can put the process in the simulation
-            Processor(environment, servers, seasonality=seasonality, kinds=[kind.strip() for kind in request.form['process'].split(',')])
+            Processor(environment, servers, seasonality=seasonality, kinds=[
+                      kind.strip() for kind in request.form['process'].split(',')])
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.
@@ -224,7 +232,6 @@ def install(client, dashapp):
                 # No logfiles found (/logs is empty)
                 return jsonify({"message": "No logfiles were found in /logs."})
 
-
     @client.route('/get_endpoint_data')
     def get_endpoint_data():
         """
@@ -250,7 +257,7 @@ def install(client, dashapp):
         if log_filenames:
 
             last_created = basename(max(list_of_files,
-                                                key=getctime))
+                                        key=getctime))
 
             # Parse URL request file f using last_created default
             f = request.args.get('f', default=last_created)
@@ -261,7 +268,6 @@ def install(client, dashapp):
         else:
             json_convert = {"data": 0, "message": "No logfile found."}
             return jsonify(json_convert)
-
 
     @client.route('/download-logs')
     def download_logfile():
@@ -289,8 +295,6 @@ def install(client, dashapp):
             attachment_filename='logs.zip'
         )
 
-
-
     @client.route('/generate-dash-graph')
     def generate_dash_graph():
         """
@@ -311,7 +315,3 @@ def install(client, dashapp):
 
         else:
             return jsonify({"message": "No logfile parameter (f) was given in the request."})
-
-        
-
-

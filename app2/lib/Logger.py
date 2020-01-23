@@ -50,10 +50,6 @@ class Logger(Middleware):
         # add the file handler to the logger so all logs will be outputted there
         self._logger.addHandler(filehandler)
 
-        # Enter first line for correct .csv headers
-        self._logger.info(
-            'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
-
         # assign the directory
         self._directory = directory
 
