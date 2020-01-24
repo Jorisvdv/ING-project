@@ -51,6 +51,8 @@ class MessageGenerator(object):
         # optional timeout duration
         self._timeout = kwargs['timeout'] if 'timeout' in kwargs else 1
 
+        self.excludeservers = []
+
         # Initialize message generator
         self.messages_process = envoirment.process(self.generate())
 
@@ -117,7 +119,7 @@ class MessageGenerator(object):
             else:
                 # we need to get access to a server pool
                 pool = self._pools.get(kind)
-                server = pool.server()
+                server = pool.server(exclude=self.excludeservers)
 
             # Set kind of server in DataFrame
             current_message.append(kind)

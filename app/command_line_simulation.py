@@ -11,6 +11,7 @@ from lib.MultiServers import MultiServers
 from lib.Servers import Servers
 from lib.Logger import Logger
 from lib.MessageGenerator import MessageGenerator
+from lib.ErrorGenerator import ErrorGenerator
 from lib.Seasonality import TransactionInterval as Seasonality
 
 # 3rd party dependencies
@@ -18,12 +19,22 @@ import os
 import glob
 from datetime import datetime
 import json
+import argparse
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
 # and behave the same
 import logging
 logging.basicConfig(level=logging.INFO)
+
+
+def parse_args():
+    "Parses inputs from commandline and returns them as a Namespace object."
+
+    parser = argparse.ArgumentParser(prog='command_line_simulation.py',
+                                     formatter_class=argparse.RawTextHelpFormatter,
+                                     description=' Runs Simpy simulation from command line.')
+    parser.add_argument('config', help='path to a json formatted configuration file')
 
 
 def main(n, config, seasonality, log_dir, log_prefix, description):
@@ -97,6 +108,11 @@ def main(n, config, seasonality, log_dir, log_prefix, description):
     for proc in config['process']:
         MessageGenerator(environment, servers, seasonality, kinds=proc, timeout=config['timeout'])
 
+    # Add error generator if specified
+    if hasattr(config, 'error'):
+        ErrorGenerator(environment, servers, config['error']['errorwait'],
+                       config['error']['error_duration'])
+
     # run the simulation with a certain runtime (runtime). this runtime is not equivalent
     # to the current time (measurements). this should be the seasonality of the system.
     # for example, day or week.
@@ -114,11 +130,17 @@ if __name__ == "__main__":
     # For timing get current time
     starttime = datetime.now()
 
-    # Find location of file and set log location relative to that
-    file_dir = os.path.dirname(os.path.abspath(__file__))
+    args = parse_args()
+    if hasattr(args, "config"):
+        config_file = args.config
+
+    else:
+        # Find location of file and set log location relative to that
+        file_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file = os.path.join(file_dir, 'config.json')
 
     # configuration for the simulation to run
-    with open(os.path.join(file_dir, 'config.json')) as f:
+    with open(config_file) as f:
         config = json.load(f)
 
     # log_dir = os.path.join(file_dir, "CLI_Logs")

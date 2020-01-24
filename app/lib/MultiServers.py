@@ -9,6 +9,8 @@ should process different actions (conceptually).
 @scope  private
 """
 
+from random import choice
+
 
 class MultiServers(object):
 
@@ -56,3 +58,13 @@ class MultiServers(object):
             # Remove for final version
             print(f"Kind: {kind} not found in pools {self._pools}")
         return self._pools[kind] if kind in self._pools else None
+
+    def random_pool(self):
+        """
+        Method to get random server pool to break a server.
+
+        Returns
+        -------
+        Server pool
+        """
+        return choice(list(self._pools.values()))
