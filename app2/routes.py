@@ -250,6 +250,8 @@ def install(client, dashapp):
                 # No logfiles found (/logs is empty)
                 return jsonify({"message": "No logfiles were found in /logs."})
 
+
+
     @client.route('/get_endpoint_data')
     def get_endpoint_data():
         """
@@ -314,6 +316,8 @@ def install(client, dashapp):
             as_attachment=True,
             attachment_filename='logs.zip'
         )
+
+
 
     @client.route('/generate-dash-graph')
     def generate_dash_graph():
