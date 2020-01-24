@@ -84,6 +84,10 @@ class Server(PreemptiveResource):
         priority: int
             See simpy.PreemptiveResource.request.
         """
+        # Temporalily update the amount of users by adding one to reflect the
+        # incoming transaction
+        self._state.update(users=self.count + 1)
+
         self._state.update(
             time=round(self._env.now, 4),
             queue=len(self.queue),
@@ -92,6 +96,8 @@ class Server(PreemptiveResource):
             memory=self.memory(),
             latency=self.latency()
         )
+        # Return users to actual count
+        self._state.update(users=self.count)
 
         # parse parameters for the super class method
         priority = kwargs['priority'] if 'priority' in kwargs else 1
