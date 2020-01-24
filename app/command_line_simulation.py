@@ -109,7 +109,8 @@ def main(n, config, seasonality, log_dir, log_prefix, description):
         MessageGenerator(environment, servers, seasonality, kinds=proc, timeout=config['timeout'])
 
     # Add error generator if specified
-    if hasattr(config, 'error'):
+    if 'error' in config:
+        print("With error function")
         ErrorGenerator(environment, servers, config['error']['errorwait'],
                        config['error']['error_duration'])
 
@@ -144,7 +145,7 @@ if __name__ == "__main__":
         config = json.load(f)
 
     # log_dir = os.path.join(file_dir, "CLI_Logs")
-    log_dir = os.path.join(file_dir, "../app2", "Logs")
+    log_dir = os.path.join(file_dir, "Logs")
     seasonality = os.path.join(file_dir, 'seasonality', 'week.csv')
     log_prefix = "log"
 

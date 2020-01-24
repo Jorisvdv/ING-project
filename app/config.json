@@ -1,27 +1,27 @@
 {
     "servers": [{
         "size":     10,
-        "capacity": 100,
+        "capacity": 1000,
         "kind":     "balance"
     }, {
         "size":     10,
-        "capacity": 100,
+        "capacity": 1000,
         "kind":     "authentication"
     }, {
         "size":     10,
-        "capacity": 100,
+        "capacity": 1000,
         "kind":     "credit"
     }, {
         "size":     10,
-        "capacity": 100,
+        "capacity": 1000,
         "kind":     "payment"
     }],
     "process":    [["balance", "authentication", "balance", "payment", "credit"],
                    ["balance", "authentication", "balance",  "credit"]],
-    "timeout": 5,
-    "runtime":    100,
-    "max_volume": 5000,
+    "timeout": 1,
+    "runtime":    1000,
+    "max_volume": 10000,
     "description": "Multiple Servers with error",
-    "error":{"errorwait": [40,50],
-             "error_duration": [5,10]}
+    "error":{"errorwait": [400,500],
+             "error_duration": [50,100]}
 }

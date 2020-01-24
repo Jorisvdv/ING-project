@@ -28,7 +28,6 @@ class ErrorGenerator(object):
         while True:
             # Wait a random amount of time to introduce the error
             yield self._env.timeout(uniform(*self.errorwait))
-            self._env.log(message='env.now;Server;Error type;Start-Stop', type="error")
 
             # Get random server
             server = self._pools.random_pool().get_random()
