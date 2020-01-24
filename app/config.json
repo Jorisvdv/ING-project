@@ -1,0 +1,25 @@
+{
+    "servers": [{
+        "size":     5,
+        "capacity": 10,
+        "kind":     "balance"
+    }, {
+        "size":     2,
+        "capacity": 5,
+        "kind":     "authentication"
+    }, {
+        "size":     2,
+        "capacity": 5,
+        "kind":     "credit"
+    }, {
+        "size":     5,
+        "capacity": 10,
+        "kind":     "payment"
+    }],
+    "process":    [["balance", "authentication", "balance", "payment", "credit"],
+                   ["balance", "authentication", "balance",  "credit"]],
+    "timeout": 1,
+    "runtime":    100,
+    "max_volume": 1000000,
+    "description": "Higher Volume"
+}

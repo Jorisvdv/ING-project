@@ -4,7 +4,7 @@
     1. [ ] Error where connection between servers is severed  
     2. [ ] Infinite loop  
     3. [ ] Connection break  
-    4. [ ] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
+    4. [x] A faulty patch, anomaly processed within 10 seconds at the place of 1 seconds after update.  
 * [x] Finalise plotly drop down selection  
 * [ ] Add latency and kind servers to logs
     * [X] Add latency to visualisation
@@ -14,16 +14,16 @@
     * [X] Use INFO to filter graphs
     * [ ] Plot occurences of errors in plotly graph
 * [ ] Add crash and restart when memory overload  
-* [ ] Add timeout error (with appropriate logger level)
-    * [ ] Move message code out of Subprocess (see test_simulation/simulation_seasonality_error.py for inspiration)
+* [x] Add timeout error (with appropriate logger level)
+    * [x] Move message code out of Subprocess (see test_simulation/simulation_seasonality_error.py for inspiration)
 * [ ] Add error introduction (with seperate logger (see Manual_Error_Log.csv))  
-* [ ] Different routes for request type  
-    * [ ] Backend
+* [x] Different routes for request type  
+    * [x] Backend
     * [ ] Frontend
 * [ ] Visual interface (see java modelling tool and Areana? for inspiration)
 * [x] Release server requests appropriately
-* [ ] add description to filename
-* [ ] Reformat Subprocess to property include timeout
+* [x] add description to filename
+* [x] Reformat Subprocess to property include timeout
 
 # Implementation:
 * [ ] Create API documentation (low priority, can be done after report is written)  
@@ -41,7 +41,7 @@
     * [x] LOG_PATH = 'logs'  
     * [x] logs/Manual_Log_Filtered.csv  
 * Processor.py
-    * [ ] Fix no load when returning to same server
+    * [x] Fix no load when returning to same server
 
 
 # Defined variables/distributions/proposed changes:  
