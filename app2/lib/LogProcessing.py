@@ -74,11 +74,12 @@ def get_endpoint_json(f):
         })
 
     for element in y:
-        node_type = element.split('#')[0]
-        endpoint_json["nodes"].append({
-            "id": element,
-            "group": group_dict[node_type]
-        })
+        if element not in x:
+            node_type = element.split('#')[0]
+            endpoint_json["nodes"].append({
+                "id": element,
+                "group": group_dict[node_type]
+            })
 
     '''
     for idx, g in enumerate(groups):

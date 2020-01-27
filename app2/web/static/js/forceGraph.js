@@ -59,10 +59,10 @@ function forceGraph(forcegraphDataUrl) {
             .links(graph.links);
 
         function ticked() {
-
+            
             node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
                 .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
-                
+
             link
                 .attr("x1", function(d) { return d.source.x; })
                 .attr("y1", function(d) { return d.source.y; })
