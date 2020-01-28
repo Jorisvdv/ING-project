@@ -1,4 +1,4 @@
-      
+
 function forceGraph(forcegraphDataUrl) {
 
       var svg = d3.select("svg"),
@@ -30,7 +30,7 @@ function forceGraph(forcegraphDataUrl) {
           .selectAll("g")
           .data(graph.nodes)
           .enter().append("g")
-          
+
         var circles = node.append("circle")
             .attr("r", 5)
             .attr("fill", function(d) { return color(d.group); })
@@ -39,15 +39,15 @@ function forceGraph(forcegraphDataUrl) {
                 .on("drag", dragged)
                 .on("end", dragended));
 
-        
+
         var labels = node.append("text")
             .text(function(d) {
               return d.id;
             })
             .attr('x', 6)
             .attr('y', 3);
-        
-        
+
+
         node.append("title")
             .text(function(d) { return d.id; });
 
@@ -60,9 +60,9 @@ function forceGraph(forcegraphDataUrl) {
 
         function ticked() {
 
-            node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
-                .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
-                
+            // node.attr("cx", function(d) { return d.x = Math.max(radius, Math.min(width - radius, d.x)); })
+            //     .attr("cy", function(d) { return d.y = Math.max(radius, Math.min(height - radius, d.y)); });
+
             link
                 .attr("x1", function(d) { return d.source.x; })
                 .attr("y1", function(d) { return d.source.y; })
