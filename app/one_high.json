@@ -18,8 +18,8 @@
     }],
     "process":    [["balance", "authentication", "balance", "payment", "credit"],
                    ["balance", "authentication",  "credit"]],
-    "timeout": 1,
-    "runtime":    100,
-    "max_volume": 200,
+    "timeout":      5,
+    "runtime":      100,
+    "max_volume":   200,
     "description": "One server per type high usage"
 }

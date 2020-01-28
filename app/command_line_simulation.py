@@ -34,7 +34,8 @@ def parse_args():
     parser = ArgumentParser(prog='command_line_simulation.py',
                             formatter_class=RawTextHelpFormatter,
                             description=' Runs Simpy simulation from command line.')
-    parser.add_argument('config', help='path to a json formatted configuration file')
+    parser.add_argument('-c', '--config',
+                        help='path to a json formatted configuration file')
 
     return parser.parse_args()
 
@@ -103,7 +104,6 @@ def main(n, config, seasonality, log_dir, log_prefix, description):
     environment.logger(logger)
     environment.logger(error_logger, type="error")
 
-    print(config["max_volume"])
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, enviroment=environment, max_volume=config["max_volume"])
 
@@ -138,7 +138,8 @@ if __name__ == "__main__":
     file_dir = os.path.dirname(os.path.abspath(__file__))
 
     args = parse_args()
-    if hasattr(args, "config"):
+    # if hasattr(args, "config") & args.config is not None:
+    if args.config is not None:
         config_file = args.config
         print("Loaded config file: ", config_file)
 

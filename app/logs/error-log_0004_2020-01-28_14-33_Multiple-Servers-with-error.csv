@@ -1,0 +1,4 @@
+Time;Server;Error type;Start-Stop
+45.852545972489274;authentication#07edaf40-2bd1-4bba-9a99-d4f54f18baca;Block;Start
+53.95392117461596;authentication#07edaf40-2bd1-4bba-9a99-d4f54f18baca;Block;Stop
+94.86796696924172;payment#97e6b39c-5436-4751-bc48-6eac8c8ebadb;Block;Start
