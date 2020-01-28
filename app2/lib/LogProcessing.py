@@ -187,7 +187,7 @@ def show_dash_graphs(dashapp, f, eventId):
     if f_filtered:
 
         df = pd.read_csv(os.path.join(LOG_PATH, 'filtered', f_filtered))
-        print(df.columns)
+
         servers = df['Server'].unique()
         metrics = df['variable'].unique()
         std_dict = {'Std = 1': 1, 'Std = 2': 2, 'Std = 3': 3, 'Std = 4': 4}
