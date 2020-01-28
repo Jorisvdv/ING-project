@@ -33,6 +33,8 @@ def get_endpoint_json(f):
     # Read in the log data
     log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
 
+    # # Use only timestamps where metrics are given
+    # log_df.dropna(subset=["CPU Usage", "Memory Usage", "Latency"], how='any')
     # Use only INFO statements for graph
     log_df = log_df[log_df["Message_type"] == "INFO"]
 

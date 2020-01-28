@@ -54,6 +54,7 @@ class Logger(object):
         filehandler = logging.FileHandler(os.path.join(directory, name+".csv"), mode='a')
 
         if usequeue:
+            print(f"Using queing for log {name}")
             log_queue = queue.Queue(-1)
             queue_handler = QueueHandler(log_queue)
             self._logger.addHandler(queue_handler)

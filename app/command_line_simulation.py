@@ -103,6 +103,7 @@ def main(n, config, seasonality, log_dir, log_prefix, description):
     environment.logger(logger)
     environment.logger(error_logger, type="error")
 
+    print(config["max_volume"])
     # we need a new form of seasonality
     seasonality = Seasonality(seasonality, enviroment=environment, max_volume=config["max_volume"])
 

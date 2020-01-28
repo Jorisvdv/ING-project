@@ -77,7 +77,7 @@ class MessageGenerator(object):
             clientrequest = self._env.process(self.client_request(process_id))
             # process = Subprocess(self.environment, self._servers, kinds=self._kinds).process
 
-            yield clientrequest
+            # yield clientrequest
 
     def client_request(self, process_id):
         """
@@ -104,6 +104,9 @@ class MessageGenerator(object):
 
             current_message = []
 
+            # Get server that requests the message
+            requested_by = route[idx]
+
             # reference to a return loop
             return_loop = None
 
@@ -128,12 +131,6 @@ class MessageGenerator(object):
             # we can release it later on
             current_message.append(server)
 
-            # set used server in route
-            if idx > 0 and hasattr(server, "state"):
-                route.append(server.state())
-
-            requested_by = route[idx]
-
             # attempt to parse a server request
             try:
 
@@ -141,7 +138,10 @@ class MessageGenerator(object):
                 if not server:
                     raise Exception("SERVER UNAVAILABLE")
 
-                # ask the server for a new request
+                # set used server in route
+                route.append(server.state())
+
+                # ask the server for a new request at
                 request = server.request()
 
                 # Add request to list of open open_requests
@@ -204,8 +204,7 @@ class MessageGenerator(object):
         try:
             # yield the request and timeout
             yield request
-            # Update server to reflect yielded request
-            server.state()
+            # Get server state with current load
             server_state = server.state()
             yield self._env.timeout(server_state['latency'])
 
@@ -217,15 +216,16 @@ class MessageGenerator(object):
 
         # handle interruptions
         except Interrupt as interrupt:
+            server_state = server.state()
 
             # Check if error is due to interuption using error_generator
             if isinstance(interrupt.cause, Preempted):
 
                 # Manually print timeout message
                 self._env.log(
-                    f"{self._env.now};{server.state()['name']};ERROR;;;;{process_id};{requested_by['name']};Error due to TIMEOUT at time {start + self._timeout}", level=40)
+                    f"{self._env.now};{server_state['name']};ERROR;{server_state['cpu']};{server_state['memory']};{server_state['latency']};{process_id};{requested_by['name']};Error due to TIMEOUT at time {start + self._timeout}", level=40)
             else:
 
                 # Use interrupt clause to write error message
                 self._env.log(
-                    f"{self._env.now};{server.state()['name']};ERROR;;;;{process_id};{requested_by['name']};Error due to {interrupt.cause}", level=40)
+                    f"{self._env.now};{server_state['name']};ERROR;{server_state['cpu']};{server_state['memory']};{server_state['latency']};{process_id};{requested_by['name']};Error due to {interrupt.cause}", level=40)
