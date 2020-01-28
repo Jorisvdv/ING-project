@@ -13,7 +13,7 @@ part clean from these declarations.
 from lib.LogProcessing import show_dash_graphs
 from lib.Logger import Logger
 from lib.Processor import Processor
-from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
+from lib.LogProcessing import get_endpoint_json, show_dash_graphs
 from lib.Seasonality import TransactionInterval as Seasonality
 from lib.Servers import Servers
 from lib.MultiServers import MultiServers
@@ -283,8 +283,7 @@ def install(client, dashapp):
             f = request.args.get('f', default=last_created)
 
             return get_endpoint_json(f)
-            # return get_endpoint_matrix(f)
-
+            
         else:
             json_convert = {"data": 0, "message": "No logfile found."}
             return jsonify(json_convert)
