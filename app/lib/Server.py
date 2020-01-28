@@ -46,6 +46,13 @@ class Server(PreemptiveResource):
             # Default is 10 times the capacity
             self.memmax = 10
 
+        # Set memory max capacity
+        if 'latencyscaler' in kwargs:
+            self.latencyscaler = kwargs['latencyscaler']
+        else:
+            # Default is 10 times the capacity
+            self.latencyscaler = 10
+
         # setup the initial state of this server
         self._state = {
             'name':  "%s#%s" % (kwargs['kind'], kwargs['uuid']),
@@ -55,7 +62,6 @@ class Server(PreemptiveResource):
             'cpu': 0,
             'memory': 0,
             'latency': 0,
-            'latencyscaler': 10
         }
 
     def environment(self):
@@ -85,22 +91,9 @@ class Server(PreemptiveResource):
 
         Keyworded parameters
         ----------
-        process_id: int
-            ID of the current processes requesting this server.
-        requested_by: string
-            Name of the entity that requested this process (e.g. client or another
-            server).
-        message: string
-            Description of the request.
         priority: int
             See simpy.PreemptiveResource.request.
         """
-        self._state.update(queue=len(self.queue),
-                           users=self.count,
-                           cpu=self.cpu(),
-                           memory=self.memory(),
-                           latency=self.latency()
-                           )
 
         # parse parameters for the super class method
         priority = kwargs['priority'] if 'priority' in kwargs else 1
@@ -116,6 +109,14 @@ class Server(PreemptiveResource):
         -------
         dict
         """
+
+        self._state.update(queue=len(self.queue),
+                           users=self.count,
+                           cpu=self.cpu(),
+                           memory=self.memory(),
+                           latency=self.latency()
+                           )
+
         return self._state
 
     def latency(self):
@@ -126,7 +127,7 @@ class Server(PreemptiveResource):
         -------
         float
         """
-        state = self.state()
+        # state = self.state()
 
         # Temporalily update the amount of users by adding one to reflect the
         # incoming transaction
@@ -135,7 +136,7 @@ class Server(PreemptiveResource):
         # with the cpu usage
         # return exponential(self.cpu())
 
-        latency = state["cpu"] * state["latencyscaler"]
+        latency = (self.cpu() + uniform(0.001, 0.01)) * self.latencyscaler
 
         return latency
 
@@ -147,12 +148,12 @@ class Server(PreemptiveResource):
         -------
         float
         """
-        # get the current state
-        state = self.state()
+        # # get the current state
+        # state = self.state()
 
         # expose the calculated memory usage based on the queue, users, and
         # scaled capacity
-        return (state['users'] + state['queue']) / (self.capacity * self.memmax)
+        return (self.count + len(self.queue)) / (self.capacity * self.memmax)
 
     def cpu(self):
         """
@@ -165,28 +166,15 @@ class Server(PreemptiveResource):
         -------
         float
         """
-        # get the current state
-        state = self.state()
+        # # get the current state
+        # state = self.state()
 
         # expose the cpu load
-        return (state['users']) / self.capacity
+        return self.count / self.capacity
 
     def faulty_patch(self, state):
         # error function to increase the latency scaler tenfold when true
         if state:
-            self._state.update(latencyscaler=100)
+            self.latencyscaler = 100
         if not state:
-            self._state.update(latencyscaler=10)
-
-    def update(self):
-        "Method to update the state when a request has been yielded"
-        # Fist update user counts
-        self._state.update(queue=len(self.queue),
-                           users=self.count)
-
-        # Then update server metrics
-        self._state.update(
-            cpu=self.cpu(),
-            memory=self.memory(),
-            latency=self.latency()
-        )
+            self.latencyscaler = 10
