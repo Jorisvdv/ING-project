@@ -200,9 +200,9 @@ def install(client, dashapp):
             error_logger = Logger(f"error-{name}", directory=LOG_PATH)
 
             # Enter first line for correct .csv headers
-            logger.info(
+            logger.log(
                 'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;From_Server;Message')
-            error_logger.info('Time;Server;Error type;Start-Stop')
+            error_logger.log('Time;Server;Error type;Start-Stop')
 
             # we can use the logger for the simulation, so we know where all logs will be written
             environment.logger(logger)
