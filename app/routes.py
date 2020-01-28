@@ -81,6 +81,18 @@ def install(client, dashapp):
             # Parse URL request file f using last_created default
             f = request.args.get('f')
 
+            # api-endpoint
+            URL = "http://127.0.0.1:8050/generate-dash-graph"
+
+            # defining a params dict for the parameters to be sent to the API
+            PARAMS = {'f': f}
+
+            # sending get request and saving the response as response object
+            r = requests.get(url=URL, params=PARAMS)
+
+            # extracting data in json format
+            data = r.json()
+
             # Wait for the Dash app to update its layout before returning front-end index.html (this is a critical line)
             time.sleep(3)
 
