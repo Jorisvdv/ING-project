@@ -173,9 +173,11 @@ class MessageGenerator(object):
 
                         # release the server request
                         if server and request:
-                            server.release(request=request)
+                            # Only release if request is still linked to server
+                            if request in server.users:
+                                server.release(request=request)
 
-                        # remove closed request from DataFrame
+                    # remove closed request from DataFrame
                     request_df = request_df.drop(range(return_loop[0], idx), axis=0)
 
             # handle exceptions
@@ -202,6 +204,8 @@ class MessageGenerator(object):
         try:
             # yield the request and timeout
             yield request
+            # Update server to reflect yielded request
+            server.state()
             server_state = server.state()
             yield self._env.timeout(server_state['latency'])
 

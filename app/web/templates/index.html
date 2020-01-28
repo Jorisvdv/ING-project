@@ -90,7 +90,7 @@
 	  <div id="Projectdescription" class="w3-row-padding w3-padding-64 w3-container">
 	    <div class="w3-content">
 
-	      <div class="w3-twothird">
+	      <div class="w3-twothird <!--w3-left-align-->">
 
 	        <h1>Project description</h1>
 	        <!--
@@ -125,7 +125,7 @@
 	      </div>
 	     -->
 
-	      <div class="w3-twothird">
+	      <div class="w3-twothird <!--w3-left-align-->">
 	        <h1>Discrete event simulation</h1>
 	        <h5 class="w3-padding-32"> A discrete event simulation is modelled using the Simpy library.</h5>
 
@@ -160,17 +160,20 @@
 	      </div>
 	      -->
 
-	      <div class="w3-twothird">
+	      <div class="w3-twothird <!--w3-left-align-->">
 	        <h1>Error Specification</h1>
 	        <h5 class="w3-padding-32">The simulation takes various kinds of errors as input to model different relevant scenarios</h5>
 
 	        <p class="w3-text-grey">
 				The errors were introduced in the system in a number of ways:<br>
-				<ul>Firstly an infinite loop, where the processing capacity of a specific server is bocked.<br>
-				<ul>Secondly, a connection between servers can be severed.<br>
-				<ul>Finally, a faulty patch could make the request be processed within 10 seconds instead of 1 second before update.<br>
-
+				<ul class="w3-text-grey">
+				<li>Firstly an infinite loop, where the processing capacity of a specific server is bocked.
+				<li>Secondly, a connection between servers can be severed.
+				<li>Finally, a faulty patch could make the request be processed within 10 seconds instead of 1 second before update.
+				</ul>
+				<span class="w3-text-grey">
 				In order to see how the systems stabilizes, the system also records when the anomaly was solved and in what way.
+				</span>
 				</p>
 	      </div>
 	    </div>

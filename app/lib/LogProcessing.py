@@ -33,6 +33,9 @@ def get_endpoint_json(f):
     # Read in the log data
     log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
 
+    # Use only INFO statements for graph
+    log_df = log_df[log_df["Message_type"] == "INFO"]
+
     # Create 'final_matrix' (initially a zeros matrix)
     rows = log_df['Server'].dropna().unique()
     cols = log_df['To_Server'].dropna().unique()
@@ -74,11 +77,12 @@ def get_endpoint_json(f):
         })
 
     for element in y:
-        node_type = element.split('#')[0]
-        endpoint_json["nodes"].append({
-            "id": element,
-            "group": group_dict[node_type]
-        })
+        if element not in x:
+            node_type = element.split('#')[0]
+            endpoint_json["nodes"].append({
+                "id": element,
+                "group": group_dict[node_type]
+            })
 
     '''
     for idx, g in enumerate(groups):
@@ -92,7 +96,7 @@ def get_endpoint_json(f):
         endpoint_json["links"].append({
             "source": r['Server'],
             "target": r['To_Server'],
-            "value": r['count'] 
+            "value": r['count']
         })
 
     return jsonify(endpoint_json)
@@ -153,10 +157,18 @@ def get_log_filtered(f):
     df = df.groupby(['Server', 'Time_floor'], as_index=False).mean()
     df = df.drop(['Time'], axis=1)
 
+    # Rename variables to include unit in name
+    replace_columns = dict({"CPU Usage": "CPU Usage (%)",
+                            "Memory Usage": "Memory Usage (%)",
+                            "Latency": "Latency (s)"})
+
+    df.rename(columns=replace_columns, inplace=True)
+
+    # Melt dataframe to get all values in one columns
     df_melt = pd.melt(
         df,
         id_vars=["Server", "Time_floor"],
-        value_vars=["CPU Usage", "Memory Usage", "Latency"],
+        value_vars=list(replace_columns.values()),
         value_name="Value"
     )
 
@@ -258,7 +270,6 @@ def show_dash_graphs(dashapp, f, eventId):
              Input('metrics-radio-{}'.format(eventId), 'value'),
              Input('std-radio-{}'.format(eventId), 'value'),
              Input('show-mv-avg-{}'.format(eventId), 'value')])
-
         def update_graph(servers, metrics, std, show_mv_avg):
 
             dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
@@ -305,7 +316,6 @@ def show_dash_graphs(dashapp, f, eventId):
             if show_mv_avg:
                 mv_avg_Y = moving_average(list(dff["Value"]), n)
                 mv_avg_X = list(range(0+n-1, len(list(dff["Value"]))))
-                
 
                 data.append(
                     dict(
@@ -326,7 +336,7 @@ def show_dash_graphs(dashapp, f, eventId):
                 'data': data,
                 'layout': dict(
                     xaxis={
-                        'title': "Time"
+                        'title': "Time (s)"
                     },
                     yaxis={
                         'title': metrics

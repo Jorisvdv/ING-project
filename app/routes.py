@@ -10,9 +10,7 @@ part clean from these declarations.
 """
 
 # third party dependencies
-from lib.LogProcessing import show_dash_graphs
-
-from lib.LogProcessing import get_endpoint_matrix, get_endpoint_json, show_dash_graphs
+from lib.LogProcessing import get_endpoint_json, show_dash_graphs
 from lib.Environment import Environment
 from lib.MultiServers import MultiServers
 from lib.Servers import Servers

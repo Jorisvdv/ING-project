@@ -27,6 +27,11 @@ class Server(PreemptiveResource):
             UUID as identifier for this server.
         kind: string
             Kind of the server (e.g. balance, regular, database).
+
+        Optiomal Keyworded arguments
+        memmax: integer:
+            Set scalar how many times the max capacity fits in memory
+            Default = 10
         """
         # call the parent constructor
         super().__init__(*args)
@@ -34,11 +39,17 @@ class Server(PreemptiveResource):
         # reference to the environment and capacity
         self._env = args[0]
 
+        # Set memory max capacity
+        if 'memmax' in kwargs:
+            self.memmax = kwargs['memmax']
+        else:
+            # Default is 10 times the capacity
+            self.memmax = 10
+
         # setup the initial state of this server
         self._state = {
             'name':  "%s#%s" % (kwargs['kind'], kwargs['uuid']),
             'kind':  kwargs['kind'],
-            'time':  round(self._env.now, 4),
             'queue': len(self.queue),
             'users': self.count,
             'cpu': 0,
@@ -84,20 +95,12 @@ class Server(PreemptiveResource):
         priority: int
             See simpy.PreemptiveResource.request.
         """
-        # Temporalily update the amount of users by adding one to reflect the
-        # incoming transaction
-        self._state.update(users=self.count + 1)
-
-        self._state.update(
-            time=round(self._env.now, 4),
-            queue=len(self.queue),
-            users=self.count,
-            cpu=self.cpu(),
-            memory=self.memory(),
-            latency=self.latency()
-        )
-        # Return users to actual count
-        self._state.update(users=self.count)
+        self._state.update(queue=len(self.queue),
+                           users=self.count,
+                           cpu=self.cpu(),
+                           memory=self.memory(),
+                           latency=self.latency()
+                           )
 
         # parse parameters for the super class method
         priority = kwargs['priority'] if 'priority' in kwargs else 1
@@ -124,10 +127,17 @@ class Server(PreemptiveResource):
         float
         """
         state = self.state()
+
+        # Temporalily update the amount of users by adding one to reflect the
+        # incoming transaction
+
         # expose a random value based on an exponential distribution, scaled
         # with the cpu usage
         # return exponential(self.cpu())
-        return state["cpu"] * state["latencyscaler"]
+
+        latency = state["cpu"] * state["latencyscaler"]
+
+        return latency
 
     def memory(self):
         """
@@ -142,12 +152,14 @@ class Server(PreemptiveResource):
 
         # expose the calculated memory usage based on the queue, users, and
         # scaled capacity
-        return (state['users'] + state['queue']) / (self.capacity * 10) \
-            + uniform(0.001, 0.01)
+        return (state['users'] + state['queue']) / (self.capacity * self.memmax)
 
     def cpu(self):
         """
         Method to expose the server's cpu usage.
+
+        Optional parameters:
+        addition (defaul = 0), possibility to add user to keep values non-zero
 
         Returns
         -------
@@ -155,8 +167,9 @@ class Server(PreemptiveResource):
         """
         # get the current state
         state = self.state()
+
         # expose the cpu load
-        return state['users'] / self.capacity + uniform(0.001, 0.01)
+        return (state['users']) / self.capacity
 
     def faulty_patch(self, state):
         # error function to increase the latency scaler tenfold when true
@@ -164,3 +177,16 @@ class Server(PreemptiveResource):
             self._state.update(latencyscaler=100)
         if not state:
             self._state.update(latencyscaler=10)
+
+    def update(self):
+        "Method to update the state when a request has been yielded"
+        # Fist update user counts
+        self._state.update(queue=len(self.queue),
+                           users=self.count)
+
+        # Then update server metrics
+        self._state.update(
+            cpu=self.cpu(),
+            memory=self.memory(),
+            latency=self.latency()
+        )

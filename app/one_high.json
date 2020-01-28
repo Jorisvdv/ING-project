@@ -1,0 +1,25 @@
+{
+    "servers": [{
+        "size":     1,
+        "capacity": 1000,
+        "kind":     "balance"
+    }, {
+        "size":     1,
+        "capacity": 1000,
+        "kind":     "authentication"
+    }, {
+        "size":     1,
+        "capacity": 1000,
+        "kind":     "credit"
+    }, {
+        "size":     1,
+        "capacity": 1000,
+        "kind":     "payment"
+    }],
+    "process":    [["balance", "authentication", "balance", "payment", "credit"],
+                   ["balance", "authentication",  "credit"]],
+    "timeout": 1000,
+    "runtime":    100,
+    "max_volume": 2000,
+    "description": "One server per type high usage"
+}

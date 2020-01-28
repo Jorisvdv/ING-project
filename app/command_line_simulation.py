@@ -19,7 +19,7 @@ import os
 import glob
 from datetime import datetime
 import json
-import argparse
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 # we need to setup logging configuration here,
 # so all other loggers will properly function
@@ -31,10 +31,12 @@ logging.basicConfig(level=logging.INFO)
 def parse_args():
     "Parses inputs from commandline and returns them as a Namespace object."
 
-    parser = argparse.ArgumentParser(prog='command_line_simulation.py',
-                                     formatter_class=argparse.RawTextHelpFormatter,
-                                     description=' Runs Simpy simulation from command line.')
+    parser = ArgumentParser(prog='command_line_simulation.py',
+                            formatter_class=RawTextHelpFormatter,
+                            description=' Runs Simpy simulation from command line.')
     parser.add_argument('config', help='path to a json formatted configuration file')
+
+    return parser.parse_args()
 
 
 def main(n, config, seasonality, log_dir, log_prefix, description):
@@ -131,14 +133,18 @@ if __name__ == "__main__":
     # For timing get current time
     starttime = datetime.now()
 
+    # Find directory of this file
+    file_dir = os.path.dirname(os.path.abspath(__file__))
+
     args = parse_args()
     if hasattr(args, "config"):
         config_file = args.config
+        print("Loaded config file: ", config_file)
 
     else:
-        # Find location of file and set log location relative to that
-        file_dir = os.path.dirname(os.path.abspath(__file__))
+        # Load standard config file
         config_file = os.path.join(file_dir, 'config.json')
+        print("Standard config file: ", config_file)
 
     # configuration for the simulation to run
     with open(config_file) as f:
