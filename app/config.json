@@ -16,8 +16,7 @@
         "capacity": 100,
         "kind":     "payment"
     }],
-    "process":    [["balance", "authentication", "balance", "payment", "credit"],
-                   ["balance", "authentication", "balance",  "credit"]],
+    "process":    [["balance", "authentication", "balance", "payment", "credit"]],
     "timeout":      1,
     "runtime":      100,
     "max_volume":   800,
