@@ -210,12 +210,14 @@ def install(client, dashapp):
 
             # we need a new form of seasonality
             seasonality = Seasonality(join(Seasonality_folder, Seasonality_file),
-                                      max_volume=int(request.form['max_volume']))
+                                      max_volume=int(request.form['max_volume']),
+                                      enviroment=environment)
 
             # now, we can attach the MessageGenerator to the simulation envoirment
             MessageGenerator(environment, servers, seasonality=seasonality,
                              kinds=[kind.strip() for kind in
-                                    request.form['process'].split(',')])
+                                    request.form['process'].split(',')],
+                             timeout=int(request.form['timeout']))
 
             # run the simulation with a certain runtime (runtime). this runtime is not equivalent
             # to the current time (measurements). this should be the seasonality of the system.

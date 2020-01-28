@@ -1,0 +1,25 @@
+{
+    "servers": [{
+        "size":     1,
+        "capacity": 25,
+        "kind":     "balance"
+    }, {
+        "size":     1,
+        "capacity": 15,
+        "kind":     "authentication"
+    }, {
+        "size":     1,
+        "capacity": 15,
+        "kind":     "credit"
+    }, {
+        "size":     1,
+        "capacity": 15,
+        "kind":     "payment"
+    }],
+    "process":    [["balance", "authentication", "balance", "payment", "credit"],
+                   ["balance", "authentication",  "credit"]],
+    "timeout":      5,
+    "runtime":      100000,
+    "max_volume":   10,
+    "description": "One server one day low usage"
+}
