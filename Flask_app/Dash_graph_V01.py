@@ -10,17 +10,17 @@ import pandas as pd
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import plotly.graph_objs as go
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-df = pd.read_csv('Manual_Log_Filtered_New.csv')
-print(df.columns)
+df = pd.read_csv('Manual_Log_Filtered_Final.csv')
 
 servers = df['Server'].unique()
-print(servers)
-
 metrics = df['variable'].unique()
-print(metrics)
+errors = df['Error_count'].unique()
+print(errors)
+
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -69,28 +69,36 @@ def update_graph(servers,metrics):
     print(metrics)
     
     dff = df[(df["Server"] == servers) & (df["variable"] == metrics)]
+    trace1 = go.Scatter(
+        x=dff["Time_floor"],
+        y=dff["Value"],
+        name='Metrics value'
+    )   
+    trace2 = go.Scatter(
+        x=dff["Time_floor"],
+        y=dff["Error_count"],
+        name='Error count',
+        yaxis='y2'
+    )
     print(dff)
 
     return {
-        'data': [dict(
-            x=dff["Time_floor"],
-            y=dff["Value"],
-            mode='line',
-            marker={
-                'size': 15,
-                'opacity': 0.5,
-                'line': {'width': 0.5, 'color': 'white'}
-            }
-        )],
-        'layout': dict(
-            xaxis={
-                'title': "Time"
-            },
-            yaxis={
-                'title': metrics
-            },
-            margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
-            hovermode='closest'
+        'data': [
+                trace1, trace2]
+        ,
+        'layout': go.Layout(
+                title='Metrics',
+                xaxis=dict(
+                    title='Time'
+                ),
+                yaxis=dict(
+                    title='Value'
+                ),
+                yaxis2=dict(
+                    title='Error_count',
+                    overlaying='y',
+                    side='right'
+                )
         )
     }
 
