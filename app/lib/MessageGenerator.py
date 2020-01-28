@@ -186,7 +186,7 @@ class MessageGenerator(object):
                 break
                 # log to the error log
                 self._env.log(
-                    f"{self._env.now};{requested_by['name']};ERROR;;;;{process_id};;Error due to {e}", level=40)
+                    f"{self._env.now};;ERROR;;;;{process_id};{requested_by['name']};Error due to {e}", level=40)
 
         # release all server requests when entire loop is done
         for row in request_df.itertuples(index=False):
@@ -213,7 +213,7 @@ class MessageGenerator(object):
             # and push onto the environment
             message = f"Requesting {server_state['name']} by {requested_by['name']}"
             self._env.log(
-                f"{self._env.now};{requested_by['name']};INFO;{server_state['cpu']};{server_state['memory']};{server_state['latency']};{process_id};{server_state['name']};{message}")
+                f"{self._env.now};{server_state['name']};INFO;{server_state['cpu']};{server_state['memory']};{server_state['latency']};{process_id};{requested_by['name']};{message}")
 
         # handle interruptions
         except Interrupt as interrupt:
@@ -223,9 +223,9 @@ class MessageGenerator(object):
 
                 # Manually print timeout message
                 self._env.log(
-                    f"{self._env.now};{requested_by['name']};ERROR;;;;{process_id};{server.state()['name']};Error due to TIMEOUT at time {start + self._timeout}", level=40)
+                    f"{self._env.now};{server.state()['name']};ERROR;;;;{process_id};{requested_by['name']};Error due to TIMEOUT at time {start + self._timeout}", level=40)
             else:
 
                 # Use interrupt clause to write error message
                 self._env.log(
-                    f"{self._env.now};{requested_by['name']};ERROR;;;;{process_id};{server.state()['name']};Error due to {interrupt.cause}", level=40)
+                    f"{self._env.now};{server.state()['name']};ERROR;;;;{process_id};{requested_by['name']};Error due to {interrupt.cause}", level=40)

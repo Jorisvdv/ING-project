@@ -38,15 +38,15 @@ def get_endpoint_json(f):
 
     # Create 'final_matrix' (initially a zeros matrix)
     rows = log_df['Server'].dropna().unique()
-    cols = log_df['To_Server'].dropna().unique()
+    cols = log_df['From_Server'].dropna().unique()
     final_matrix = pd.DataFrame(0, index=cols, columns=rows)
 
-    # Filter by Server and To_Server
-    filtered_log_df = log_df[['Server', 'To_Server']]
+    # Filter by Server and From_Server
+    filtered_log_df = log_df[['Server', 'From_Server']]
 
     # Group by unique combinations and count occurrences
     endpoint_df = filtered_log_df.groupby(
-        ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
+        ['Server', 'From_Server']).size().reset_index().rename(columns={0: 'count'})
 
     x = list(rows)
     y = list(cols)
@@ -94,8 +94,8 @@ def get_endpoint_json(f):
 
     for idx, r in endpoint_df.iterrows():
         endpoint_json["links"].append({
-            "source": r['Server'],
-            "target": r['To_Server'],
+            "source": r['From_Server'],
+            "target": r['Server'],
             "value": r['count']
         })
 
@@ -107,20 +107,20 @@ def get_endpoint_matrix(f):
     log_df = pd.read_csv(os.path.join(LOG_PATH, f), sep=';')
 
     # Create 'final_matrix' (initially a zeros matrix)
-    rows = log_df['Server'].dropna().unique()
-    cols = log_df['To_Server'].dropna().unique()
+    rows = log_df['From_Server'].dropna().unique()
+    cols = log_df['Server'].dropna().unique()
     final_matrix = pd.DataFrame(0, index=cols, columns=rows)
 
-    # Filter by Server and To_Server
-    filtered_log_df = log_df[['Server', 'To_Server']]
+    # Filter by Server and From_Server
+    filtered_log_df = log_df[['From_Server', 'Server']]
 
     # Group by unique combinations and count occurrences
     endpoint_df = filtered_log_df.groupby(
-        ['Server', 'To_Server']).size().reset_index().rename(columns={0: 'count'})
+        ['From_Server', 'Server']).size().reset_index().rename(columns={0: 'count'})
 
     # Iterate over combinations in grouped_by df and fill in occurrences in final_matrix df
     for index, row in endpoint_df.iterrows():
-        final_matrix.loc[row['To_Server']][row['Server']] = row['count']
+        final_matrix.loc[row['From_Server']][row['Server']] = row['count']
 
     # Convert 'final_matrix' df to array and prepare data for jsonify
     final_matrix_arr = final_matrix.values.tolist()
@@ -148,7 +148,7 @@ def get_log_filtered(f):
     df = pd.read_csv(os.path.join(LOG_PATH, f), sep=";", error_bad_lines=False)
 
     # Split dataframe into three dataframes based on Server
-    df = df.drop(['Message_type', 'Transaction_ID', 'To_Server', 'Message'], axis=1)
+    df = df.drop(['Message_type', 'Transaction_ID', 'From_Server', 'Message'], axis=1)
 
     df = df.reset_index()
     df = df.drop(['index'], axis=1)
@@ -212,7 +212,9 @@ def show_dash_graphs(dashapp, f, eventId):
                     dcc.Dropdown(
                         id='servers-radio-{}'.format(eventId),
                         options=[{'label': k, 'value': k} for k in servers],
-                        value='client'
+                        # Change to show first one in list
+                        # value='client'
+                        value=servers[0]
                     )],
                     style={'width': '48%', 'display': 'inline-block'}
                 ),

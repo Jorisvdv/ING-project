@@ -96,7 +96,7 @@ def main(n, config, seasonality, log_dir, log_prefix, description):
 
     # Enter first line for correct .csv headers
     logger.log(
-        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;To_Server;Message')
+        'Time;Server;Message_type;CPU Usage;Memory Usage;Latency;Transaction_ID;From_Server;Message')
     error_logger.log('Time;Server;Error type;Start-Stop')
 
     # we can use the logger for the simulation, so we know where all logs will be written
