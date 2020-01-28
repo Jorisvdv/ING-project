@@ -150,13 +150,13 @@ def get_log_filtered(f):
     df = pd.read_csv(os.path.join(LOG_PATH, f), sep=";", error_bad_lines=False)
 
     # Split dataframe into three dataframes based on Server
-    df = df.drop(['Message_type', 'Transaction_ID', 'From_Server', 'Message'], axis=1)
+    df = df.drop(['Transaction_ID', 'From_Server', 'Message'], axis=1)
 
     df = df.reset_index()
     df = df.drop(['index'], axis=1)
     # df["Time"] = df["Time"].div(60)
     df["Time_floor"] = np.floor(df["Time"]).astype("int")
-    df = df.groupby(['Server', 'Time_floor'], as_index=False).mean()
+    df = df.groupby(['Server', 'Time_floor', 'Message_type'], as_index=False).mean()
     df = df.drop(['Time'], axis=1)
 
     # Rename variables to include unit in name
@@ -169,14 +169,25 @@ def get_log_filtered(f):
     # Melt dataframe to get all values in one columns
     df_melt = pd.melt(
         df,
-        id_vars=["Server", "Time_floor"],
+        id_vars=["Server", "Time_floor", "Message_type"],
         value_vars=list(replace_columns.values()),
         value_name="Value"
     )
 
     df_melt = df_melt.sort_values(by=["Server", "Time_floor"])
 
-    file_out_filtered = f.split('.')[0] + "_filtered.csv"
+    # # Make two separate dataframes to filter by INFO and ERROR
+    # df_info = df_melt.loc[df_melt["Message_type"] == "INFO"]
+    # df_info = df_info.drop(["Message_type"], axis=1)
+    #
+    # if "ERROR" in df_melt["Message_type"].unique():
+    #     df_error = df_melt.loc[df_melt["Message_type"] == "ERROR"]
+    #
+    #     # Check if ERROR is not NA
+    #     # df_error = df_error.loc[df_error["variable"] == df_error["variable"][0]]
+    #     df_error = df_error.loc[df_error["Server"].notnull()]
+    #
+    # file_out_filtered = f.split('.')[0] + "_filtered.csv"
     df_melt.to_csv(os.path.join(LOG_PATH, 'filtered', file_out_filtered))
 
     return file_out_filtered
@@ -344,6 +355,11 @@ def show_dash_graphs(dashapp, f, eventId):
                     },
                     yaxis={
                         'title': metrics
+                    },
+                    yaxis2={
+                        'title': 'Error Count',
+                        'overlaying': 'y',
+                        'side': 'right'
                     },
                     margin={'l': 40, 'b': 40, 't': 10, 'r': 0},
                     hovermode='closest'
