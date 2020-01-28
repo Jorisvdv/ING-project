@@ -187,7 +187,7 @@ def get_log_filtered(f):
     #     # df_error = df_error.loc[df_error["variable"] == df_error["variable"][0]]
     #     df_error = df_error.loc[df_error["Server"].notnull()]
     #
-    # file_out_filtered = f.split('.')[0] + "_filtered.csv"
+    file_out_filtered = f.split('.')[0] + "_filtered.csv"
     df_melt.to_csv(os.path.join(LOG_PATH, 'filtered', file_out_filtered))
 
     return file_out_filtered
