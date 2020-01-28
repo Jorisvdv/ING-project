@@ -285,7 +285,6 @@ def install(client, dashapp):
             f = request.args.get('f', default=last_created)
 
             return get_endpoint_json(f)
-            # return get_endpoint_matrix(f)
 
         else:
             json_convert = {"data": 0, "message": "No logfile found."}
