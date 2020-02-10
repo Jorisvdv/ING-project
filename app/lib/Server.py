@@ -46,12 +46,12 @@ class Server(PreemptiveResource):
             # Default is 10 times the capacity
             self.memmax = 10
 
-        # Set memory max capacity
+        # Set latencyscaler capacity
         if 'latencyscaler' in kwargs:
             self.latencyscaler = kwargs['latencyscaler']
         else:
-            # Default is 10 times the capacity
-            self.latencyscaler = 10
+            # Default is 1 times the capacity
+            self.latencyscaler = 1
 
         # setup the initial state of this server
         self._state = {
@@ -136,7 +136,7 @@ class Server(PreemptiveResource):
         # with the cpu usage
         # return exponential(self.cpu())
 
-        latency = (self.cpu() + uniform(0.001, 0.01)) * self.latencyscaler
+        latency = exponential(self.cpu()) * self.latencyscaler
 
         return latency
 
@@ -175,6 +175,6 @@ class Server(PreemptiveResource):
     def faulty_patch(self, state):
         # error function to increase the latency scaler tenfold when true
         if state:
-            self.latencyscaler = 100
-        if not state:
             self.latencyscaler = 10
+        if not state:
+            self.latencyscaler = 1
