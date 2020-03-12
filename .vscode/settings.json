@@ -1,7 +1,0 @@
-{
-    "python.pythonPath": "/Users/Tycho/GoogleDrive/University/University of Amsterdam/[Master] Information studies: Data Science/Data Systems Project/src/bin/python",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true,
-    "python.linting.pylintPath": "./bin/python",
-    "python.linting.banditEnabled": false
-}
